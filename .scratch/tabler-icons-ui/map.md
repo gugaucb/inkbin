@@ -19,6 +19,7 @@ Modernização e refinamento visual de toda a interface do Inkbin (Editor, Visua
 - **02 Ícones na Sidebar e Topbar de Navegação**: Adição de `ti-terminal` na marca, `ti-plus` nas ações da sidebar e topbar, `ti-shield-check` no rodapé e `ti-file-text` na listagem de histórico recente. ([02-sidebar-and-topbar-icons.md](issues/02-sidebar-and-topbar-icons.md))
 - **03 Ícones em Labels e Ações do Formulário de Criação**: Inclusão de `ti-heading`, `ti-code`, `ti-clock` e `ti-lock` nos labels, `ti-letter-case` e `ti-database` nos contadores e `ti-upload`/`ti-loader` no botão principal. ([03-editor-form-labels-and-actions.md](issues/03-editor-form-labels-and-actions.md))
 - **04 Ícones em Ações e Metadados do Visualizador**: Inclusão de `ti-code`, `ti-calendar`, `ti-eye` e `ti-hourglass` nos metadados, e `ti-copy`/`ti-check`, `ti-file-code`, `ti-plus`, `ti-trash` e `ti-flag` nas ações com acessibilidade e recolhimento responsivo. ([04-viewer-actions-and-metadata.md](issues/04-viewer-actions-and-metadata.md))
+- **05 Ícones em Modais e Telas Especiais**: Enriquecimento de modais de sucesso e denúncia, telas de confirmação de exclusão e desafio de senha, e páginas de erro 404 e 451 com ícones e feedbacks de estado. ([05-modals-and-special-pages.md](issues/05-modals-and-special-pages.md))
 
 ## Not yet specified
 

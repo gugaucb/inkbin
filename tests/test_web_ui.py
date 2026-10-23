@@ -102,3 +102,37 @@ async def test_get_viewer_page_not_found(client: AsyncClient):
     response = await client.get("/p/notExists")
     assert response.status_code == 404
     assert "Publicação não encontrada" in response.text
+    assert "ti ti-file-x" in response.text
+    assert "ti ti-plus" in response.text
+
+
+@pytest.mark.asyncio
+async def test_modals_and_special_pages_icons(client: AsyncClient):
+    # Success modal in editor
+    editor_res = await client.get("/")
+    assert editor_res.status_code == 200
+    assert "ti ti-circle-check" in editor_res.text
+    assert "ti ti-external-link" in editor_res.text
+
+    # Create protected paste for challenge page test and report modal test
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Protegido", "content": "segredo", "password": "senha-segura-123"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    # Challenge page
+    challenge_res = await client.get(f"/p/{slug}")
+    assert challenge_res.status_code == 200
+    assert "ti ti-lock" in challenge_res.text
+    assert "ti ti-lock-open" in challenge_res.text
+    assert "ti ti-arrow-left" in challenge_res.text
+
+    # Delete confirmation page
+    delete_res = await client.get(f"/p/{slug}/delete")
+    assert delete_res.status_code == 200
+    assert "ti ti-alert-triangle" in delete_res.text
+    assert "ti ti-trash" in delete_res.text
+    assert "ti ti-arrow-left" in delete_res.text
+

@@ -1,6 +1,6 @@
 # 05 - Ícones em Modais e Telas Especiais
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 02, 03, 04
 
@@ -26,3 +26,14 @@ Como aplicar ícones Tabler em modais (sucesso de criação, denúncia de abuso)
 5. Páginas 404 (`404.html`) e 451 (`451.html`):
    - Ícones ilustrativos centrais: `ti-file-x` (404) e `ti-shield-alert` (451).
    - Botões de navegação com `ti-plus` e `ti-arrow-left`.
+
+## Answer
+
+Implementados ícones em todos os modais e telas especiais:
+- Modal de Sucesso (`editor.html`): `ti-circle-check`, `ti-link`, `ti-copy`, `ti-key`, `ti-x` e `ti-external-link`.
+- Modal de Denúncia (`viewer.html`): `ti-flag`, `ti-alert-circle`, `ti-notes`, `ti-x` e `ti-send`.
+- Tela de Exclusão (`delete_confirmation.html`): badge com `ti-alert-triangle`, label com `ti-key`, botões com `ti-arrow-left` e `ti-trash`.
+- Desafio de Senha (`password_challenge.html`): badge com `ti-lock`, label com `ti-key`, botões com `ti-arrow-left` e `ti-lock-open`.
+- Telas de Erro 404 e 451: ilustrações centrais de 48px com `ti-file-x` e `ti-shield-alert`, e botões com `ti-plus` e `ti-arrow-left`.
+- Testes automatizados adicionados e validados em `tests/test_web_ui.py`.
+

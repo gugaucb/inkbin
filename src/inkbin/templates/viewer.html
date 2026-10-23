@@ -52,7 +52,10 @@
 <div id="report-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
   <div class="modal-dialog">
     <div class="modal-header">
-      <h2 id="report-modal-title" class="modal-title">Denunciar publicação</h2>
+      <h2 id="report-modal-title" class="modal-title" style="display: flex; align-items: center; gap: var(--space-2);">
+        <i class="ti ti-flag" aria-hidden="true"></i>
+        <span>Denunciar publicação</span>
+      </h2>
     </div>
 
     <div class="modal-body">
@@ -60,8 +63,9 @@
 
       <form id="report-form">
         <div class="field-group" style="margin-bottom: var(--space-4);">
-          <label for="report-reason" class="field-label" style="display: block; margin-bottom: var(--space-2);">
-            Motivo da denúncia
+          <label for="report-reason" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <i class="ti ti-alert-circle icon-sm" aria-hidden="true"></i>
+            <span>Motivo da denúncia</span>
           </label>
           <select id="report-reason" name="reason" class="select-field" style="width: 100%;" required>
             <option value="spam">Spam ou publicidade indesejada</option>
@@ -73,8 +77,9 @@
         </div>
 
         <div class="field-group" style="margin-bottom: var(--space-4);">
-          <label for="report-details" class="field-label" style="display: block; margin-bottom: var(--space-2);">
-            Detalhes adicionais (opcional)
+          <label for="report-details" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <i class="ti ti-notes icon-sm" aria-hidden="true"></i>
+            <span>Detalhes adicionais (opcional)</span>
           </label>
           <textarea
             id="report-details"
@@ -88,8 +93,14 @@
         </div>
 
         <div class="modal-footer" style="padding-top: var(--space-4); display: flex; justify-content: flex-end; gap: var(--space-3);">
-          <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancelar</button>
-          <button type="submit" id="submit-report-btn" class="btn btn-primary">Enviar denúncia</button>
+          <button type="button" class="btn btn-secondary" onclick="closeReportModal()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+            <span>Cancelar</span>
+          </button>
+          <button type="submit" id="submit-report-btn" class="btn btn-primary">
+            <i class="ti ti-send" aria-hidden="true"></i>
+            <span>Enviar denúncia</span>
+          </button>
         </div>
       </form>
     </div>

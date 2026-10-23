@@ -148,10 +148,10 @@ function copyToClipboard(elementId, feedbackBtnId) {
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById(feedbackBtnId);
     if (btn) {
-      const originalText = btn.textContent;
-      btn.textContent = 'Copiado!';
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Copiado!</span>';
       setTimeout(() => {
-        btn.textContent = originalText;
+        btn.innerHTML = originalHtml;
       }, 2000);
     }
   }).catch(() => {
