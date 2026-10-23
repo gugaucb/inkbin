@@ -247,6 +247,41 @@ html, body {
   align-items: center;
 }
 
+/* Tabler Icons & Iconografia Canônica */
+i.ti, [class^="ti-"], [class*=" ti-"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--icon-size-md);
+  line-height: 1;
+  color: currentColor;
+  stroke-width: var(--icon-stroke);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.icon-sm {
+  font-size: var(--icon-size-sm) !important;
+}
+
+.icon-md {
+  font-size: var(--icon-size-md) !important;
+}
+
+.icon-lg {
+  font-size: var(--icon-size-lg) !important;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;

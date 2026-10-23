@@ -26,6 +26,18 @@ async def test_get_static_tokens_css(client: AsyncClient):
     assert response.status_code == 200
     assert "--ink-0" in response.text
     assert "--ink-950" in response.text
+    assert "--icon-size-sm" in response.text
+    assert "--icon-size-md" in response.text
+    assert "--icon-size-lg" in response.text
+    assert "--icon-stroke" in response.text
+
+
+@pytest.mark.asyncio
+async def test_base_template_includes_tabler_icons(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    assert "@tabler/icons-webfont" in response.text
+
 
 
 @pytest.mark.asyncio
