@@ -12,12 +12,21 @@ from inkbin.config import get_settings
 from inkbin.db import get_db_session
 from inkbin.models import Paste
 from inkbin.schemas import PasteCreateRequest, PasteCreateResponse, PasteDetailResponse
+from inkbin.security import verify_unlock_token
 from inkbin.services import create_paste_record
 
 router = APIRouter(tags=["pastes"])
 settings = get_settings()
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+def is_paste_unlocked(request: Request, slug: str) -> bool:
+    cookie_name = f"inkbin_unlocked_{slug}"
+    cookie_val = request.cookies.get(cookie_name)
+    if not cookie_val:
+        return False
+    return verify_unlock_token(cookie_val, slug, settings.SECRET_KEY)
 
 
 @router.post(
@@ -30,7 +39,6 @@ async def create_paste_endpoint(
     request: Request,
     session: DbSession,
 ) -> PasteCreateResponse:
-    # Check raw byte size
     content_bytes = len(payload.content.encode("utf-8"))
     if content_bytes > settings.MAX_PASTE_BYTES:
         raise HTTPException(
@@ -46,6 +54,7 @@ async def create_paste_endpoint(
         content=payload.content,
         language=payload.language,
         expires_at=expires_at,
+        password=payload.password,
     )
 
     base = settings.BASE_URL.rstrip("/")
@@ -59,6 +68,7 @@ async def create_paste_endpoint(
         language=paste.language,
         expires_at=paste.expires_at,
         created_at=paste.created_at,
+        is_protected=paste.is_protected,
     )
 
 
@@ -68,6 +78,7 @@ async def create_paste_endpoint(
 )
 async def get_paste_endpoint(
     slug: str,
+    request: Request,
     session: DbSession,
 ) -> PasteDetailResponse:
     cache = get_cache_service()
@@ -85,6 +96,11 @@ async def get_paste_endpoint(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Paste não encontrado ou expirado.",
                 )
+        if data.get("is_protected", False) and not is_paste_unlocked(request, slug):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Paste protegido por senha. Autenticação necessária.",
+            )
         await session.execute(
             update(Paste).where(Paste.slug == slug).values(views_count=Paste.views_count + 1)
         )
@@ -103,6 +119,12 @@ async def get_paste_endpoint(
             detail="Paste não encontrado ou expirado.",
         )
 
+    if paste.is_protected and not is_paste_unlocked(request, slug):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Paste protegido por senha. Autenticação necessária.",
+        )
+
     # Atomic increment of views_count
     await session.execute(
         update(Paste).where(Paste.id == paste.id).values(views_count=Paste.views_count + 1)
@@ -118,6 +140,7 @@ async def get_paste_endpoint(
         views_count=paste.views_count,
         expires_at=paste.expires_at,
         created_at=paste.created_at,
+        is_protected=paste.is_protected,
     )
 
     ttl = 3600
@@ -145,6 +168,7 @@ async def get_paste_endpoint(
 )
 async def get_raw_paste_endpoint(
     slug: str,
+    request: Request,
     session: DbSession,
 ) -> Response:
     stmt = select(Paste).where(Paste.slug == slug)
@@ -155,6 +179,12 @@ async def get_raw_paste_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Paste não encontrado ou expirado.",
+        )
+
+    if paste.is_protected and not is_paste_unlocked(request, slug):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Paste protegido por senha. Autenticação necessária.",
         )
 
     # Atomic increment of views_count

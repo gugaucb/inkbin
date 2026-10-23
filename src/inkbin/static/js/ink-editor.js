@@ -62,6 +62,7 @@ function setupEditor() {
       const title = document.getElementById('paste-title')?.value || null;
       const language = document.getElementById('paste-language')?.value || 'plaintext';
       const expiration = document.getElementById('paste-expiration')?.value || 'never';
+      const password = document.getElementById('paste-password')?.value || null;
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -79,6 +80,7 @@ function setupEditor() {
             content,
             language,
             expiration,
+            password: password || null,
           }),
         });
 

@@ -7,14 +7,25 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from inkbin.config import get_settings
 from inkbin.db import get_db_session
 from inkbin.models import Paste
+from inkbin.security import verify_unlock_token
 
 templates_path = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(templates_path))
+settings = get_settings()
 
 router = APIRouter(include_in_schema=False)
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+def is_paste_unlocked(request: Request, slug: str) -> bool:
+    cookie_name = f"inkbin_unlocked_{slug}"
+    cookie_val = request.cookies.get(cookie_name)
+    if not cookie_val:
+        return False
+    return verify_unlock_token(cookie_val, slug, settings.SECRET_KEY)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -28,6 +39,7 @@ async def editor_page(request: Request) -> Response:
 
 
 @router.get("/p/{slug}", response_class=HTMLResponse)
+@router.get("/{slug:[a-zA-Z0-9]{6,10}}", response_class=HTMLResponse)
 async def viewer_page(
     slug: str,
     request: Request,
@@ -43,6 +55,18 @@ async def viewer_page(
             name="404.html",
             context={},
             status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Check password challenge
+    if paste.is_protected and not is_paste_unlocked(request, slug):
+        return templates.TemplateResponse(
+            request=request,
+            name="password_challenge.html",
+            context={
+                "paste": paste,
+                "active_page": "viewer",
+            },
+            status_code=status.HTTP_200_OK,
         )
 
     # Increment view count

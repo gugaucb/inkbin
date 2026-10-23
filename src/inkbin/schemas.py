@@ -31,6 +31,7 @@ class PasteCreateRequest(BaseModel):
     content: str = Field(..., max_length=1_048_576)
     language: str = Field(default="plaintext", max_length=50)
     expiration: ExpirationEnum = Field(default=ExpirationEnum.never)
+    password: str | None = Field(default=None, max_length=50)
 
     @field_validator("content")
     @classmethod
@@ -39,6 +40,16 @@ class PasteCreateRequest(BaseModel):
             raise ValueError("O conteúdo do paste não pode ser vazio ou conter apenas espaços.")
         if len(value.encode("utf-8")) > 1_048_576:
             raise ValueError("O conteúdo excede o tamanho máximo de 1MB permitido.")
+        return value
+
+    @field_validator("password", mode="before")
+    @classmethod
+    def validate_password_length(cls, value: str | None) -> str | None:
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return None
+        value = value.strip()
+        if len(value) < 4 or len(value) > 50:
+            raise ValueError("A senha deve ter entre 4 e 50 caracteres.")
         return value
 
 
@@ -50,6 +61,7 @@ class PasteCreateResponse(BaseModel):
     language: str
     expires_at: datetime | None
     created_at: datetime
+    is_protected: bool = False
 
 
 class PasteDetailResponse(BaseModel):
@@ -60,3 +72,4 @@ class PasteDetailResponse(BaseModel):
     views_count: int
     expires_at: datetime | None
     created_at: datetime
+    is_protected: bool = False
