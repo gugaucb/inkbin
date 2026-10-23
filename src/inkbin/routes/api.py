@@ -1,10 +1,10 @@
 import json
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response, status
 from fastapi.responses import PlainTextResponse
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from inkbin.cache import get_cache_service
@@ -18,7 +18,12 @@ from inkbin.schemas import (
     PasteUnlockRequest,
     PasteUnlockResponse,
 )
-from inkbin.security import create_unlock_token, verify_password, verify_unlock_token
+from inkbin.security import (
+    create_unlock_token,
+    verify_admin_delete_token,
+    verify_password,
+    verify_unlock_token,
+)
 from inkbin.services import create_paste_record
 
 router = APIRouter(tags=["pastes"])
@@ -166,6 +171,54 @@ async def unlock_paste_endpoint(
         unlocked=True,
         slug=slug,
     )
+
+
+@router.delete(
+    "/api/pastes/{slug}",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_paste_endpoint(
+    slug: str,
+    request: Request,
+    session: DbSession,
+    x_admin_delete_token: Annotated[str | None, Header(alias="X-Admin-Delete-Token")] = None,
+    token: str | None = None,
+) -> dict[str, Any]:
+    provided_token = x_admin_delete_token or token or request.query_params.get("token")
+    if not provided_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de exclusão administrativa ausente. Envie o cabeçalho X-Admin-Delete-Token.",
+        )
+
+    stmt = select(Paste).where(Paste.slug == slug)
+    result = await session.execute(stmt)
+    paste = result.scalar_one_or_none()
+
+    if paste is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paste não encontrado.",
+        )
+
+    if not verify_admin_delete_token(provided_token, paste.admin_delete_hash):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token de exclusão administrativa inválido.",
+        )
+
+    await session.execute(delete(Paste).where(Paste.id == paste.id))
+    await session.commit()
+
+    cache = get_cache_service()
+    await cache.delete(f"paste:{slug}")
+    client_ip = get_client_ip(request)
+    await cache.delete(f"auth_attempts:{slug}:{client_ip}")
+
+    return {
+        "message": "Paste excluído permanentemente com sucesso.",
+        "slug": slug,
+    }
 
 
 @router.get(

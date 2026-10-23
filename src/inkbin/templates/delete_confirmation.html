@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Excluir Publicação — Inkbin{% endblock %}
+{% block page_heading %}Gerenciamento de publicação{% endblock %}
+
+{% block content %}
+<div class="viewer-card" style="max-width: 560px; margin: var(--space-8) auto; padding: var(--space-8);">
+  <div style="margin-bottom: var(--space-6); text-align: left;">
+    <span class="badge" style="background: var(--ink-950); color: var(--ink-0); margin-bottom: var(--space-3); display: inline-block;">
+      Ação Destrutiva
+    </span>
+    <h2 style="font-size: 22px; font-weight: 650; margin: var(--space-2) 0; color: var(--text-primary);">
+      Excluir "{{ paste.title or 'Sem título' }}"
+    </h2>
+    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+      A exclusão definitiva remove fisicamente este Paste do banco de dados e invalida o cache. Esta operação é imediata e <strong>irreversível</strong>.
+    </p>
+  </div>
+
+  {% if error %}
+  <div class="token-alert-box" style="margin-bottom: var(--space-4); border-color: var(--border-strong);">
+    <span style="color: var(--text-primary); font-size: 13px;">{{ error }}</span>
+  </div>
+  {% endif %}
+
+  <div id="delete-msg" class="token-alert-box" style="display: none; margin-bottom: var(--space-4);">
+    <span id="delete-msg-text" style="color: var(--text-primary); font-size: 13px;"></span>
+  </div>
+
+  <form id="delete-form" method="POST" action="/p/{{ paste.slug }}/delete">
+    <div class="field-group" style="margin-bottom: var(--space-6);">
+      <label for="delete-token" class="field-label" style="display: block; margin-bottom: var(--space-2);">
+        Chave Secreta de Administração (Admin Delete Token)
+      </label>
+      <input
+        type="text"
+        id="delete-token"
+        name="token"
+        class="input-text"
+        value="{{ token or '' }}"
+        placeholder="Cole aqui o token recebido na criação"
+        required
+        autocomplete="off"
+        style="width: 100%; height: 42px; font-family: var(--font-mono); font-size: 13px;"
+      >
+      <span style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: block;">
+        Token exclusivo de 64 caracteres gerado quando a publicação foi criada.
+      </span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="/p/{{ paste.slug }}" class="btn btn-secondary" style="font-size: 13px; height: 38px;">
+        Cancelar e voltar
+      </a>
+      <button 
+        type="submit" 
+        id="confirm-delete-btn" 
+        class="btn btn-primary" 
+        style="font-size: 13px; height: 38px; background: var(--ink-950);"
+      >
+        Confirmar exclusão definitiva
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("delete-form");
+  const tokenInput = document.getElementById("delete-token");
+  const msgBox = document.getElementById("delete-msg");
+  const msgText = document.getElementById("delete-msg-text");
+  const confirmBtn = document.getElementById("confirm-delete-btn");
+
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const token = tokenInput.value.trim();
+      if (!token) return;
+
+      confirmBtn.disabled = true;
+      confirmBtn.innerText = "Excluindo...";
+      msgBox.style.display = "none";
+
+      try {
+        const response = await fetch(`/api/pastes/{{ paste.slug }}`, {
+          method: "DELETE",
+          headers: {
+            "X-Admin-Delete-Token": token,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          msgText.innerText = "Publicação excluída com sucesso! Redirecionando...";
+          msgBox.style.display = "block";
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1200);
+        } else {
+          msgText.innerText = data.detail || "Erro ao excluir. Verifique se o token está correto.";
+          msgBox.style.display = "block";
+          confirmBtn.disabled = false;
+          confirmBtn.innerText = "Confirmar exclusão definitiva";
+        }
+      } catch (err) {
+        msgText.innerText = "Falha de comunicação com o servidor.";
+        msgBox.style.display = "block";
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "Confirmar exclusão definitiva";
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
