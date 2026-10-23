@@ -1,3 +1,5 @@
+import json
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -5,6 +7,7 @@ from fastapi.responses import PlainTextResponse
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from inkbin.cache import get_cache_service
 from inkbin.config import get_settings
 from inkbin.db import get_db_session
 from inkbin.models import Paste
@@ -46,7 +49,6 @@ async def create_paste_endpoint(
     )
 
     base = settings.BASE_URL.rstrip("/")
-    # If base is localhost and request has host header, prefer actual request base url if appropriate
     url = f"{base}/p/{paste.slug}"
 
     return PasteCreateResponse(
@@ -58,12 +60,6 @@ async def create_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
     )
-
-
-import json
-from datetime import UTC, datetime
-
-from inkbin.cache import get_cache_service
 
 
 @router.get(
@@ -80,12 +76,21 @@ async def get_paste_endpoint(
 
     if cached:
         data = json.loads(cached)
-        # Increment views_count in database
+        if data.get("expires_at"):
+            exp = datetime.fromisoformat(data["expires_at"])
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=UTC)
+            if exp < datetime.now(UTC):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Paste não encontrado ou expirado.",
+                )
         await session.execute(
             update(Paste).where(Paste.slug == slug).values(views_count=Paste.views_count + 1)
         )
         await session.commit()
         data["views_count"] = data.get("views_count", 0) + 1
+        await cache.set(cache_key, json.dumps(data), ttl_seconds=3600)
         return PasteDetailResponse(**data)
 
     stmt = select(Paste).where(Paste.slug == slug)
