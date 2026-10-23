@@ -18,9 +18,7 @@ class InMemoryRateLimiter:
         self._history: dict[str, list[float]] = {}
         self._lock = asyncio.Lock()
 
-    async def is_allowed(
-        self, key: str, limit: int, window_seconds: int = 60
-    ) -> tuple[bool, int]:
+    async def is_allowed(self, key: str, limit: int, window_seconds: int = 60) -> tuple[bool, int]:
         now = time.monotonic()
         threshold = now - window_seconds
 
@@ -53,6 +51,7 @@ class RateLimiter:
         if redis_url:
             try:
                 import redis.asyncio as aioredis
+
                 self._redis = aioredis.from_url(redis_url, decode_responses=True)
             except (RedisError, OSError) as e:
                 logger.warning(
@@ -61,9 +60,7 @@ class RateLimiter:
                 )
                 self._redis = None
 
-    async def is_allowed(
-        self, key: str, limit: int, window_seconds: int = 60
-    ) -> tuple[bool, int]:
+    async def is_allowed(self, key: str, limit: int, window_seconds: int = 60) -> tuple[bool, int]:
         if self._redis is not None:
             try:
                 redis_key = f"rate:{key}"
@@ -90,6 +87,7 @@ def get_rate_limiter() -> RateLimiter:
     global _rate_limiter_instance
     if _rate_limiter_instance is None:
         from inkbin.config import get_settings
+
         settings = get_settings()
         _rate_limiter_instance = RateLimiter(redis_url=settings.REDIS_URL)
     return _rate_limiter_instance
@@ -106,9 +104,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.limiter = limiter or get_rate_limiter()
         self.limit_per_minute = limit_per_minute
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         path = request.url.path
         # Skip internal health checks and static files
         if path.startswith("/static") or path == "/health":

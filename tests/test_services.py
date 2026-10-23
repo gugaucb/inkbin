@@ -22,6 +22,7 @@ async def test_slug_collision_retry_success():
 
     # Now attempt creating a second paste where first try returns "collision", second returns "unique"
     slug_sequence = ["collision", "unique12"]
+
     def mock_generator():
         return slug_sequence.pop(0)
 
@@ -37,6 +38,7 @@ async def test_slug_collision_retry_success():
         assert token is not None
 
     await engine.dispose()
+
 
 @pytest.mark.asyncio
 async def test_slug_collision_max_retries_exceeded():

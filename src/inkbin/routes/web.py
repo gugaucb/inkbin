@@ -169,9 +169,7 @@ async def viewer_page(
     await session.refresh(paste)
 
     formatted_date = paste.created_at.strftime("%d/%m/%Y às %H:%M")
-    formatted_expires = (
-        paste.expires_at.strftime("%d/%m/%Y às %H:%M") if paste.expires_at else None
-    )
+    formatted_expires = paste.expires_at.strftime("%d/%m/%Y às %H:%M") if paste.expires_at else None
 
     return templates.TemplateResponse(
         request=request,

@@ -55,13 +55,11 @@ async def test_sidebar_and_topbar_icons(client: AsyncClient):
     assert response.status_code == 200
     text = response.text
     # Sidebar brand icon
-    assert 'ti ti-terminal' in text or 'ti ti-file-text' in text
+    assert "ti ti-terminal" in text or "ti ti-file-text" in text
     # Nav link icon
-    assert 'ti ti-plus' in text
+    assert "ti ti-plus" in text
     # Footer icon
-    assert 'ti ti-shield-check' in text
-
-
+    assert "ti ti-shield-check" in text
 
 
 @pytest.mark.asyncio
@@ -135,4 +133,3 @@ async def test_modals_and_special_pages_icons(client: AsyncClient):
     assert "ti ti-alert-triangle" in delete_res.text
     assert "ti ti-trash" in delete_res.text
     assert "ti ti-arrow-left" in delete_res.text
-
