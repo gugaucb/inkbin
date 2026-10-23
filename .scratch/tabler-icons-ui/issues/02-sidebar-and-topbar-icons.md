@@ -1,6 +1,6 @@
 # 02 - Ícones na Sidebar e Topbar de Navegação
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -17,3 +17,13 @@ Como aplicar ícones Tabler na barra lateral canônica (AppSidebar) e na barra s
    - Na `.topbar`, enriquecer o botão de ação rápida "Novo texto" com `<i class="ti ti-plus"></i>`.
 2. Em `src/inkbin/static/js/ink-editor.js`:
    - Na função `renderHistoryList`, incluir `<i class="ti ti-file-text"></i>` ou `<i class="ti ti-code"></i>` nos itens do histórico recente para melhor hierarquia visual.
+
+## Answer
+
+Implementados ícones na Sidebar e Topbar:
+- Marca `INKBIN` no cabeçalho da sidebar enriquecida com `<i class="ti ti-terminal icon-lg"></i>`.
+- Botão/link de criação rápida na sidebar e na topbar atualizado com `<i class="ti ti-plus"></i>`.
+- Rodapé de integridade ("Sem rastreamento · Anônimo") enriquecido com `<i class="ti ti-shield-check icon-sm"></i>`.
+- Histórico dinâmico local em `ink-editor.js` renderiza `<i class="ti ti-file-text icon-sm"></i>` com layout flex alinhado.
+- Testes validados em `tests/test_web_ui.py`.
+

@@ -39,6 +39,20 @@ async def test_base_template_includes_tabler_icons(client: AsyncClient):
     assert "@tabler/icons-webfont" in response.text
 
 
+@pytest.mark.asyncio
+async def test_sidebar_and_topbar_icons(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+    # Sidebar brand icon
+    assert 'ti ti-terminal' in text or 'ti ti-file-text' in text
+    # Nav link icon
+    assert 'ti ti-plus' in text
+    # Footer icon
+    assert 'ti ti-shield-check' in text
+
+
+
 
 @pytest.mark.asyncio
 async def test_get_viewer_page_success(client: AsyncClient):

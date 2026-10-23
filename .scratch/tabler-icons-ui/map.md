@@ -16,6 +16,7 @@ Modernização e refinamento visual de toda a interface do Inkbin (Editor, Visua
 ## Decisions so far
 
 - **01 Tabler Icons CDN e Tokens Canônicos INK**: Carregamento de `@tabler/icons-webfont@3.29.0` via jsDelivr em `base.html`, registro de `--icon-size-*` em `ink-tokens.css` e reset/regras de herança em `ink-editorial.css`. ([01-tabler-icons-cdn-and-ink-tokens.md](issues/01-tabler-icons-cdn-and-ink-tokens.md))
+- **02 Ícones na Sidebar e Topbar de Navegação**: Adição de `ti-terminal` na marca, `ti-plus` nas ações da sidebar e topbar, `ti-shield-check` no rodapé e `ti-file-text` na listagem de histórico recente. ([02-sidebar-and-topbar-icons.md](issues/02-sidebar-and-topbar-icons.md))
 
 ## Not yet specified
 

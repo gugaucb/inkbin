@@ -206,7 +206,7 @@ function renderHistoryList(items) {
 
   container.innerHTML = items.map(item => `
     <a href="/p/${item.slug}" class="history-item">
-      <span class="history-title">${escapeHtml(item.title)}</span>
+      <span class="history-title"><i class="ti ti-file-text icon-sm" aria-hidden="true"></i> <span>${escapeHtml(item.title)}</span></span>
       <span class="history-date">${item.language} · ${new Date(item.created_at).toLocaleDateString('pt-BR')}</span>
     </a>
   `).join('');
