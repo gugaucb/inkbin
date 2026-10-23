@@ -22,6 +22,7 @@ async def test_create_anonymous_paste_success(client: AsyncClient):
     assert "url" in data
     assert data["expires_at"] is not None
 
+
 @pytest.mark.asyncio
 async def test_create_paste_validation_empty_content(client: AsyncClient):
     payload = {
@@ -31,6 +32,7 @@ async def test_create_paste_validation_empty_content(client: AsyncClient):
     }
     response = await client.post("/api/pastes", json=payload)
     assert response.status_code == 422
+
 
 @pytest.mark.asyncio
 async def test_create_paste_exceeding_1mb(client: AsyncClient):
@@ -42,6 +44,7 @@ async def test_create_paste_exceeding_1mb(client: AsyncClient):
     }
     response = await client.post("/api/pastes", json=payload)
     assert response.status_code in (413, 422)
+
 
 @pytest.mark.asyncio
 async def test_get_paste_success_and_views_increment(client: AsyncClient):
@@ -65,10 +68,12 @@ async def test_get_paste_success_and_views_increment(client: AsyncClient):
     data2 = get_res2.json()
     assert data2["views_count"] == 2
 
+
 @pytest.mark.asyncio
 async def test_get_paste_not_found(client: AsyncClient):
     response = await client.get("/api/pastes/notFoundSlug")
     assert response.status_code == 404
+
 
 @pytest.mark.asyncio
 async def test_get_raw_paste(client: AsyncClient):
