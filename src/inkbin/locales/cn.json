@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title_default": "Inkbin — 匿名安全的社论级文本分享平台",
+    "description": "用于匿名、安全共享代码和文本的开源社论级平台，采用短小且非顺序生成的 URL。"
+  },
+  "a11y": {
+    "skip_link": "跳转至主要内容"
+  },
+  "nav": {
+    "actions": "操作",
+    "new_text": "新建文本",
+    "local_history": "本地历史",
+    "loading_history": "正在加载历史...",
+    "no_history": "此浏览器中暂无最近文本。",
+    "clear_history": "清空历史",
+    "clear_history_confirm": "确定要清空所有本地历史记录吗？",
+    "delete_item_aria": "从历史中删除此文本",
+    "delete_item_title": "从历史中移除",
+    "language": "语言"
+  },
+  "footer": {
+    "version": "Inkbin v0.1.0 · 开源项目",
+    "tagline": "无追踪 · 匿名"
+  },
+  "lang": {
+    "en": "English",
+    "pt_br": "Português (BR)",
+    "cn": "简体中文 (CN)"
+  },
+  "editor": {
+    "page_title": "Inkbin — 创建新文本",
+    "heading": "新建文本",
+    "title_label": "文本标题（可选）",
+    "title_placeholder": "例如：docker-compose.yml 或 生产环境日志分析",
+    "syntax_label": "语言 / 语法高亮",
+    "expiration_label": "过期时间",
+    "password_label": "访问密码（可选）",
+    "password_placeholder": "输入 4 至 50 位密码进行保护",
+    "toolbar_hint": "粘贴代码或直接输入（支持 Tab 缩进）",
+    "chars": "{count} 个字符",
+    "bytes_max": "最大",
+    "content_placeholder": "在此粘贴要分享的内容...",
+    "content_aria": "文本或代码内容",
+    "anonymous_hint": "匿名发布 · 无追踪",
+    "submit_btn": "发布文本",
+    "publishing_btn": "正在发布...",
+    "alert_empty": "发布前请输入内容。",
+    "alert_error": "发布文本时出错。",
+    "alert_network": "发布文本时网络连接失败。"
+  },
+  "expiration": {
+    "never": "永不过期",
+    "10m": "10 分钟",
+    "30m": "30 分钟",
+    "1h": "1 小时",
+    "12h": "12 小时",
+    "1d": "1 天",
+    "7d": "7 天",
+    "1w": "1 周",
+    "2w": "2 周",
+    "1m": "1 个月",
+    "custom_minutes": "{count} 分钟",
+    "custom_minutes_plural": "{count} 分钟",
+    "custom_hours": "{count} 小时",
+    "custom_hours_plural": "{count} 小时",
+    "custom_days": "{count} 天",
+    "custom_days_plural": "{count} 天",
+    "custom_weeks": "{count} 周",
+    "custom_weeks_plural": "{count} 周",
+    "custom_months": "{count} 个月",
+    "custom_months_plural": "{count} 个月"
+  },
+  "modal": {
+    "title": "文本发布成功！",
+    "public_url": "公开访问链接",
+    "copy_url": "复制链接",
+    "copied": "已复制！",
+    "admin_token": "管理密钥（管理员删除凭证）",
+    "copy_token_aria": "复制删除密钥",
+    "warning": "请注意：由于文本为匿名发布，请妥善保存此密钥！若需提前删除文本，此密钥为唯一凭据，且不会再次显示。",
+    "close": "关闭",
+    "open": "打开文本"
+  },
+  "viewer": {
+    "untitled": "无标题",
+    "page_heading": "阅读文本",
+    "published_at": "发布于 {date}",
+    "views_singular": "{count} 次浏览",
+    "views_plural": "{count} 次浏览",
+    "expires_at": "过期时间：{date}",
+    "copy_code": "复制代码",
+    "code_copied": "代码已复制！",
+    "view_raw": "查看原文",
+    "view_raw_aria": "查看原始代码",
+    "new_paste": "新建文本",
+    "new_paste_aria": "创建新文本",
+    "delete": "删除",
+    "delete_aria": "使用删除密钥删除此文本",
+    "report": "举报",
+    "report_aria": "举报此发布内容"
+  },
+  "report": {
+    "modal_title": "举报此内容",
+    "reason_label": "举报原因",
+    "reason_spam": "垃圾信息或恶意推广",
+    "reason_malware": "恶意代码或钓鱼网站",
+    "reason_leak": "泄露机密数据或密码凭证",
+    "reason_abuse": "滥用或违法违规内容",
+    "reason_other": "其他原因",
+    "details_label": "补充详情（可选）",
+    "details_placeholder": "如有需要，请填写更多详细信息...",
+    "cancel": "取消",
+    "submit": "提交举报",
+    "submitting": "正在提交...",
+    "success": "举报已成功提交。",
+    "error": "无法提交举报。",
+    "network_error": "与服务器通信失败。"
+  },
+  "delete": {
+    "page_title": "删除文本 — Inkbin",
+    "page_heading": "文本管理",
+    "badge": "危险操作",
+    "title_prefix": "删除 \"{title}\"",
+    "description": "彻底删除将从数据库中物理清除此文本并使缓存失效。此操作立即生效且不可逆。",
+    "token_label": "管理密钥（管理员删除凭证）",
+    "token_placeholder": "在此粘贴创建时获得的密钥",
+    "token_hint": "创建文本时生成的专属 64 位字符凭据。",
+    "cancel": "取消并返回",
+    "confirm": "确认彻底删除",
+    "deleting": "正在删除...",
+    "success": "文本已成功删除！正在跳转...",
+    "error_invalid": "管理员删除凭据无效。",
+    "network_error": "与服务器通信失败。"
+  },
+  "password": {
+    "page_title": "受保护文本 — Inkbin",
+    "page_heading": "受保护访问",
+    "badge": "密码保护",
+    "confidential": "机密文本",
+    "description": "此文档已被作者设置密码保护。请在下方输入凭据以解密并查看完整内容。",
+    "label": "访问密码",
+    "placeholder": "输入此文本的密码",
+    "back": "返回首页",
+    "unlock": "解密文本",
+    "validating": "验证中...",
+    "error": "密码错误，请重试。",
+    "network_error": "连接服务器出错，请重试。"
+  },
+  "error404": {
+    "page_title": "未找到内容 — Inkbin",
+    "heading": "404 · 记录不可用",
+    "title": "未找到文本",
+    "message": "您要查找的文本可能已根据保留策略过期清除、已被作者删除，或根本不存在。",
+    "create_new": "创建新文本"
+  },
+  "error451": {
+    "page_title": "因法律或违规原因不可用 — Inkbin",
+    "heading": "451 · 因法律合规原因不可用",
+    "badge": "监管审核处置 (HTTP 451)",
+    "title": "文本已被管理员下架封禁",
+    "message": "因收到举报或系统检测到违反平台使用条款（如恶意代码、泄露私有凭据或侵权滥用内容），此文档已被下架停用。",
+    "back_home": "返回首页"
+  },
+  "clipboard": {
+    "copied": "已复制！",
+    "copy_failed": "无法自动复制，请手动选择文本并复制。",
+    "code_copied": "代码已复制！"
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title_default": "Inkbin — Publicação Editorial Anônima e Segura",
+    "description": "Plataforma open-source editorial para compartilhamento anônimo e seguro de código e textos com URLs curtas e não sequenciais."
+  },
+  "a11y": {
+    "skip_link": "Pular para o conteúdo principal"
+  },
+  "nav": {
+    "actions": "Ações",
+    "new_text": "Novo texto",
+    "local_history": "Histórico Local",
+    "loading_history": "Carregando histórico...",
+    "no_history": "Nenhum paste recente neste navegador.",
+    "clear_history": "Limpar histórico",
+    "clear_history_confirm": "Tem certeza de que deseja limpar todo o histórico local?",
+    "delete_item_aria": "Remover este paste do histórico",
+    "delete_item_title": "Remover do histórico",
+    "language": "Idioma"
+  },
+  "footer": {
+    "version": "Inkbin v0.1.0 · Open Source",
+    "tagline": "Sem rastreamento · Anônimo"
+  },
+  "lang": {
+    "en": "English",
+    "pt_br": "Português (BR)",
+    "cn": "简体中文 (CN)"
+  },
+  "editor": {
+    "page_title": "Inkbin — Criar Novo Paste",
+    "heading": "Nova publicação",
+    "title_label": "Título do texto (opcional)",
+    "title_placeholder": "Ex.: docker-compose.yml ou Análise de logs de produção",
+    "syntax_label": "Linguagem / Sintaxe",
+    "expiration_label": "Prazo de expiração",
+    "password_label": "Senha de proteção (opcional)",
+    "password_placeholder": "4 a 50 caracteres para proteger",
+    "toolbar_hint": "Cole seu código ou digite diretamente (Tab suportado)",
+    "chars": "{count} caracteres",
+    "bytes_max": "máx",
+    "content_placeholder": "Cole aqui o conteúdo a ser compartilhado...",
+    "content_aria": "Conteúdo do texto ou código",
+    "anonymous_hint": "Publicação anônima · Sem rastreamento",
+    "submit_btn": "Publicar texto",
+    "publishing_btn": "Publicando...",
+    "alert_empty": "Por favor, insira o conteúdo do paste antes de publicar.",
+    "alert_error": "Ocorreu um erro ao publicar o paste.",
+    "alert_network": "Falha na conexão ao publicar o paste."
+  },
+  "expiration": {
+    "never": "Nunca expirar",
+    "10m": "10 minutos",
+    "30m": "30 minutos",
+    "1h": "1 hora",
+    "12h": "12 horas",
+    "1d": "1 dia",
+    "7d": "7 dias",
+    "1w": "1 semana",
+    "2w": "2 semanas",
+    "1m": "1 mês",
+    "custom_minutes": "{count} minuto",
+    "custom_minutes_plural": "{count} minutos",
+    "custom_hours": "{count} hora",
+    "custom_hours_plural": "{count} horas",
+    "custom_days": "{count} dia",
+    "custom_days_plural": "{count} dias",
+    "custom_weeks": "{count} semana",
+    "custom_weeks_plural": "{count} semanas",
+    "custom_months": "{count} mês",
+    "custom_months_plural": "{count} meses"
+  },
+  "modal": {
+    "title": "Publicação criada com sucesso!",
+    "public_url": "URL Pública de Acesso",
+    "copy_url": "Copiar URL",
+    "copied": "Copiado!",
+    "admin_token": "Chave Secreta de Administração (Admin Delete Token)",
+    "copy_token_aria": "Copiar token de exclusão",
+    "warning": "Atenção: Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.",
+    "close": "Fechar",
+    "open": "Abrir publicação"
+  },
+  "viewer": {
+    "untitled": "Sem título",
+    "page_heading": "Leitura do texto",
+    "published_at": "Publicado em {date}",
+    "views_singular": "{count} visualização",
+    "views_plural": "{count} visualizações",
+    "expires_at": "Expira em: {date}",
+    "copy_code": "Copiar código",
+    "code_copied": "Código copiado!",
+    "view_raw": "Ver Raw",
+    "view_raw_aria": "Ver código bruto",
+    "new_paste": "Novo texto",
+    "new_paste_aria": "Criar nova publicação",
+    "delete": "Excluir",
+    "delete_aria": "Excluir este paste com seu Admin Delete Token",
+    "report": "Denunciar",
+    "report_aria": "Denunciar publicação"
+  },
+  "report": {
+    "modal_title": "Denunciar publicação",
+    "reason_label": "Motivo da denúncia",
+    "reason_spam": "Spam ou publicidade indesejada",
+    "reason_malware": "Código malicioso ou phishing",
+    "reason_leak": "Vazamento de dados confidenciais ou senhas",
+    "reason_abuse": "Conteúdo abusivo ou ilegal",
+    "reason_other": "Outro motivo",
+    "details_label": "Detalhes adicionais (opcional)",
+    "details_placeholder": "Forneça mais informações se necessário...",
+    "cancel": "Cancelar",
+    "submit": "Enviar denúncia",
+    "submitting": "Enviando...",
+    "success": "Denúncia enviada com sucesso.",
+    "error": "Não foi possível registrar a denúncia.",
+    "network_error": "Falha na comunicação com o servidor."
+  },
+  "delete": {
+    "page_title": "Excluir Publicação — Inkbin",
+    "page_heading": "Gerenciamento de publicação",
+    "badge": "Ação Destrutiva",
+    "title_prefix": "Excluir \"{title}\"",
+    "description": "A exclusão definitiva remove fisicamente este Paste do banco de dados e invalida o cache. Esta operação é imediata e irreversível.",
+    "token_label": "Chave Secreta de Administração (Admin Delete Token)",
+    "token_placeholder": "Cole aqui o token recebido na criação",
+    "token_hint": "Token exclusivo de 64 caracteres gerado quando a publicação foi criada.",
+    "cancel": "Cancelar e voltar",
+    "confirm": "Confirmar exclusão definitiva",
+    "deleting": "Excluindo...",
+    "success": "Publicação excluída com sucesso! Redirecionando...",
+    "error_invalid": "Token de exclusão administrativa inválido.",
+    "network_error": "Falha de comunicação com o servidor."
+  },
+  "password": {
+    "page_title": "Texto Protegido — Inkbin",
+    "page_heading": "Acesso protegido",
+    "badge": "Protegido por senha",
+    "confidential": "Texto confidencial",
+    "description": "Este documento foi protegido pelo criador. Digite a credencial abaixo para descriptografar e visualizar o conteúdo completo.",
+    "label": "Senha de acesso",
+    "placeholder": "Digite a senha deste paste",
+    "back": "Voltar ao início",
+    "unlock": "Desbloquear texto",
+    "validating": "Validando...",
+    "error": "Senha incorreta. Tente novamente.",
+    "network_error": "Erro ao conectar com o servidor. Tente novamente."
+  },
+  "error404": {
+    "page_title": "Conteúdo Não Encontrado — Inkbin",
+    "heading": "404 · Registro indisponível",
+    "title": "Publicação não encontrada",
+    "message": "O texto que você está procurando pode ter expirado conforme a política configurada, foi excluído pelo autor ou nunca existiu.",
+    "create_new": "Criar novo texto"
+  },
+  "error451": {
+    "page_title": "Conteúdo Indisponível por Violação Legal — Inkbin",
+    "heading": "451 · Indisponível por determinação legal",
+    "badge": "Ação de Moderação (HTTP 451)",
+    "title": "Publicação desativada pela moderação",
+    "message": "Este documento foi desativado administrativamente devido a denúncia ou constatação de violação dos termos de uso da plataforma (ex.: código malicioso, vazamento de credenciais privadas ou conteúdo abusivo).",
+    "back_home": "Voltar à página inicial"
+  },
+  "clipboard": {
+    "copied": "Copiado!",
+    "copy_failed": "Não foi possível copiar. Selecione o texto e copie manualmente.",
+    "code_copied": "Código copiado!"
+  }
+}

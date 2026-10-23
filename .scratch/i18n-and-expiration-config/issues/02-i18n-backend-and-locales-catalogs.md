@@ -1,6 +1,6 @@
 # 02 - Infraestrutura de i18n Backend, Catálogos JSON e Resolução de Locale
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 01
 

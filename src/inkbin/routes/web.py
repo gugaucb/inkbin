@@ -10,16 +10,42 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from inkbin.cache import get_cache_service
 from inkbin.config import get_settings
 from inkbin.db import get_db_session
+from inkbin.i18n import (
+    COOKIE_NAME,
+    i18n_context_processor,
+    normalize_locale,
+)
 from inkbin.lifecycle import purge_single_expired_paste
 from inkbin.models import Paste
 from inkbin.security import verify_admin_delete_token, verify_unlock_token
 
 templates_path = Path(__file__).parent.parent / "templates"
-templates = Jinja2Templates(directory=str(templates_path))
+templates = Jinja2Templates(
+    directory=str(templates_path),
+    context_processors=[i18n_context_processor],
+)
 settings = get_settings()
 
 router = APIRouter(include_in_schema=False)
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+@router.get("/set-locale/{locale}")
+async def set_locale_endpoint(locale: str, request: Request) -> Response:
+    norm = normalize_locale(locale)
+    referer = request.headers.get("referer") or "/"
+    if not referer.startswith("/") and not referer.startswith("http://") and not referer.startswith("https://"):
+        referer = "/"
+    response = RedirectResponse(url=referer, status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=norm,
+        max_age=31536000,
+        path="/",
+        samesite="lax",
+        httponly=False,
+    )
+    return response
 
 
 def is_paste_unlocked(request: Request, slug: str) -> bool:
