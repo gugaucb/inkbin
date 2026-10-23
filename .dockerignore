@@ -1,14 +1,42 @@
+# Version control
 .git
 .gitignore
+
+# Virtual environments
 .venv
+venv/
+env/
+
+# Python bytecode & caches
 __pycache__
 *.pyc
 *.pyo
 *.pyd
 .pytest_cache
 .ruff_cache
-.scratch
-.DS_Store
 *.egg-info
 dist
 build
+
+# Project local artifacts & documentation
+.scratch
+.agents
+graphify-out
+docs
+tests
+
+# Databases & local state
+*.db
+*.sqlite*
+inkbin.db
+
+# Secrets & local environment variables
+.env
+.env.*
+.env.local
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+.idea
+.vscode
