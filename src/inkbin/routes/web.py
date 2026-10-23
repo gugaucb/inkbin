@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from inkbin.cache import get_cache_service
 from inkbin.config import get_settings
 from inkbin.db import get_db_session
+from inkbin.lifecycle import purge_single_expired_paste
 from inkbin.models import Paste
 from inkbin.security import verify_admin_delete_token, verify_unlock_token
 
@@ -130,6 +131,9 @@ async def viewer_page(
     paste = result.scalar_one_or_none()
 
     if paste is None or paste.is_expired():
+        if paste is not None and paste.is_expired():
+            cache = get_cache_service()
+            await purge_single_expired_paste(session, slug, cache)
         return templates.TemplateResponse(
             request=request,
             name="404.html",

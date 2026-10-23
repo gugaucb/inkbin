@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from inkbin.cache import get_cache_service
 from inkbin.config import get_settings
 from inkbin.db import get_db_session
+from inkbin.lifecycle import purge_single_expired_paste
 from inkbin.models import Paste
 from inkbin.schemas import (
     PasteCreateRequest,
@@ -241,6 +242,7 @@ async def get_paste_endpoint(
             if exp.tzinfo is None:
                 exp = exp.replace(tzinfo=UTC)
             if exp < datetime.now(UTC):
+                await purge_single_expired_paste(session, slug, cache)
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Paste não encontrado ou expirado.",
@@ -263,6 +265,8 @@ async def get_paste_endpoint(
     paste = result.scalar_one_or_none()
 
     if paste is None or paste.is_expired():
+        if paste is not None and paste.is_expired():
+            await purge_single_expired_paste(session, slug, cache)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Paste não encontrado ou expirado.",
@@ -302,6 +306,7 @@ async def get_paste_endpoint(
         if remaining > 0:
             ttl = min(3600, remaining)
         else:
+            await purge_single_expired_paste(session, slug, cache)
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Paste não encontrado ou expirado.",
@@ -325,6 +330,9 @@ async def get_raw_paste_endpoint(
     paste = result.scalar_one_or_none()
 
     if paste is None or paste.is_expired():
+        if paste is not None and paste.is_expired():
+            cache = get_cache_service()
+            await purge_single_expired_paste(session, slug, cache)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Paste não encontrado ou expirado.",
