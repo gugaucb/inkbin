@@ -1,3 +1,4 @@
+import hashlib
 from collections.abc import Callable
 from datetime import UTC, datetime
 
@@ -5,7 +6,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from inkbin.models import Paste
-from inkbin.security import generate_admin_delete_token, hash_admin_delete_token
+from inkbin.security import (
+    generate_admin_delete_token,
+    hash_admin_delete_token,
+    hash_password,
+)
 from inkbin.slug import generate_slug
 
 
@@ -19,6 +24,7 @@ async def create_paste_record(
     content: str,
     language: str = "plaintext",
     expires_at: datetime | None = None,
+    password: str | None = None,
     slug_generator: Callable[[], str] = generate_slug,
     max_retries: int = 3,
 ) -> tuple[Paste, str]:
@@ -28,6 +34,10 @@ async def create_paste_record(
     """
     admin_token = generate_admin_delete_token()
     admin_hash = hash_admin_delete_token(admin_token)
+
+    is_protected = bool(password)
+    password_hash = hash_password(password) if is_protected and password else None
+    content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
     for attempt in range(max_retries):
         slug = slug_generator()
@@ -40,6 +50,11 @@ async def create_paste_record(
             views_count=0,
             expires_at=expires_at,
             created_at=datetime.now(UTC),
+            is_protected=is_protected,
+            password_hash=password_hash,
+            content_hash=content_hash,
+            report_count=0,
+            is_active=True,
         )
 
         try:

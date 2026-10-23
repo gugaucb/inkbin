@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from inkbin.db import Base
@@ -22,12 +22,16 @@ class Paste(Base):
         default=lambda: datetime.now(UTC),
         nullable=False,
     )
+    is_protected: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    content_hash: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
+    report_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     def is_expired(self) -> bool:
         if self.expires_at is None:
             return False
         now = datetime.now(UTC)
-        # Ensure aware comparison
         exp = self.expires_at
         if exp.tzinfo is None:
             exp = exp.replace(tzinfo=UTC)

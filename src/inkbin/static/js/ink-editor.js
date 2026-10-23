@@ -34,15 +34,19 @@ function setupEditor() {
     const chars = text.length;
     const bytes = new Blob([text]).size;
 
-    if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} caracteres`;
+    if (charCountEl) {
+      charCountEl.innerHTML = `<i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>${chars.toLocaleString()} caracteres</span>`;
+    }
     if (byteCountEl) {
+      let byteStr = '';
       if (bytes < 1024) {
-        byteCountEl.textContent = `${bytes} B`;
+        byteStr = `${bytes} B`;
       } else if (bytes < 1024 * 1024) {
-        byteCountEl.textContent = `${(bytes / 1024).toFixed(1)} KB`;
+        byteStr = `${(bytes / 1024).toFixed(1)} KB`;
       } else {
-        byteCountEl.textContent = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB máx`;
+        byteStr = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB máx`;
       }
+      byteCountEl.innerHTML = `<i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>${byteStr}</span>`;
     }
   }
 
@@ -62,10 +66,11 @@ function setupEditor() {
       const title = document.getElementById('paste-title')?.value || null;
       const language = document.getElementById('paste-language')?.value || 'plaintext';
       const expiration = document.getElementById('paste-expiration')?.value || 'never';
+      const password = document.getElementById('paste-password')?.value || null;
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Publicando...';
+        submitBtn.innerHTML = '<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>Publicando...</span>';
       }
 
       try {
@@ -79,6 +84,7 @@ function setupEditor() {
             content,
             language,
             expiration,
+            password: password || null,
           }),
         });
 
@@ -106,7 +112,7 @@ function setupEditor() {
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Publicar texto';
+          submitBtn.innerHTML = '<i class="ti ti-upload" aria-hidden="true"></i> <span>Publicar texto</span>';
         }
       }
     });
@@ -142,10 +148,10 @@ function copyToClipboard(elementId, feedbackBtnId) {
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById(feedbackBtnId);
     if (btn) {
-      const originalText = btn.textContent;
-      btn.textContent = 'Copiado!';
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Copiado!</span>';
       setTimeout(() => {
-        btn.textContent = originalText;
+        btn.innerHTML = originalHtml;
       }, 2000);
     }
   }).catch(() => {
@@ -160,9 +166,9 @@ function setupViewerCopyActions() {
       const codeEl = document.getElementById('raw-code');
       if (!codeEl) return;
       navigator.clipboard.writeText(codeEl.textContent).then(() => {
-        copyCodeBtn.textContent = 'Código copiado!';
+        copyCodeBtn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Código copiado!</span>';
         setTimeout(() => {
-          copyCodeBtn.textContent = 'Copiar código';
+          copyCodeBtn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> <span>Copiar código</span>';
         }, 2000);
       });
     });
@@ -204,7 +210,7 @@ function renderHistoryList(items) {
 
   container.innerHTML = items.map(item => `
     <a href="/p/${item.slug}" class="history-item">
-      <span class="history-title">${escapeHtml(item.title)}</span>
+      <span class="history-title"><i class="ti ti-file-text icon-sm" aria-hidden="true"></i> <span>${escapeHtml(item.title)}</span></span>
       <span class="history-date">${item.language} · ${new Date(item.created_at).toLocaleDateString('pt-BR')}</span>
     </a>
   `).join('');

@@ -39,6 +39,33 @@ class InMemoryCache:
         async with self._lock:
             self._store.clear()
 
+    async def incr(self, key: str, ttl_seconds: int = 900) -> int:
+        async with self._lock:
+            now = time.monotonic()
+            entry = self._store.get(key)
+            if entry is None or (entry[1] is not None and now > entry[1]):
+                val = 1
+                expire_at = now + ttl_seconds
+                self._store[key] = (str(val), expire_at)
+                return val
+            val = int(entry[0]) + 1
+            self._store[key] = (str(val), entry[1])
+            return val
+
+    async def ttl(self, key: str) -> int:
+        async with self._lock:
+            entry = self._store.get(key)
+            if entry is None:
+                return -2
+            expire_at = entry[1]
+            if expire_at is None:
+                return -1
+            remaining = int(expire_at - time.monotonic())
+            if remaining <= 0:
+                del self._store[key]
+                return -2
+            return remaining
+
 
 class CacheService:
     """Serviço unificado de cache com Redis assíncrono e fallback em memória."""
@@ -50,6 +77,7 @@ class CacheService:
         if redis_url:
             try:
                 import redis.asyncio as aioredis
+
                 self._redis = aioredis.from_url(redis_url, decode_responses=True)
             except (RedisError, OSError) as e:
                 logger.warning(
@@ -89,6 +117,33 @@ class CacheService:
                 logger.warning("Erro ao deletar do Redis (%s).", e)
         await self._fallback.delete(key)
 
+    async def clear(self) -> None:
+        if self._redis is not None:
+            try:
+                await self._redis.flushdb()
+            except (RedisError, OSError) as e:
+                logger.warning("Erro ao limpar Redis (%s).", e)
+        await self._fallback.clear()
+
+    async def incr(self, key: str, ttl_seconds: int = 900) -> int:
+        if self._redis is not None:
+            try:
+                val = await self._redis.incr(key)
+                if val == 1:
+                    await self._redis.expire(key, ttl_seconds)
+                return val
+            except (RedisError, OSError) as e:
+                logger.warning("Erro ao incrementar no Redis (%s). Usando fallback.", e)
+        return await self._fallback.incr(key, ttl_seconds)
+
+    async def ttl(self, key: str) -> int:
+        if self._redis is not None:
+            try:
+                return await self._redis.ttl(key)
+            except (RedisError, OSError) as e:
+                logger.warning("Erro ao consultar TTL no Redis (%s). Usando fallback.", e)
+        return await self._fallback.ttl(key)
+
     async def close(self) -> None:
         if self._redis is not None:
             try:
@@ -104,6 +159,7 @@ def get_cache_service() -> CacheService:
     global _cache_instance
     if _cache_instance is None:
         from inkbin.config import get_settings
+
         settings = get_settings()
         _cache_instance = CacheService(redis_url=settings.REDIS_URL)
     return _cache_instance

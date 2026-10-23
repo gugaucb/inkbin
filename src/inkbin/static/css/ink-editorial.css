@@ -189,6 +189,9 @@ html, body {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .input-text, .select-field {
@@ -245,6 +248,41 @@ html, body {
   display: flex;
   gap: var(--space-4);
   align-items: center;
+}
+
+/* Tabler Icons & Iconografia Canônica */
+i.ti, [class^="ti-"], [class*=" ti-"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--icon-size-md);
+  line-height: 1;
+  color: currentColor;
+  stroke-width: var(--icon-stroke);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.icon-sm {
+  font-size: var(--icon-size-sm) !important;
+}
+
+.icon-md {
+  font-size: var(--icon-size-md) !important;
+}
+
+.icon-lg {
+  font-size: var(--icon-size-lg) !important;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
 }
 
 /* Buttons */
@@ -445,6 +483,9 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .history-date {
@@ -466,5 +507,17 @@ html, body {
   }
   .page-container {
     padding: var(--space-4);
+  }
+  .viewer-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .viewer-actions .btn-secondary span {
+    display: none;
+  }
+  .viewer-actions .btn-secondary {
+    padding: 0 var(--space-3);
   }
 }

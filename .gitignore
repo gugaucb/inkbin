@@ -35,3 +35,6 @@ Thumbs.db
 
 # Project local artifacts
 graphify-out/
+
+*.db
+*.sqlite*

@@ -7,7 +7,10 @@
 <form id="paste-form" class="editor-layout">
   <div class="editor-header-fields">
     <div class="field-group input-title">
-      <label for="paste-title" class="field-label">Título do texto (opcional)</label>
+      <label for="paste-title" class="field-label">
+        <i class="ti ti-heading icon-sm" aria-hidden="true"></i>
+        <span>Título do texto (opcional)</span>
+      </label>
       <input 
         type="text" 
         id="paste-title" 
@@ -19,7 +22,10 @@
     </div>
 
     <div class="field-group">
-      <label for="paste-language" class="field-label">Linguagem / Sintaxe</label>
+      <label for="paste-language" class="field-label">
+        <i class="ti ti-code icon-sm" aria-hidden="true"></i>
+        <span>Linguagem / Sintaxe</span>
+      </label>
       <select id="paste-language" name="language" class="select-field">
         <option value="plaintext" selected>Texto puro (plaintext)</option>
         <option value="python">Python</option>
@@ -39,7 +45,10 @@
     </div>
 
     <div class="field-group">
-      <label for="paste-expiration" class="field-label">Prazo de expiração</label>
+      <label for="paste-expiration" class="field-label">
+        <i class="ti ti-clock icon-sm" aria-hidden="true"></i>
+        <span>Prazo de expiração</span>
+      </label>
       <select id="paste-expiration" name="expiration" class="select-field">
         <option value="never" selected>Nunca expirar</option>
         <option value="1h">1 hora</option>
@@ -48,15 +57,32 @@
         <option value="1m">1 mês</option>
       </select>
     </div>
+
+    <div class="field-group">
+      <label for="paste-password" class="field-label">
+        <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
+        <span>Senha de proteção (opcional)</span>
+      </label>
+      <input 
+        type="password" 
+        id="paste-password" 
+        name="password" 
+        class="input-text" 
+        minlength="4"
+        maxlength="50" 
+        placeholder="4 a 50 caracteres para proteger"
+        autocomplete="new-password"
+      >
+    </div>
   </div>
 
   <div class="editor-container">
     <div class="editor-toolbar">
       <span>Cole seu código ou digite diretamente (Tab suportado)</span>
       <div class="editor-stats">
-        <span id="char-count">0 caracteres</span>
+        <span id="char-count"><i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>0 caracteres</span></span>
         <span>·</span>
-        <span id="byte-count">0 B / 1 MB máx</span>
+        <span id="byte-count"><i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>0 B / 1 MB máx</span></span>
       </div>
     </div>
     <textarea 
@@ -73,7 +99,8 @@
   <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4);">
     <span style="font-size: 12px; color: var(--text-secondary);">Publicação anônima · Sem rastreamento</span>
     <button type="submit" id="submit-btn" class="btn btn-primary">
-      Publicar texto
+      <i class="ti ti-upload" aria-hidden="true"></i>
+      <span>Publicar texto</span>
     </button>
   </div>
 </form>
@@ -82,23 +109,38 @@
 <div id="success-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-dialog">
     <div class="modal-header">
-      <h2 id="modal-title" class="modal-title">Publicação criada com sucesso!</h2>
+      <h2 id="modal-title" class="modal-title" style="display: flex; align-items: center; gap: var(--space-2);">
+        <i class="ti ti-circle-check" aria-hidden="true"></i>
+        <span>Publicação criada com sucesso!</span>
+      </h2>
     </div>
 
     <div class="modal-body">
       <div>
-        <label for="modal-slug-url" class="field-label" style="display: block; margin-bottom: 6px;">URL Pública de Acesso</label>
+        <label for="modal-slug-url" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
+          <i class="ti ti-link icon-sm" aria-hidden="true"></i>
+          <span>URL Pública de Acesso</span>
+        </label>
         <div style="display: flex; gap: var(--space-2);">
           <input type="text" id="modal-slug-url" class="input-text" style="flex-grow: 1;" readonly>
           <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-slug-url', 'copy-url-btn')" id="copy-url-btn">
-            Copiar URL
+            <i class="ti ti-copy" aria-hidden="true"></i>
+            <span>Copiar URL</span>
           </button>
         </div>
       </div>
 
       <div>
-        <label class="field-label" style="display: block; margin-bottom: 6px;">Chave Secreta de Administração (Admin Delete Token)</label>
-        <div class="token-alert-box" id="modal-delete-token"></div>
+        <label class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
+          <i class="ti ti-key icon-sm" aria-hidden="true"></i>
+          <span>Chave Secreta de Administração (Admin Delete Token)</span>
+        </label>
+        <div style="display: flex; gap: var(--space-2); align-items: stretch;">
+          <div class="token-alert-box" id="modal-delete-token" style="flex-grow: 1;"></div>
+          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-delete-token', 'copy-token-btn')" id="copy-token-btn" title="Copiar token" aria-label="Copiar token de exclusão">
+            <i class="ti ti-copy" aria-hidden="true"></i>
+          </button>
+        </div>
         <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
           <strong>Atenção:</strong> Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.
         </p>
@@ -106,8 +148,14 @@
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">Fechar</button>
-      <a href="#" id="modal-view-link" class="btn btn-primary">Acessar publicação</a>
+      <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">
+        <i class="ti ti-x" aria-hidden="true"></i>
+        <span>Fechar</span>
+      </button>
+      <a href="#" id="modal-view-link" class="btn btn-primary">
+        <i class="ti ti-external-link" aria-hidden="true"></i>
+        <span>Abrir publicação</span>
+      </a>
     </div>
   </div>
 </div>

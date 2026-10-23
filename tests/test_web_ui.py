@@ -11,6 +11,16 @@ async def test_get_editor_page(client: AsyncClient):
     assert "INKBIN" in text
     assert "Publicar texto" in text
     assert "paste-content" in text
+    # Field labels icons
+    assert "ti ti-heading" in text
+    assert "ti ti-code" in text
+    assert "ti ti-clock" in text
+    assert "ti ti-lock" in text
+    # Editor stats icons
+    assert "ti ti-letter-case" in text
+    assert "ti ti-database" in text
+    # Submit button icon
+    assert "ti ti-upload" in text
 
 
 @pytest.mark.asyncio
@@ -26,6 +36,32 @@ async def test_get_static_tokens_css(client: AsyncClient):
     assert response.status_code == 200
     assert "--ink-0" in response.text
     assert "--ink-950" in response.text
+    assert "--icon-size-sm" in response.text
+    assert "--icon-size-md" in response.text
+    assert "--icon-size-lg" in response.text
+    assert "--icon-stroke" in response.text
+
+
+@pytest.mark.asyncio
+async def test_base_template_includes_tabler_icons(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    assert "@tabler/icons-webfont" in response.text
+
+
+@pytest.mark.asyncio
+async def test_sidebar_and_topbar_icons(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+    # Sidebar brand icon
+    assert 'ti ti-terminal' in text or 'ti ti-file-text' in text
+    # Nav link icon
+    assert 'ti ti-plus' in text
+    # Footer icon
+    assert 'ti ti-shield-check' in text
+
+
 
 
 @pytest.mark.asyncio
@@ -44,9 +80,59 @@ async def test_get_viewer_page_success(client: AsyncClient):
     assert "INK" in response.text
     assert "Copiar código" in response.text
 
+    # Viewer metadata icons
+    assert "ti ti-code" in response.text
+    assert "ti ti-calendar" in response.text
+    assert "ti ti-eye" in response.text
+
+    # Viewer action buttons icons and accessibility labels
+    assert "ti ti-copy" in response.text
+    assert "ti ti-file-code" in response.text
+    assert "ti ti-plus" in response.text
+    assert "ti ti-trash" in response.text
+    assert "ti ti-flag" in response.text
+    assert 'aria-label="Ver código bruto"' in response.text
+    assert 'aria-label="Criar nova publicação"' in response.text
+    assert 'aria-label="Excluir este paste"' in response.text
+    assert 'aria-label="Denunciar publicação"' in response.text
+
 
 @pytest.mark.asyncio
 async def test_get_viewer_page_not_found(client: AsyncClient):
     response = await client.get("/p/notExists")
     assert response.status_code == 404
     assert "Publicação não encontrada" in response.text
+    assert "ti ti-file-x" in response.text
+    assert "ti ti-plus" in response.text
+
+
+@pytest.mark.asyncio
+async def test_modals_and_special_pages_icons(client: AsyncClient):
+    # Success modal in editor
+    editor_res = await client.get("/")
+    assert editor_res.status_code == 200
+    assert "ti ti-circle-check" in editor_res.text
+    assert "ti ti-external-link" in editor_res.text
+
+    # Create protected paste for challenge page test and report modal test
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Protegido", "content": "segredo", "password": "senha-segura-123"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    # Challenge page
+    challenge_res = await client.get(f"/p/{slug}")
+    assert challenge_res.status_code == 200
+    assert "ti ti-lock" in challenge_res.text
+    assert "ti ti-lock-open" in challenge_res.text
+    assert "ti ti-arrow-left" in challenge_res.text
+
+    # Delete confirmation page
+    delete_res = await client.get(f"/p/{slug}/delete")
+    assert delete_res.status_code == 200
+    assert "ti ti-alert-triangle" in delete_res.text
+    assert "ti ti-trash" in delete_res.text
+    assert "ti ti-arrow-left" in delete_res.text
+

@@ -4,12 +4,12 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] Campo opcional de senha disponível na API (`POST /api/pastes`) e no formulário de criação com validação de 4 a 50 caracteres.
-- [ ] Senha armazenada com hash seguro Argon2id em `password_hash`; a senha em texto plano jamais é salva ou exposta em logs e respostas.
-- [ ] Resposta da API de criação retorna `is_protected: true` e omite o hash de senha.
-- [ ] Acesso à URL pública (`GET /{slug}`) de um Paste protegido sem credenciais renderiza a tela editorial de desafio de senha do INK Design System.
-- [ ] Acesso à rota bruta (`GET /raw/{slug}`) de um Paste protegido sem autenticação prévia retorna status HTTP 401/403.
-- [ ] Tentativas de modificação pós-criação são categoricamente rejeitadas mantendo a imutabilidade estrita.
-- [ ] Testes automatizados cobrem a criação com senha válida, validação de limites de caracteres e restrição de acesso público inicial.
+- [x] Campo opcional de senha disponível na API (`POST /api/pastes`) e no formulário de criação com validação de 4 a 50 caracteres.
+- [x] Senha armazenada com hash seguro Argon2id em `password_hash`; a senha em texto plano jamais é salva ou exposta em logs e respostas.
+- [x] Resposta da API de criação retorna `is_protected: true` e omite o hash de senha.
+- [x] Acesso à URL pública (`GET /{slug}`) de um Paste protegido sem credenciais renderiza a tela editorial de desafio de senha do INK Design System.
+- [x] Acesso à rota bruta (`GET /raw/{slug}`) de um Paste protegido sem autenticação prévia retorna status HTTP 401/403.
+- [x] Tentativas de modificação pós-criação são categoricamente rejeitadas mantendo a imutabilidade estrita.
+- [x] Testes automatizados cobrem a criação com senha válida, validação de limites de caracteres e restrição de acesso público inicial.

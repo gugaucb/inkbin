@@ -9,26 +9,37 @@
     <h2 class="viewer-title">{{ paste.title or 'Sem título' }}</h2>
     
     <div class="viewer-meta">
-      <span class="badge">{{ paste.language }}</span>
-      <span class="meta-item">Publicado em {{ formatted_date }}</span>
+      <span class="badge"><i class="ti ti-code icon-sm" aria-hidden="true"></i> <span>{{ paste.language }}</span></span>
+      <span class="meta-item"><i class="ti ti-calendar icon-sm" aria-hidden="true"></i> <span>Publicado em {{ formatted_date }}</span></span>
       <span>·</span>
-      <span class="meta-item">{{ paste.views_count }} visualizaç{{ 'ão' if paste.views_count == 1 else 'ões' }}</span>
+      <span class="meta-item"><i class="ti ti-eye icon-sm" aria-hidden="true"></i> <span>{{ paste.views_count }} visualizaç{{ 'ão' if paste.views_count == 1 else 'ões' }}</span></span>
       {% if paste.expires_at %}
       <span>·</span>
-      <span class="meta-item">Expira em: {{ formatted_expires }}</span>
+      <span class="meta-item"><i class="ti ti-hourglass icon-sm" aria-hidden="true"></i> <span>Expira em: {{ formatted_expires }}</span></span>
       {% endif %}
     </div>
 
     <div class="viewer-actions">
       <button type="button" id="copy-code-btn" class="btn btn-primary" style="font-size: 13px; height: 36px;">
-        Copiar código
+        <i class="ti ti-copy" aria-hidden="true"></i>
+        <span>Copiar código</span>
       </button>
-      <a href="/raw/{{ paste.slug }}" target="_blank" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
-        Ver Raw
+      <a href="/raw/{{ paste.slug }}" target="_blank" class="btn btn-secondary" style="font-size: 13px; height: 36px;" title="Ver conteúdo bruto (raw)" aria-label="Ver código bruto">
+        <i class="ti ti-file-code" aria-hidden="true"></i>
+        <span>Ver Raw</span>
       </a>
-      <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
-        Novo texto
+      <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;" title="Criar nova publicação" aria-label="Criar nova publicação">
+        <i class="ti ti-plus" aria-hidden="true"></i>
+        <span>Novo texto</span>
       </a>
+      <a href="/p/{{ paste.slug }}/delete" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" title="Excluir este paste com seu Admin Delete Token" aria-label="Excluir este paste">
+        <i class="ti ti-trash" aria-hidden="true"></i>
+        <span>Excluir</span>
+      </a>
+      <button type="button" id="open-report-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" onclick="openReportModal()" title="Denunciar publicação" aria-label="Denunciar publicação">
+        <i class="ti ti-flag" aria-hidden="true"></i>
+        <span>Denunciar</span>
+      </button>
     </div>
   </div>
 
@@ -36,4 +47,121 @@
     <pre class="code-content"><code id="raw-code" class="ink-code language-{{ paste.language }}">{{ paste.content }}</code></pre>
   </div>
 </div>
+
+<!-- Modal de Denúncia (WCAG 2.1 AA) -->
+<div id="report-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h2 id="report-modal-title" class="modal-title" style="display: flex; align-items: center; gap: var(--space-2);">
+        <i class="ti ti-flag" aria-hidden="true"></i>
+        <span>Denunciar publicação</span>
+      </h2>
+    </div>
+
+    <div class="modal-body">
+      <div id="report-status-msg" class="token-alert-box" style="display: none; margin-bottom: var(--space-4);"></div>
+
+      <form id="report-form">
+        <div class="field-group" style="margin-bottom: var(--space-4);">
+          <label for="report-reason" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <i class="ti ti-alert-circle icon-sm" aria-hidden="true"></i>
+            <span>Motivo da denúncia</span>
+          </label>
+          <select id="report-reason" name="reason" class="select-field" style="width: 100%;" required>
+            <option value="spam">Spam ou publicidade indesejada</option>
+            <option value="malware">Código malicioso ou phishing</option>
+            <option value="leak">Vazamento de dados confidenciais ou senhas</option>
+            <option value="abuse">Conteúdo abusivo ou ilegal</option>
+            <option value="other">Outro motivo</option>
+          </select>
+        </div>
+
+        <div class="field-group" style="margin-bottom: var(--space-4);">
+          <label for="report-details" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <i class="ti ti-notes icon-sm" aria-hidden="true"></i>
+            <span>Detalhes adicionais (opcional)</span>
+          </label>
+          <textarea
+            id="report-details"
+            name="details"
+            class="input-text"
+            rows="3"
+            maxlength="1000"
+            placeholder="Forneça mais informações se necessário..."
+            style="width: 100%; height: auto; resize: vertical;"
+          ></textarea>
+        </div>
+
+        <div class="modal-footer" style="padding-top: var(--space-4); display: flex; justify-content: flex-end; gap: var(--space-3);">
+          <button type="button" class="btn btn-secondary" onclick="closeReportModal()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+            <span>Cancelar</span>
+          </button>
+          <button type="submit" id="submit-report-btn" class="btn btn-primary">
+            <i class="ti ti-send" aria-hidden="true"></i>
+            <span>Enviar denúncia</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openReportModal() {
+  const modal = document.getElementById('report-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeReportModal() {
+  const modal = document.getElementById('report-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('report-form');
+  const statusMsg = document.getElementById('report-status-msg');
+  const submitBtn = document.getElementById('submit-report-btn');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const reason = document.getElementById('report-reason')?.value;
+      const details = document.getElementById('report-details')?.value || null;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Enviando...';
+
+      try {
+        const response = await fetch('/api/pastes/{{ paste.slug }}/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason, details }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusMsg.innerText = data.message || 'Denúncia enviada com sucesso.';
+          statusMsg.style.display = 'block';
+          form.style.display = 'none';
+          setTimeout(() => {
+            closeReportModal();
+          }, 2000);
+        } else {
+          statusMsg.innerText = data.detail || 'Não foi possível registrar a denúncia.';
+          statusMsg.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Enviar denúncia';
+        }
+      } catch (err) {
+        statusMsg.innerText = 'Falha na comunicação com o servidor.';
+        statusMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Enviar denúncia';
+      }
+    });
+  }
+});
+</script>
 {% endblock %}

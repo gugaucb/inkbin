@@ -59,4 +59,10 @@
   --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --control-height: 40px;
   --sidebar-width: 248px;
+
+  /* Tokens Canônicos de Ícones */
+  --icon-size-sm: 16px;
+  --icon-size-md: 18px;
+  --icon-size-lg: 20px;
+  --icon-stroke: 2px;
 }
