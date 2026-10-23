@@ -20,6 +20,7 @@ Entrega da plataforma open-source Inkbin (Fase 1 - MVP): serviço de alto desemp
 ## Decisions so far
 
 - **[01 - Estruturação do repositório open-source](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/01-scaffold-and-docker.md)**: Estabelecido layout padrão `src/inkbin/`, `pyproject.toml` com dependências assíncronas e dev tools, `Dockerfile` multi-stage e `docker-compose.yml` para FastAPI + Postgres + Redis. Endpoint `/health` e suíte pytest operacional.
+- **[02 - Modelagem de dados e slugs Base62](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/02-database-schema-and-base62-slug.md)**: Entidade `Paste` em SQLAlchemy 2.0 com expiração e visualizações, gerador criptográfico Base62 (7 chars), `Admin Delete Token` com hash SHA-256 e serviço com retry automático para colisões de slug.
 
 ## Not yet specified
 
