@@ -2,13 +2,9 @@ import hashlib
 import hmac
 import secrets
 import time
-from typing import TYPE_CHECKING
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
-
-if TYPE_CHECKING:
-    pass
 
 _hasher = PasswordHasher()
 
@@ -51,7 +47,7 @@ def create_unlock_token(slug: str, secret_key: str | None = None) -> str:
     timestamp = str(int(time.time()))
     signature = hmac.new(
         secret_key.encode("utf-8"),
-        f"{slug}:{timestamp}".encode("utf-8"),
+        f"{slug}:{timestamp}".encode(),
         hashlib.sha256,
     ).hexdigest()
     return f"{timestamp}:{signature}"
@@ -79,7 +75,7 @@ def verify_unlock_token(token: str, slug: str, secret_key: str | None = None) ->
 
     expected_sig = hmac.new(
         secret_key.encode("utf-8"),
-        f"{slug}:{timestamp_str}".encode("utf-8"),
+        f"{slug}:{timestamp_str}".encode(),
         hashlib.sha256,
     ).hexdigest()
     return hmac.compare_digest(signature, expected_sig)

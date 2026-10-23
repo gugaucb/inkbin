@@ -1,16 +1,12 @@
 import asyncio
 import logging
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from inkbin.cache import CacheService, get_cache_service
 from inkbin.models import Paste
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +72,7 @@ async def run_expiration_sweep_loop(
         try:
             async with session_factory() as session:
                 await purge_expired_pastes(session)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Erro na execução periódica do sweep runner: %s", e)
 
         try:
