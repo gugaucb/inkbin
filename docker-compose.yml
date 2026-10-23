@@ -17,6 +17,7 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
       - BASE_URL=http://localhost:8000
+      - EXPIRATION_OPTIONS=1h,1d,1w,1m,never
     depends_on:
       db:
         condition: service_healthy

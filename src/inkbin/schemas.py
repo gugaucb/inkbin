@@ -1,7 +1,25 @@
 from datetime import UTC, datetime, timedelta
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
+
+from inkbin.expiration import (
+    calculate_expires_at,
+    get_active_expiration_options,
+    parse_duration_to_seconds,
+)
+
+
+class ExpirationValue(str):
+    def to_datetime(self) -> datetime | None:
+        return calculate_expires_at(str(self))
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> Any:
+        from pydantic_core import core_schema
+
+        return core_schema.no_info_after_validator_function(cls, core_schema.str_schema())
 
 
 class ExpirationEnum(str, Enum):
@@ -12,26 +30,32 @@ class ExpirationEnum(str, Enum):
     never = "never"
 
     def to_datetime(self) -> datetime | None:
-        now = datetime.now(UTC)
-        match self:
-            case ExpirationEnum.one_hour:
-                return now + timedelta(hours=1)
-            case ExpirationEnum.one_day:
-                return now + timedelta(days=1)
-            case ExpirationEnum.one_week:
-                return now + timedelta(weeks=1)
-            case ExpirationEnum.one_month:
-                return now + timedelta(days=30)
-            case ExpirationEnum.never:
-                return None
+        return calculate_expires_at(self.value)
 
 
 class PasteCreateRequest(BaseModel):
     title: str | None = Field(default=None, max_length=200)
     content: str = Field(..., max_length=1_048_576)
     language: str = Field(default="plaintext", max_length=50)
-    expiration: ExpirationEnum = Field(default=ExpirationEnum.never)
+    expiration: ExpirationValue = Field(default_factory=lambda: ExpirationValue("never"))
     password: str | None = Field(default=None, max_length=50)
+
+    @field_validator("expiration", mode="before")
+    @classmethod
+    def validate_expiration(cls, value: Any) -> ExpirationValue:
+        active_options = get_active_expiration_options()
+        if value is None or value == "":
+            val_str = "never" if "never" in active_options else active_options[0]
+            return ExpirationValue(val_str)
+
+        val_str = getattr(value, "value", str(value)).strip()
+        if val_str not in active_options:
+            raise ValueError(
+                f"Opção de expiração '{val_str}' não é permitida pelas configurações do sistema. Opções permitidas: {', '.join(active_options)}."
+            )
+
+        parse_duration_to_seconds(val_str)
+        return ExpirationValue(val_str)
 
     @field_validator("content")
     @classmethod

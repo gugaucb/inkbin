@@ -1,6 +1,6 @@
 # 03 - Parametrização Dinâmica de Expiração via Docker e Backend (EXPIRATION_OPTIONS)
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 02
 
