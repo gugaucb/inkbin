@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: closed
 
 # Especificação: Segurança, Ciclo de Vida e Moderação (Fases 2 e 3)
 
