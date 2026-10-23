@@ -4,13 +4,13 @@
 
 **Blocked by:** 01: Criação de Paste Protegido por Senha com Argon2id
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] Endpoint `POST /api/pastes/{slug}/unlock` e formulário web para validação de senha.
-- [ ] Comparação criptográfica segura de senha contra o hash Argon2id armazenado.
-- [ ] Emissão de cookie seguro `inkbin_unlocked_{slug}` assinado com HMAC (atributos `HttpOnly`, `SameSite=Lax`, `Secure` em produção) com TTL de 24 horas.
-- [ ] Presença do cookie válido libera automaticamente a visualização do paste na web e na rota `/raw/{slug}` sem repetição de senha.
-- [ ] Contador atômico de tentativas de autenticação no Redis com chave por `{slug}:{client_ip}` e expiração móvel de 900s.
-- [ ] Retorno de mensagem informativa com número de tentativas restantes em caso de senha incorreta.
-- [ ] Aplicação de bloqueio por 15 minutos após 5 erros, retornando HTTP 429 com cabeçalho `Retry-After`.
-- [ ] Testes automatizados cobrem desbloqueio correto, persistência da sessão por cookie, contagem de falhas e ativação do lockout por 15 minutos.
+- [x] Endpoint `POST /api/pastes/{slug}/unlock` e formulário web para validação de senha.
+- [x] Comparação criptográfica segura de senha contra o hash Argon2id armazenado.
+- [x] Emissão de cookie seguro `inkbin_unlocked_{slug}` assinado com HMAC (atributos `HttpOnly`, `SameSite=Lax`, `Secure` em produção) com TTL de 24 horas.
+- [x] Presença do cookie válido libera automaticamente a visualização do paste na web e na rota `/raw/{slug}` sem repetição de senha.
+- [x] Contador atômico de tentativas de autenticação no Redis com chave por `{slug}:{client_ip}` e expiração móvel de 900s.
+- [x] Retorno de mensagem informativa com número de tentativas restantes em caso de senha incorreta.
+- [x] Aplicação de bloqueio por 15 minutos após 5 erros, retornando HTTP 429 com cabeçalho `Retry-After`.
+- [x] Testes automatizados cobrem desbloqueio correto, persistência da sessão por cookie, contagem de falhas e ativação do lockout por 15 minutos.

@@ -11,8 +11,14 @@ from inkbin.cache import get_cache_service
 from inkbin.config import get_settings
 from inkbin.db import get_db_session
 from inkbin.models import Paste
-from inkbin.schemas import PasteCreateRequest, PasteCreateResponse, PasteDetailResponse
-from inkbin.security import verify_unlock_token
+from inkbin.schemas import (
+    PasteCreateRequest,
+    PasteCreateResponse,
+    PasteDetailResponse,
+    PasteUnlockRequest,
+    PasteUnlockResponse,
+)
+from inkbin.security import create_unlock_token, verify_password, verify_unlock_token
 from inkbin.services import create_paste_record
 
 router = APIRouter(tags=["pastes"])
@@ -27,6 +33,15 @@ def is_paste_unlocked(request: Request, slug: str) -> bool:
     if not cookie_val:
         return False
     return verify_unlock_token(cookie_val, slug, settings.SECRET_KEY)
+
+
+def get_client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return "127.0.0.1"
 
 
 @router.post(
@@ -69,6 +84,87 @@ async def create_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
         is_protected=paste.is_protected,
+    )
+
+
+@router.post(
+    "/api/pastes/{slug}/unlock",
+    response_model=PasteUnlockResponse,
+)
+async def unlock_paste_endpoint(
+    slug: str,
+    payload: PasteUnlockRequest,
+    request: Request,
+    response: Response,
+    session: DbSession,
+) -> PasteUnlockResponse:
+    cache = get_cache_service()
+    client_ip = get_client_ip(request)
+    attempts_key = f"auth_attempts:{slug}:{client_ip}"
+
+    current_val = await cache.get(attempts_key)
+    current_attempts = int(current_val) if current_val else 0
+
+    if current_attempts >= 5:
+        ttl = await cache.ttl(attempts_key)
+        retry_after = max(1, ttl if ttl > 0 else 900)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Muitas tentativas incorretas. Acesso bloqueado por 15 minutos.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    stmt = select(Paste).where(Paste.slug == slug)
+    result = await session.execute(stmt)
+    paste = result.scalar_one_or_none()
+
+    if paste is None or paste.is_expired():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paste não encontrado ou expirado.",
+        )
+
+    if not paste.is_protected:
+        return PasteUnlockResponse(
+            message="Paste não é protegido por senha.",
+            unlocked=True,
+            slug=slug,
+        )
+
+    if not paste.password_hash or not verify_password(paste.password_hash, payload.password):
+        new_attempts = await cache.incr(attempts_key, ttl_seconds=900)
+        if new_attempts >= 5:
+            ttl = await cache.ttl(attempts_key)
+            retry_after = max(1, ttl if ttl > 0 else 900)
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Muitas tentativas incorretas. Acesso bloqueado por 15 minutos.",
+                headers={"Retry-After": str(retry_after)},
+            )
+        remaining = 5 - new_attempts
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Senha incorreta. Você tem mais {remaining} tentativa(s) antes do bloqueio temporário.",
+        )
+
+    # Password matches: clear lockout counter
+    await cache.delete(attempts_key)
+
+    cookie_val = create_unlock_token(slug, settings.SECRET_KEY)
+    cookie_name = f"inkbin_unlocked_{slug}"
+    response.set_cookie(
+        key=cookie_name,
+        value=cookie_val,
+        max_age=86400,
+        httponly=True,
+        samesite="lax",
+        secure=settings.APP_ENV == "production",
+    )
+
+    return PasteUnlockResponse(
+        message="Paste desbloqueado com sucesso.",
+        unlocked=True,
+        slug=slug,
     )
 
 

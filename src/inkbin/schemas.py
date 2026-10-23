@@ -73,3 +73,13 @@ class PasteDetailResponse(BaseModel):
     expires_at: datetime | None
     created_at: datetime
     is_protected: bool = False
+
+
+class PasteUnlockRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=100)
+
+
+class PasteUnlockResponse(BaseModel):
+    message: str
+    unlocked: bool
+    slug: str
