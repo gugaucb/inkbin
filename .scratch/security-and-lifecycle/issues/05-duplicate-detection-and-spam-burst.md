@@ -4,11 +4,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] Cálculo determinístico de hash SHA-256 do conteúdo bruto no momento da submissão em `content_hash`.
-- [ ] Coluna `content_hash` indexada no banco de dados para buscas rápidas.
-- [ ] Middleware ou serviço de proteção que armazena no Redis a chave `spam_burst:{client_ip}:{content_hash}` com TTL de 60 segundos.
-- [ ] Detecção de rajadas repetitivas pelo mesmo IP, retornando o slug existente ou resposta `429 Too Many Requests` com aviso informativo.
-- [ ] Prevenção de duplicação sem quebrar a privacidade nem a experiência do criador legítimo.
-- [ ] Testes automatizados validam cálculo exato do hash, detecção de envios idênticos em sequência e liberação normal após expiração da janela de 60s.
+- [x] Cálculo determinístico de hash SHA-256 do conteúdo bruto no momento da submissão em `content_hash`.
+- [x] Coluna `content_hash` indexada no banco de dados para buscas rápidas.
+- [x] Middleware ou serviço de proteção que armazena no Redis a chave `spam_burst:{client_ip}:{content_hash}` com TTL de 60 segundos.
+- [x] Detecção de rajadas repetitivas pelo mesmo IP, retornando o slug existente ou resposta `429 Too Many Requests` com aviso informativo.
+- [x] Prevenção de duplicação sem quebrar a privacidade nem a experiência do criador legítimo.
+- [x] Testes automatizados validam cálculo exato do hash, detecção de envios idênticos em sequência e liberação normal após expiração da janela de 60s.

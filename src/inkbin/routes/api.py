@@ -1,3 +1,4 @@
+import hashlib
 import json
 from datetime import UTC, datetime
 from typing import Annotated, Any
@@ -67,6 +68,21 @@ async def create_paste_endpoint(
             detail=f"Conteúdo excede o limite máximo permitido de {settings.MAX_PASTE_BYTES} bytes.",
         )
 
+    content_hash = hashlib.sha256(payload.content.encode("utf-8")).hexdigest()
+    client_ip = get_client_ip(request)
+    cache = get_cache_service()
+    spam_key = f"spam_burst:{client_ip}:{content_hash}"
+    existing_slug = await cache.get(spam_key)
+
+    if existing_slug:
+        ttl = await cache.ttl(spam_key)
+        retry_after = max(1, ttl if ttl > 0 else 60)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Envio duplicado detectado para o mesmo conteúdo em menos de 60 segundos. Slug existente: {existing_slug}.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
     expires_at = payload.expiration.to_datetime()
 
     paste, admin_token = await create_paste_record(
@@ -77,6 +93,8 @@ async def create_paste_endpoint(
         expires_at=expires_at,
         password=payload.password,
     )
+
+    await cache.set(spam_key, paste.slug, ttl_seconds=60)
 
     base = settings.BASE_URL.rstrip("/")
     url = f"{base}/p/{paste.slug}"
