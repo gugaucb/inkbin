@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paste.title or 'Sem título' }} — Inkbin{% endblock %}
+{% block page_heading %}Leitura do texto{% endblock %}
+
+{% block content %}
+<div class="viewer-card">
+  <div class="viewer-header">
+    <h2 class="viewer-title">{{ paste.title or 'Sem título' }}</h2>
+    
+    <div class="viewer-meta">
+      <span class="badge">{{ paste.language }}</span>
+      <span class="meta-item">Publicado em {{ formatted_date }}</span>
+      <span>·</span>
+      <span class="meta-item">{{ paste.views_count }} visualizaç{{ 'ão' if paste.views_count == 1 else 'ões' }}</span>
+      {% if paste.expires_at %}
+      <span>·</span>
+      <span class="meta-item">Expira em: {{ formatted_expires }}</span>
+      {% endif %}
+    </div>
+
+    <div class="viewer-actions">
+      <button type="button" id="copy-code-btn" class="btn btn-primary" style="font-size: 13px; height: 36px;">
+        Copiar código
+      </button>
+      <a href="/raw/{{ paste.slug }}" target="_blank" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
+        Ver Raw
+      </a>
+      <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
+        Novo texto
+      </a>
+    </div>
+  </div>
+
+  <div class="code-container">
+    <pre class="code-content"><code id="raw-code" class="ink-code language-{{ paste.language }}">{{ paste.content }}</code></pre>
+  </div>
+</div>
+{% endblock %}

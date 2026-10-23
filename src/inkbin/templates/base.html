@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Inkbin — Publicação Editorial Anônima e Segura{% endblock %}</title>
+  <meta name="description" content="Plataforma open-source editorial para compartilhamento anônimo e seguro de código e textos com URLs curtas e não sequenciais.">
+  
+  <!-- Tipografia canônica: Inter e JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tokens e Estilos Monocromáticos INK Design System v2 -->
+  <link rel="stylesheet" href="/static/css/ink-tokens.css">
+  <link rel="stylesheet" href="/static/css/ink-editorial.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <div class="app-shell">
+    <!-- AppSidebar canônica (248px) -->
+    <aside class="app-sidebar" aria-label="Navegação da aplicação">
+      <div class="sidebar-header">
+        <a href="/" class="brand-title">
+          <span>INKBIN</span>
+        </a>
+        <div class="brand-subtitle">Editorial Pastebin</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Ações</div>
+        <a href="/" class="nav-link {% if active_page == 'editor' %}active{% endif %}">
+          <span>＋</span>
+          <span>Novo texto</span>
+        </a>
+
+        <div class="nav-section-title">Histórico Local</div>
+        <div id="local-history-container" class="history-list">
+          <div style="font-size: 12px; color: var(--text-muted); padding: 8px;">Carregando histórico...</div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div>Inkbin v0.1.0 · Open Source</div>
+        <div style="margin-top: 4px; font-size: 11px;">Sem rastreamento · Anônimo</div>
+      </div>
+    </aside>
+
+    <!-- Região Principal -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <h1 class="topbar-title">{% block page_heading %}Nova publicação{% endblock %}</h1>
+        <div class="topbar-actions">
+          {% block topbar_actions %}
+          <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;">Novo texto</a>
+          {% endblock %}
+        </div>
+      </header>
+
+      <main id="main-content" class="page-container">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/js/ink-editor.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

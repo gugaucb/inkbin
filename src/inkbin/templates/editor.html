@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Inkbin — Criar Novo Paste{% endblock %}
+{% block page_heading %}Criar publicação{% endblock %}
+
+{% block content %}
+<form id="paste-form" class="editor-layout">
+  <div class="editor-header-fields">
+    <div class="field-group input-title">
+      <label for="paste-title" class="field-label">Título do texto (opcional)</label>
+      <input 
+        type="text" 
+        id="paste-title" 
+        name="title" 
+        class="input-text" 
+        maxlength="200" 
+        placeholder="Ex.: docker-compose.yml ou Análise de logs de produção"
+      >
+    </div>
+
+    <div class="field-group">
+      <label for="paste-language" class="field-label">Linguagem / Sintaxe</label>
+      <select id="paste-language" name="language" class="select-field">
+        <option value="plaintext" selected>Texto puro (plaintext)</option>
+        <option value="python">Python</option>
+        <option value="javascript">JavaScript</option>
+        <option value="typescript">TypeScript</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="json">JSON</option>
+        <option value="markdown">Markdown</option>
+        <option value="sql">SQL</option>
+        <option value="bash">Shell / Bash</option>
+        <option value="rust">Rust</option>
+        <option value="go">Go</option>
+        <option value="yaml">YAML</option>
+        <option value="dockerfile">Dockerfile</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label for="paste-expiration" class="field-label">Prazo de expiração</label>
+      <select id="paste-expiration" name="expiration" class="select-field">
+        <option value="never" selected>Nunca expirar</option>
+        <option value="1h">1 hora</option>
+        <option value="1d">1 dia</option>
+        <option value="1w">1 semana</option>
+        <option value="1m">1 mês</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="editor-container">
+    <div class="editor-toolbar">
+      <span>Cole seu código ou digite diretamente (Tab suportado)</span>
+      <div class="editor-stats">
+        <span id="char-count">0 caracteres</span>
+        <span>·</span>
+        <span id="byte-count">0 B / 1 MB máx</span>
+      </div>
+    </div>
+    <textarea 
+      id="paste-content" 
+      name="content" 
+      class="editor-textarea" 
+      placeholder="Cole aqui o conteúdo a ser compartilhado..." 
+      required
+      spellcheck="false"
+      aria-label="Conteúdo do texto ou código"
+    ></textarea>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4);">
+    <span style="font-size: 12px; color: var(--text-secondary);">Publicação anônima · Sem rastreamento</span>
+    <button type="submit" id="submit-btn" class="btn btn-primary">
+      Publicar texto
+    </button>
+  </div>
+</form>
+
+<!-- Modal de Sucesso com URL e Admin Delete Token -->
+<div id="success-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h2 id="modal-title" class="modal-title">Publicação criada com sucesso!</h2>
+    </div>
+
+    <div class="modal-body">
+      <div>
+        <label for="modal-slug-url" class="field-label" style="display: block; margin-bottom: 6px;">URL Pública de Acesso</label>
+        <div style="display: flex; gap: var(--space-2);">
+          <input type="text" id="modal-slug-url" class="input-text" style="flex-grow: 1;" readonly>
+          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-slug-url', 'copy-url-btn')" id="copy-url-btn">
+            Copiar URL
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label" style="display: block; margin-bottom: 6px;">Chave Secreta de Administração (Admin Delete Token)</label>
+        <div class="token-alert-box" id="modal-delete-token"></div>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
+          <strong>Atenção:</strong> Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">Fechar</button>
+      <a href="#" id="modal-view-link" class="btn btn-primary">Acessar publicação</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

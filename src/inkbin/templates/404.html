@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Conteúdo Não Encontrado — Inkbin{% endblock %}
+{% block page_heading %}404 · Registro indisponível{% endblock %}
+
+{% block content %}
+<div class="viewer-card" style="padding: var(--space-12); text-align: center;">
+  <h2 style="font-size: 28px; font-weight: 700; margin-bottom: var(--space-3);">Publicação não encontrada</h2>
+  <p style="font-size: 15px; color: var(--text-secondary); max-width: 480px; margin: 0 auto var(--space-6);">
+    O texto que você está procurando pode ter expirado conforme a política configurada, foi excluído pelo autor ou nunca existiu.
+  </p>
+  <div>
+    <a href="/" class="btn btn-primary">Criar novo texto</a>
+  </div>
+</div>
+{% endblock %}
