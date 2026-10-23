@@ -22,6 +22,7 @@ Entrega da plataforma open-source Inkbin (Fase 1 - MVP): serviço de alto desemp
 - **[01 - Estruturação do repositório open-source](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/01-scaffold-and-docker.md)**: Estabelecido layout padrão `src/inkbin/`, `pyproject.toml` com dependências assíncronas e dev tools, `Dockerfile` multi-stage e `docker-compose.yml` para FastAPI + Postgres + Redis. Endpoint `/health` e suíte pytest operacional.
 - **[02 - Modelagem de dados e slugs Base62](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/02-database-schema-and-base62-slug.md)**: Entidade `Paste` em SQLAlchemy 2.0 com expiração e visualizações, gerador criptográfico Base62 (7 chars), `Admin Delete Token` com hash SHA-256 e serviço com retry automático para colisões de slug.
 - **[03 - API assíncrona de criação e leitura](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/03-core-paste-crud-and-anonymous-api.md)**: Endpoints `POST /api/pastes`, `GET /api/pastes/{slug}` e `GET /raw/{slug}` com validação de payload (1MB), entrega de token de admin, expiração e incremento atômico de visualizações.
+- **[04 - Cache Redis e Rate Limiting](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/04-redis-caching-and-rate-limiting.md)**: Cache assíncrono para leituras (`paste:{slug}`, TTL 3600s) e middleware de rate limiting (100 req/min por IP com 429 Retry-After) com fallback transparente em memória.
 
 ## Not yet specified
 

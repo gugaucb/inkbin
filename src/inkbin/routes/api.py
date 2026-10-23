@@ -60,6 +60,12 @@ async def create_paste_endpoint(
     )
 
 
+import json
+from datetime import UTC, datetime
+
+from inkbin.cache import get_cache_service
+
+
 @router.get(
     "/api/pastes/{slug}",
     response_model=PasteDetailResponse,
@@ -68,6 +74,20 @@ async def get_paste_endpoint(
     slug: str,
     session: DbSession,
 ) -> PasteDetailResponse:
+    cache = get_cache_service()
+    cache_key = f"paste:{slug}"
+    cached = await cache.get(cache_key)
+
+    if cached:
+        data = json.loads(cached)
+        # Increment views_count in database
+        await session.execute(
+            update(Paste).where(Paste.slug == slug).values(views_count=Paste.views_count + 1)
+        )
+        await session.commit()
+        data["views_count"] = data.get("views_count", 0) + 1
+        return PasteDetailResponse(**data)
+
     stmt = select(Paste).where(Paste.slug == slug)
     result = await session.execute(stmt)
     paste = result.scalar_one_or_none()
@@ -85,7 +105,7 @@ async def get_paste_endpoint(
     await session.commit()
     await session.refresh(paste)
 
-    return PasteDetailResponse(
+    response = PasteDetailResponse(
         slug=paste.slug,
         title=paste.title,
         content=paste.content,
@@ -94,6 +114,24 @@ async def get_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
     )
+
+    ttl = 3600
+    if paste.expires_at is not None:
+        now = datetime.now(UTC)
+        exp = paste.expires_at
+        if exp.tzinfo is None:
+            exp = exp.replace(tzinfo=UTC)
+        remaining = int((exp - now).total_seconds())
+        if remaining > 0:
+            ttl = min(3600, remaining)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Paste não encontrado ou expirado.",
+            )
+
+    await cache.set(cache_key, response.model_dump_json(), ttl_seconds=ttl)
+    return response
 
 
 @router.get(

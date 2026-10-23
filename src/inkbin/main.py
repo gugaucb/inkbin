@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from inkbin.config import get_settings
 from inkbin.db import init_db
+from inkbin.rate_limit import RateLimitMiddleware
 from inkbin.routes.api import router as api_router
 
 settings = get_settings()
@@ -22,6 +23,11 @@ app = FastAPI(
     version="0.1.0",
     debug=settings.DEBUG,
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    RateLimitMiddleware,
+    limit_per_minute=settings.RATE_LIMIT_PER_MINUTE,
 )
 
 app.include_router(api_router)
