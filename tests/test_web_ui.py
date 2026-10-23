@@ -80,6 +80,22 @@ async def test_get_viewer_page_success(client: AsyncClient):
     assert "INK" in response.text
     assert "Copiar código" in response.text
 
+    # Viewer metadata icons
+    assert "ti ti-code" in response.text
+    assert "ti ti-calendar" in response.text
+    assert "ti ti-eye" in response.text
+
+    # Viewer action buttons icons and accessibility labels
+    assert "ti ti-copy" in response.text
+    assert "ti ti-file-code" in response.text
+    assert "ti ti-plus" in response.text
+    assert "ti ti-trash" in response.text
+    assert "ti ti-flag" in response.text
+    assert 'aria-label="Ver código bruto"' in response.text
+    assert 'aria-label="Criar nova publicação"' in response.text
+    assert 'aria-label="Excluir este paste"' in response.text
+    assert 'aria-label="Denunciar publicação"' in response.text
+
 
 @pytest.mark.asyncio
 async def test_get_viewer_page_not_found(client: AsyncClient):

@@ -1,6 +1,6 @@
 # 04 - Ícones em Ações e Metadados do Visualizador
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -23,3 +23,13 @@ Como enriquecer os metadados e os botões de ação do visualizador (viewer.html
      - Botão Excluir: `<a href="/p/.../delete" class="btn btn-secondary" title="Excluir este paste" aria-label="Excluir este paste"><i class="ti ti-trash"></i> <span>Excluir</span></a>`.
      - Botão Denunciar: `<button id="open-report-btn" class="btn btn-secondary" title="Denunciar publicação" aria-label="Denunciar publicação"><i class="ti ti-flag"></i> <span>Denunciar</span></button>`.
    - Adicionar regras responsivas em `ink-editorial.css` para que em telas menores as ações secundárias possam recolher o label de texto mantendo o ícone e o `aria-label`.
+
+## Answer
+
+Implementados ícones na tela do visualizador (viewer):
+- Metadados enriquecidos com `ti-code`, `ti-calendar`, `ti-eye` e `ti-hourglass`.
+- Barra de ações estruturada com `ti-copy`, `ti-file-code`, `ti-plus`, `ti-trash` e `ti-flag`.
+- Alternância dinâmica de `ti-copy` para `ti-check` com feedback temporal no JavaScript.
+- Adicionados atributos de acessibilidade WCAG (`aria-label` e `title`) em todos os botões e regras responsivas em `ink-editorial.css` para recolhimento limpo de labels em telas compactas (<= 640px).
+- Testes validados em `tests/test_web_ui.py`.
+

@@ -508,4 +508,16 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   .page-container {
     padding: var(--space-4);
   }
+  .viewer-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .viewer-actions .btn-secondary span {
+    display: none;
+  }
+  .viewer-actions .btn-secondary {
+    padding: 0 var(--space-3);
+  }
 }

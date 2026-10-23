@@ -166,9 +166,9 @@ function setupViewerCopyActions() {
       const codeEl = document.getElementById('raw-code');
       if (!codeEl) return;
       navigator.clipboard.writeText(codeEl.textContent).then(() => {
-        copyCodeBtn.textContent = 'Código copiado!';
+        copyCodeBtn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Código copiado!</span>';
         setTimeout(() => {
-          copyCodeBtn.textContent = 'Copiar código';
+          copyCodeBtn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> <span>Copiar código</span>';
         }, 2000);
       });
     });
