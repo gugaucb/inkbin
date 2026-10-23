@@ -1,6 +1,6 @@
 # 01 - Remoção do Subtítulo 'Editorial Pastebin' e Ajuste do Cabeçalho da Sidebar
 
-Status: open
+Status: closed
 Type: task
 Blocked by: none
 
