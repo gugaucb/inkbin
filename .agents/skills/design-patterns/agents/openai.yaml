@@ -1,0 +1,3 @@
+interface:
+  display_name: "Design Patterns"
+  short_description: "Apply GoF patterns to build deep modules"
