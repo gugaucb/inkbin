@@ -19,9 +19,7 @@ Entrega da plataforma open-source Inkbin (Fase 1 - MVP): serviço de alto desemp
 
 ## Decisions so far
 
-<!-- O índice de decisões e resoluções completadas -->
-
-*(Nenhum ticket resolvido ainda nesta sessão inicial de mapeamento)*
+- **[01 - Estruturação do repositório open-source](file:///Users/gustavoluiscosta/Downloads/projetos/TextEditor/.scratch/inkbin/issues/01-scaffold-and-docker.md)**: Estabelecido layout padrão `src/inkbin/`, `pyproject.toml` com dependências assíncronas e dev tools, `Dockerfile` multi-stage e `docker-compose.yml` para FastAPI + Postgres + Redis. Endpoint `/health` e suíte pytest operacional.
 
 ## Not yet specified
 
