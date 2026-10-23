@@ -1,6 +1,6 @@
 # 03 - Ícones em Labels e Ações do Formulário de Criação
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -22,3 +22,12 @@ Como integrar os ícones do Tabler nos rótulos de campos (labels), na toolbar d
    - No botão de envio `.btn-primary`:
      - `<button type="submit" id="submit-btn" class="btn btn-primary"><i class="ti ti-upload"></i> <span>Publicar texto</span></button>`.
    - Ajustar no `ink-editor.js` o estado de loading do botão (`submitBtn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Publicando...'`).
+
+## Answer
+
+Implementados ícones no formulário do editor:
+- Rótulos dos campos (`.field-label`) enriquecidos com `ti-heading`, `ti-code`, `ti-clock` e `ti-lock`.
+- Toolbar de métricas enriquecida com `ti-letter-case` e `ti-database`, preservando reatividade em tempo real no JS.
+- Botão de envio primário estruturado com `ti-upload` e transição para `ti-loader` com rotação via CSS durante envio assíncrono.
+- Validação automática de integridade e testes no `tests/test_web_ui.py`.
+

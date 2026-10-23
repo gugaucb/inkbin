@@ -11,6 +11,16 @@ async def test_get_editor_page(client: AsyncClient):
     assert "INKBIN" in text
     assert "Publicar texto" in text
     assert "paste-content" in text
+    # Field labels icons
+    assert "ti ti-heading" in text
+    assert "ti ti-code" in text
+    assert "ti ti-clock" in text
+    assert "ti ti-lock" in text
+    # Editor stats icons
+    assert "ti ti-letter-case" in text
+    assert "ti ti-database" in text
+    # Submit button icon
+    assert "ti ti-upload" in text
 
 
 @pytest.mark.asyncio

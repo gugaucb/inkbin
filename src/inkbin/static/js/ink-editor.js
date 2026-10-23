@@ -34,15 +34,19 @@ function setupEditor() {
     const chars = text.length;
     const bytes = new Blob([text]).size;
 
-    if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} caracteres`;
+    if (charCountEl) {
+      charCountEl.innerHTML = `<i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>${chars.toLocaleString()} caracteres</span>`;
+    }
     if (byteCountEl) {
+      let byteStr = '';
       if (bytes < 1024) {
-        byteCountEl.textContent = `${bytes} B`;
+        byteStr = `${bytes} B`;
       } else if (bytes < 1024 * 1024) {
-        byteCountEl.textContent = `${(bytes / 1024).toFixed(1)} KB`;
+        byteStr = `${(bytes / 1024).toFixed(1)} KB`;
       } else {
-        byteCountEl.textContent = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB máx`;
+        byteStr = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB máx`;
       }
+      byteCountEl.innerHTML = `<i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>${byteStr}</span>`;
     }
   }
 
@@ -66,7 +70,7 @@ function setupEditor() {
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Publicando...';
+        submitBtn.innerHTML = '<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>Publicando...</span>';
       }
 
       try {
@@ -108,7 +112,7 @@ function setupEditor() {
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Publicar texto';
+          submitBtn.innerHTML = '<i class="ti ti-upload" aria-hidden="true"></i> <span>Publicar texto</span>';
         }
       }
     });
