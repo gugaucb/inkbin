@@ -73,6 +73,7 @@ class PasteDetailResponse(BaseModel):
     expires_at: datetime | None
     created_at: datetime
     is_protected: bool = False
+    is_active: bool = True
 
 
 class PasteUnlockRequest(BaseModel):
@@ -83,3 +84,22 @@ class PasteUnlockResponse(BaseModel):
     message: str
     unlocked: bool
     slug: str
+
+
+class ReportReasonEnum(str, Enum):
+    spam = "spam"
+    malware = "malware"
+    leak = "leak"
+    abuse = "abuse"
+    other = "other"
+
+
+class PasteReportRequest(BaseModel):
+    reason: ReportReasonEnum
+    details: str | None = Field(default=None, max_length=1000)
+
+
+class PasteReportResponse(BaseModel):
+    message: str
+    slug: str
+    report_count: int

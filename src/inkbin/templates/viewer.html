@@ -32,6 +32,9 @@
       <a href="/p/{{ paste.slug }}/delete" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" title="Excluir este paste com seu Admin Delete Token">
         Excluir
       </a>
+      <button type="button" id="open-report-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" onclick="openReportModal()">
+        Denunciar
+      </button>
     </div>
   </div>
 
@@ -39,4 +42,110 @@
     <pre class="code-content"><code id="raw-code" class="ink-code language-{{ paste.language }}">{{ paste.content }}</code></pre>
   </div>
 </div>
+
+<!-- Modal de Denúncia (WCAG 2.1 AA) -->
+<div id="report-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h2 id="report-modal-title" class="modal-title">Denunciar publicação</h2>
+    </div>
+
+    <div class="modal-body">
+      <div id="report-status-msg" class="token-alert-box" style="display: none; margin-bottom: var(--space-4);"></div>
+
+      <form id="report-form">
+        <div class="field-group" style="margin-bottom: var(--space-4);">
+          <label for="report-reason" class="field-label" style="display: block; margin-bottom: var(--space-2);">
+            Motivo da denúncia
+          </label>
+          <select id="report-reason" name="reason" class="select-field" style="width: 100%;" required>
+            <option value="spam">Spam ou publicidade indesejada</option>
+            <option value="malware">Código malicioso ou phishing</option>
+            <option value="leak">Vazamento de dados confidenciais ou senhas</option>
+            <option value="abuse">Conteúdo abusivo ou ilegal</option>
+            <option value="other">Outro motivo</option>
+          </select>
+        </div>
+
+        <div class="field-group" style="margin-bottom: var(--space-4);">
+          <label for="report-details" class="field-label" style="display: block; margin-bottom: var(--space-2);">
+            Detalhes adicionais (opcional)
+          </label>
+          <textarea
+            id="report-details"
+            name="details"
+            class="input-text"
+            rows="3"
+            maxlength="1000"
+            placeholder="Forneça mais informações se necessário..."
+            style="width: 100%; height: auto; resize: vertical;"
+          ></textarea>
+        </div>
+
+        <div class="modal-footer" style="padding-top: var(--space-4); display: flex; justify-content: flex-end; gap: var(--space-3);">
+          <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancelar</button>
+          <button type="submit" id="submit-report-btn" class="btn btn-primary">Enviar denúncia</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openReportModal() {
+  const modal = document.getElementById('report-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeReportModal() {
+  const modal = document.getElementById('report-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('report-form');
+  const statusMsg = document.getElementById('report-status-msg');
+  const submitBtn = document.getElementById('submit-report-btn');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const reason = document.getElementById('report-reason')?.value;
+      const details = document.getElementById('report-details')?.value || null;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Enviando...';
+
+      try {
+        const response = await fetch('/api/pastes/{{ paste.slug }}/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason, details }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusMsg.innerText = data.message || 'Denúncia enviada com sucesso.';
+          statusMsg.style.display = 'block';
+          form.style.display = 'none';
+          setTimeout(() => {
+            closeReportModal();
+          }, 2000);
+        } else {
+          statusMsg.innerText = data.detail || 'Não foi possível registrar a denúncia.';
+          statusMsg.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Enviar denúncia';
+        }
+      } catch (err) {
+        statusMsg.innerText = 'Falha na comunicação com o servidor.';
+        statusMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Enviar denúncia';
+      }
+    });
+  }
+});
+</script>
 {% endblock %}

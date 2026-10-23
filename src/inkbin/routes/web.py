@@ -141,6 +141,14 @@ async def viewer_page(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    if not paste.is_active:
+        return templates.TemplateResponse(
+            request=request,
+            name="451.html",
+            context={"paste": paste},
+            status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+        )
+
     # Check password challenge
     if paste.is_protected and not is_paste_unlocked(request, slug):
         return templates.TemplateResponse(

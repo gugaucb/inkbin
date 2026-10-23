@@ -1,5 +1,7 @@
 import hashlib
+import hmac
 import json
+import logging
 from datetime import UTC, datetime
 from typing import Annotated, Any
 
@@ -17,6 +19,8 @@ from inkbin.schemas import (
     PasteCreateRequest,
     PasteCreateResponse,
     PasteDetailResponse,
+    PasteReportRequest,
+    PasteReportResponse,
     PasteUnlockRequest,
     PasteUnlockResponse,
 )
@@ -27,6 +31,8 @@ from inkbin.security import (
     verify_unlock_token,
 )
 from inkbin.services import create_paste_record
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["pastes"])
 settings = get_settings()
@@ -68,6 +74,7 @@ async def create_paste_endpoint(
             detail=f"Conteúdo excede o limite máximo permitido de {settings.MAX_PASTE_BYTES} bytes.",
         )
 
+    # Spam burst detection
     content_hash = hashlib.sha256(payload.content.encode("utf-8")).hexdigest()
     client_ip = get_client_ip(request)
     cache = get_cache_service()
@@ -146,6 +153,12 @@ async def unlock_paste_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Paste não encontrado ou expirado.",
+        )
+
+    if not paste.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+            detail="Paste desativado pela moderação por violação dos termos de uso.",
         )
 
     if not paste.is_protected:
@@ -240,6 +253,100 @@ async def delete_paste_endpoint(
     }
 
 
+@router.post(
+    "/api/pastes/{slug}/report",
+    response_model=PasteReportResponse,
+)
+async def report_paste_endpoint(
+    slug: str,
+    payload: PasteReportRequest,
+    request: Request,
+    session: DbSession,
+) -> PasteReportResponse:
+    client_ip = get_client_ip(request)
+    cache = get_cache_service()
+    report_rate_key = f"report_rate:{client_ip}"
+
+    # Allow at most 5 reports per minute per IP
+    reports_count = await cache.incr(report_rate_key, ttl_seconds=60)
+    if reports_count > 5:
+        ttl = await cache.ttl(report_rate_key)
+        retry_after = max(1, ttl if ttl > 0 else 60)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Limite de denúncias excedido. Aguarde antes de enviar novas denúncias.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    stmt = select(Paste).where(Paste.slug == slug)
+    result = await session.execute(stmt)
+    paste = result.scalar_one_or_none()
+
+    if paste is None or paste.is_expired():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paste não encontrado ou expirado.",
+        )
+
+    await session.execute(
+        update(Paste).where(Paste.id == paste.id).values(report_count=Paste.report_count + 1)
+    )
+    await session.commit()
+    await session.refresh(paste)
+
+    logger.warning(
+        "AUDIT: Denúncia registrada para paste %s - motivo: %s - detalhes: %s - IP: %s",
+        slug,
+        payload.reason.value,
+        payload.details,
+        client_ip,
+    )
+
+    return PasteReportResponse(
+        message="Denúncia registrada com sucesso. Agradecemos a colaboração.",
+        slug=slug,
+        report_count=paste.report_count,
+    )
+
+
+@router.patch(
+    "/api/pastes/{slug}/deactivate",
+    status_code=status.HTTP_200_OK,
+)
+async def deactivate_paste_endpoint(
+    slug: str,
+    session: DbSession,
+    x_operator_token: Annotated[str | None, Header(alias="X-Operator-Token")] = None,
+) -> dict[str, Any]:
+    if not x_operator_token or not hmac.compare_digest(x_operator_token, settings.SECRET_KEY):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso restrito. Token de operador inválido.",
+        )
+
+    stmt = select(Paste).where(Paste.slug == slug)
+    result = await session.execute(stmt)
+    paste = result.scalar_one_or_none()
+
+    if paste is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paste não encontrado.",
+        )
+
+    await session.execute(update(Paste).where(Paste.id == paste.id).values(is_active=False))
+    await session.commit()
+
+    cache = get_cache_service()
+    await cache.delete(f"paste:{slug}")
+
+    return {
+        "message": "Paste desativado administrativamente com sucesso.",
+        "slug": slug,
+        "is_active": False,
+    }
+
+
 @router.get(
     "/api/pastes/{slug}",
     response_model=PasteDetailResponse,
@@ -255,6 +362,11 @@ async def get_paste_endpoint(
 
     if cached:
         data = json.loads(cached)
+        if data.get("is_active", True) is False:
+            raise HTTPException(
+                status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+                detail="Paste desativado pela moderação por violação dos termos de uso.",
+            )
         if data.get("expires_at"):
             exp = datetime.fromisoformat(data["expires_at"])
             if exp.tzinfo is None:
@@ -290,6 +402,12 @@ async def get_paste_endpoint(
             detail="Paste não encontrado ou expirado.",
         )
 
+    if not paste.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+            detail="Paste desativado pela moderação por violação dos termos de uso.",
+        )
+
     if paste.is_protected and not is_paste_unlocked(request, slug):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -312,6 +430,7 @@ async def get_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
         is_protected=paste.is_protected,
+        is_active=paste.is_active,
     )
 
     ttl = 3600
@@ -354,6 +473,12 @@ async def get_raw_paste_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Paste não encontrado ou expirado.",
+        )
+
+    if not paste.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+            detail="Paste desativado pela moderação por violação dos termos de uso.",
         )
 
     if paste.is_protected and not is_paste_unlocked(request, slug):
