@@ -18,7 +18,14 @@ Implementar a internacionalização completa do Inkbin com suporte a inglês (`e
 
 ## Decisions so far
 
-<!-- index preenchido à medida que os tickets forem resolvidos -->
+- **Decisão 1 (Header)**: Remoção do subtítulo redundante "Editorial Pastebin" em `src/inkbin/templates/base.html`, mantendo o logotipo e ícone focados e limpos.
+- **Decisão 2 (i18n Backend)**: Implementação de catálogo JSON leve em `src/inkbin/locales/` (`en.json`, `pt-br.json`, `cn.json`) com resolução em cascata (`?lang=` -> cookie `inkbin_locale` -> `Accept-Language` -> default `en`), helper `t(key, **kwargs)` exposto aos templates Jinja2 e middleware de cookie. Endpoint de comutação rápida `GET /set-locale/{locale}`.
+- **Decisão 3 (Expiração Dinâmica)**: `EXPIRATION_OPTIONS: str = "1h,1d,1w,1m,never"` configurável via variável de ambiente no Docker/Settings. Parser e validador estrito em `src/inkbin/expiration.py` e `src/inkbin/schemas.py` (`ExpirationValue` compatível com Pydantic v2 core schema e `to_datetime()`), retornando HTTP 422 para prazos não habilitados.
+- **Decisão 4 (Templates & Switcher)**: Injeção de `lang` dinâmico na tag `<html>`, catalogo do locale atual injetado em `window.__INK_I18N__`, tradução de todos os templates Jinja2 (`base.html`, `editor.html`, `viewer.html`, `delete_confirmation.html`, `password_challenge.html`, `404.html`, `451.html`), renderização dinâmica das opções de expiração e seletor monocromático acessível no rodapé da barra lateral.
+- **Decisão 5 (JS & Histórico Local)**: Helper de tradução client-side `t(key, fallback, params)` em `src/inkbin/static/js/ink-editor.js` para contadores e notificações. Ações de exclusão no Histórico Local: botão individual `ti-x` para remoção pontual (`removePasteFromHistory`) e botão de limpeza total com confirmação (`clearLocalHistory`), respeitando o design system editorial INK.
+- **Decisão 6 (Documentação Multilíngue)**: Documentação canônica em inglês (`README.md`), português do Brasil (`README.pt-BR.md`) e chinês simplificado (`README.zh-CN.md`), com switcher no cabeçalho e documentação da variável `EXPIRATION_OPTIONS`.
+- **Decisão 7 (Testes & Grafo)**: Atualização das asserções de UI para inglês canônico e cobertura de 100% (66/66 testes passando no pytest). Grafo de conhecimento atualizado com Graphify.
+
 
 ## Not yet specified
 

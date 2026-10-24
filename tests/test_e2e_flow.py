@@ -77,7 +77,7 @@ async def test_expired_paste_returns_404_everywhere(client: AsyncClient, test_se
     # 3. Web UI GET returns 404 template
     web_res = await client.get("/p/exp1234")
     assert web_res.status_code == 404
-    assert "Publicação não encontrada" in web_res.text
+    assert "Paste not found" in web_res.text or "Publicação não encontrada" in web_res.text
 
 
 @pytest.mark.asyncio

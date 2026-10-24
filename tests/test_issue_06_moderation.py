@@ -107,4 +107,9 @@ async def test_admin_deactivation_flow(client):
 
     web_res = await client.get(f"/p/{slug}")
     assert web_res.status_code == 451
-    assert "desativado" in web_res.text.lower() or "violação" in web_res.text.lower()
+    assert (
+        "deactivated" in web_res.text.lower()
+        or "desativado" in web_res.text.lower()
+        or "violation" in web_res.text.lower()
+        or "violação" in web_res.text.lower()
+    )

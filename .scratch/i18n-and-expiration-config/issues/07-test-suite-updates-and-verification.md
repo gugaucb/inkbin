@@ -1,8 +1,17 @@
 # 07 - Atualização da Suíte de Testes e Validação Completa de Cobertura
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 05, 06
+
+## Resolution
+
+- Updated UI assertions in legacy test files (`tests/test_web_ui.py`, `tests/test_e2e_flow.py`, `tests/test_issue_03_admin_delete.py`, and `tests/test_issue_06_moderation.py`) to assert canonical English default strings while retaining fallback recognition.
+- Verified dedicated test suites for i18n (`tests/test_i18n.py`) covering query params, cookies, headers, template rendering, and locale switching endpoints.
+- Verified dedicated test suites for configurable expirations (`tests/test_expiration_options.py`) covering custom durations, strict HTTP 422 rejection for unlisted periods, and schema validation.
+- Successfully ran full pytest suite (`uv run pytest`): 66/66 passed cleanly (100% success rate).
+- Updated knowledge graph via `graphify . --code-only --cluster-only && graphify cluster-only .`.
+
 
 ## Question
 
