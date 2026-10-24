@@ -78,3 +78,38 @@ async def test_burn_after_read_api_confirmation(client: AsyncClient):
     # Subsequent access is 404
     res_api_404 = await client.get(f"/api/pastes/{slug}?confirm_burn=true")
     assert res_api_404.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_burn_after_read_time_expiration(client: AsyncClient, test_session_factory):
+    from datetime import UTC, datetime, timedelta
+    from sqlalchemy import update
+
+    # 1. Create a paste with burn_after_read=True
+    create_payload = {
+        "title": "Expiring Secret",
+        "content": "Secret will expire before read",
+        "language": "python",
+        "expiration": "1h",
+        "burn_after_read": True,
+    }
+    res_create = await client.post("/api/pastes", json=create_payload)
+    assert res_create.status_code == 201
+    slug = res_create.json()["slug"]
+
+    # 2. Simulate expiration in the past
+    past_time = datetime.now(UTC) - timedelta(hours=2)
+    async with test_session_factory() as session:
+        await session.execute(
+            update(Paste).where(Paste.slug == slug).values(expires_at=past_time)
+        )
+        await session.commit()
+
+    # 3. GET /p/{slug} should return 404 (expired) without showing confirmation
+    res_get = await client.get(f"/p/{slug}")
+    assert res_get.status_code == 404
+
+    # 4. POST /p/{slug}/reveal should also return 404
+    res_reveal = await client.post(f"/p/{slug}/reveal")
+    assert res_reveal.status_code == 404
+

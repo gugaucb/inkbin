@@ -19,6 +19,7 @@ Implementação das funcionalidades de segurança avançada e formatos de privac
 - 03: [03-web-crypto-and-editor-integration.md](issues/03-web-crypto-and-editor-integration.md) — Implementados controles do editor, Web Crypto API para AES-256-GCM, codificação Base64 e link com fragmento `#key` no modal de sucesso.
 - 04: [04-burn-after-read-interstitial-and-lifecycle.md](issues/04-burn-after-read-interstitial-and-lifecycle.md) — Implementada tela intermediária `burn_confirmation.html`, rota `/reveal` com expurgo permanente do banco/cache, e parâmetros de confirmação na API.
 - 05: [05-viewer-client-decryption-and-base64-toggle.md](issues/05-viewer-client-decryption-and-base64-toggle.md) — Implementada decifração client-side AES-256-GCM com tratamento de chave ausente/inválida, alternância Base64 (Decodificado/Bruto) e cópia contextual.
+- 06: [06-e2e-tests-security-and-graph-sync.md](issues/06-e2e-tests-security-and-graph-sync.md) — Validação de testes ponta a ponta (API, UI, ciclo de vida de burn-after-read, formatos e i18n), 91 testes passando (100% de cobertura de cenários) e sincronização do grafo de conhecimento (`graphify update .`).
 
 ## Not yet specified
 
