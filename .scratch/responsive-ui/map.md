@@ -15,6 +15,7 @@ Implementação e refinamento da responsividade multiplataforma em todas as tela
 ## Decisions so far
 
 - [01 - Breakpoints Globais, Tokens de Viewport e Container Base](issues/01-global-breakpoints-and-layout-container.md): padronizados tokens canônicos do INK v2, layout responsivo da topbar (56px mobile / 64px desktop), drawer retrátil com backdrop e contenção de overflow global.
+- [02 - Editor Responsivo e Altura Adaptativa de Paste Content](issues/02-editor-responsive-and-adaptive-textarea.md): altura adaptativa proporcional em `.editor-textarea` com `clamp()` e `vh`, campos do formulário em coluna fluida com alvo de toque de 44px e botão de publicação visível sem rolagem forçada.
 
 ## Not yet specified
 

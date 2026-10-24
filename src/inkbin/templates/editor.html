@@ -21,7 +21,7 @@
       >
     </div>
 
-    <div class="field-group">
+    <div class="field-group field-language">
       <label for="paste-language" class="field-label">
         <i class="ti ti-code icon-sm" aria-hidden="true"></i>
         <span>{{ t('editor.syntax_label') }}</span>
@@ -44,7 +44,7 @@
       </select>
     </div>
 
-    <div class="field-group">
+    <div class="field-group field-expiration">
       <label for="paste-expiration" class="field-label">
         <i class="ti ti-clock icon-sm" aria-hidden="true"></i>
         <span>{{ t('editor.expiration_label') }}</span>
@@ -56,7 +56,7 @@
       </select>
     </div>
 
-    <div class="field-group">
+    <div class="field-group field-password">
       <label for="paste-password" class="field-label">
         <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
         <span>{{ t('editor.password_label') }}</span>
@@ -94,9 +94,9 @@
     ></textarea>
   </div>
 
-  <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4);">
-    <span style="font-size: 12px; color: var(--text-secondary);">{{ t('editor.anonymous_hint') }}</span>
-    <button type="submit" id="submit-btn" class="btn btn-primary">
+  <div class="editor-footer-actions">
+    <span class="editor-hint-text">{{ t('editor.anonymous_hint') }}</span>
+    <button type="submit" id="submit-btn" class="btn btn-primary btn-submit">
       <i class="ti ti-upload" aria-hidden="true"></i>
       <span>{{ t('editor.submit_btn') }}</span>
     </button>

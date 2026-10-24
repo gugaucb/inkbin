@@ -1,6 +1,6 @@
 # 02 - Editor Responsivo e Altura Adaptativa de Paste Content
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -21,3 +21,11 @@ Como reestruturar o formulário do editor (`src/inkbin/templates/editor.html`) e
 3. Ajustar o rodapé do formulário:
    - Garantir que a linha de ação com a dica anônima e o botão de submissão `#submit-btn` se adeque a telas pequenas (quebrando em coluna ou alinhando o botão à direita com largura total se necessário).
    - Inserir suporte a `padding-bottom: env(safe-area-inset-bottom, 16px)` para dispositivos móveis com barra de navegação virtual.
+
+## Answer
+
+Reestruturado o formulário e a área de texto do editor:
+- `.editor-textarea` atualizada para altura adaptativa: no desktop permanece com 480px; em tablets varia com `clamp(300px, 45vh, 420px)`; em mobile varia proporcionalmente com `height: clamp(200px, 36vh, 320px); min-height: 180px; resize: vertical;`.
+- Em mobile (`<= 639px`), `.editor-header-fields` colapsa fluidamente em coluna única com largura de 100%, campos de texto e seletores com altura de toque de 44px e fonte de 16px para evitar auto-zoom indesejado no iOS Safari.
+- A barra de contadores `.editor-toolbar` e `.editor-stats` adapta-se fluidamente em coluna/wrap.
+- O rodapé `.editor-footer-actions` inverte para coluna no mobile, colocando o botão `#submit-btn` como alvo prioritário de toque total e centralizando a dica de publicação anônima.

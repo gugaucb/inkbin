@@ -272,6 +272,24 @@ body {
   align-items: center;
 }
 
+.editor-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.editor-hint-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.btn-submit {
+  min-height: var(--control-height);
+  padding: 0 var(--space-6);
+}
+
 /* Tabler Icons & Iconografia Canônica */
 i.ti, [class^="ti-"], [class*=" ti-"] {
   display: inline-flex;
@@ -741,6 +759,11 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   .page-container {
     padding: var(--space-6);
   }
+
+  .editor-textarea {
+    height: clamp(300px, 45vh, 420px);
+    min-height: 240px;
+  }
 }
 
 /* 3. Mobile (<= 639px) */
@@ -752,6 +775,67 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
 
   .page-container {
     padding: var(--space-4);
+  }
+
+  /* Editor Responsivo */
+  .editor-layout {
+    gap: var(--space-4);
+  }
+
+  .editor-header-fields {
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  .editor-header-fields .field-group {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .input-text, .select-field {
+    width: 100%;
+    height: var(--touch-target-min);
+    font-size: 16px; /* Evita auto-zoom no iOS Safari */
+  }
+
+  .editor-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .editor-stats {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: 11px;
+  }
+
+  .editor-textarea {
+    height: clamp(200px, 36vh, 320px);
+    min-height: 180px;
+    resize: vertical;
+    padding: var(--space-3);
+    font-size: 13px;
+  }
+
+  .editor-footer-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: var(--space-3);
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .editor-footer-actions .btn-submit {
+    width: 100%;
+    height: var(--touch-target-min);
+    font-size: 15px;
+  }
+
+  .editor-hint-text {
+    text-align: center;
   }
 }
 
