@@ -720,6 +720,103 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
 }
 
 /* ==========================================================================
+   Vitrine de Recursos e Garantias da Plataforma (Platform Features Showcase)
+   ========================================================================== */
+
+.platform-features-section {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-default);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.platform-features-header {
+  margin-bottom: var(--space-5);
+}
+
+.platform-features-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.platform-features-title i {
+  font-size: var(--icon-size-md);
+  color: var(--text-secondary);
+}
+
+.platform-features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feature-card {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  word-break: break-word;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.feature-card:hover {
+  border-color: var(--border-focus);
+  background-color: var(--surface);
+}
+
+.feature-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  flex-shrink: 0;
+  font-size: var(--icon-size-md);
+}
+
+.feature-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.feature-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.feature-card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ==========================================================================
    Mobile Nav, Drawer & Responsive Layout Breakpoints (INK Design System v2)
    ========================================================================== */
 
@@ -853,6 +950,12 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   .viewer-actions {
     flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  /* Vitrine no Tablet (2 colunas fluidas) */
+  .platform-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
   }
 }
 
@@ -1024,6 +1127,46 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
 
   .error-message {
     font-size: 14px;
+  }
+
+  /* Vitrine no Mobile (<= 639px): Otimização ergonômica de toque, ausência de overflow horizontal */
+  .platform-features-section {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+  }
+
+  .platform-features-header {
+    margin-bottom: var(--space-3);
+  }
+
+  .platform-features-title {
+    font-size: 12px;
+  }
+
+  .platform-features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-2);
+  }
+
+  .feature-card {
+    padding: var(--space-3);
+    gap: var(--space-3);
+    min-height: var(--touch-target-min);
+  }
+
+  .feature-card-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .feature-card-title {
+    font-size: 12px;
+  }
+
+  .feature-card-desc {
+    font-size: 11px;
+    line-height: 1.35;
   }
 }
 

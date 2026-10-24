@@ -284,3 +284,23 @@ async def test_editor_platform_features_showcase_markup(client: AsyncClient):
     ]
     for icon in expected_icons:
         assert icon in html
+
+
+@pytest.mark.asyncio
+async def test_platform_features_css_and_responsiveness(client: AsyncClient):
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+
+    # Base classes
+    assert ".platform-features-section" in css_text
+    assert ".platform-features-header" in css_text
+    assert ".platform-features-grid" in css_text
+    assert ".feature-card" in css_text
+    assert ".feature-card-icon" in css_text
+    assert ".feature-card-title" in css_text
+    assert ".feature-card-desc" in css_text
+
+    # Responsive rules
+    assert "platform-features-grid" in css_text
+    assert "platform-features-section" in css_text

@@ -26,6 +26,7 @@
   --text-inverse: var(--ink-0);
   --border-default: var(--ink-200);
   --border-strong: var(--ink-300);
+  --border-focus: var(--ink-700);
   --action-primary: var(--ink-950);
   --action-primary-hover: var(--ink-900);
   --focus-ring: var(--ink-950);
