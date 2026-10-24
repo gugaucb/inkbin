@@ -321,3 +321,48 @@ async def test_editor_format_and_burn_after_read_elements(client: AsyncClient):
     assert "aes-256-gcm" in html
     assert "base64" in html
 
+
+@pytest.mark.asyncio
+async def test_viewer_aes_and_base64_elements(client: AsyncClient):
+    # 1. AES-256-GCM paste
+    aes_create = await client.post(
+        "/api/pastes",
+        json={
+            "title": "Encrypted Test",
+            "content": "b64ciphertext",
+            "language": "python",
+            "content_format": "aes-256-gcm",
+        },
+    )
+    assert aes_create.status_code == 201
+    aes_slug = aes_create.json()["slug"]
+
+    resp_aes = await client.get(f"/p/{aes_slug}")
+    assert resp_aes.status_code == 200
+    html_aes = resp_aes.text
+    assert 'data-content-format="aes-256-gcm"' in html_aes
+    assert 'id="crypto-error-notice"' in html_aes
+    assert 'id="badge-encrypted"' in html_aes
+
+    # 2. Base64 paste
+    b64_create = await client.post(
+        "/api/pastes",
+        json={
+            "title": "Base64 Test",
+            "content": "SGVsbG8gSW5rYmlu",
+            "language": "plaintext",
+            "content_format": "base64",
+        },
+    )
+    assert b64_create.status_code == 201
+    b64_slug = b64_create.json()["slug"]
+
+    resp_b64 = await client.get(f"/p/{b64_slug}")
+    assert resp_b64.status_code == 200
+    html_b64 = resp_b64.text
+    assert 'data-content-format="base64"' in html_b64
+    assert 'id="badge-base64"' in html_b64
+    assert "base64-notice-banner" in html_b64
+    assert 'id="toggle-base64-btn"' in html_b64
+
+

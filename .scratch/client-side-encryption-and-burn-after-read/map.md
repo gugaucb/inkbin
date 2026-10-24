@@ -18,6 +18,7 @@ Implementação das funcionalidades de segurança avançada e formatos de privac
 - 02: [02-i18n-catalogs-and-editorial-labels.md](issues/02-i18n-catalogs-and-editorial-labels.md) — Adicionadas chaves de tradução i18n com 100% de paridade em `en`, `pt-br` e `cn` cobrindo editor, burn-after-read, avisos de transparência Base64 e Web Crypto.
 - 03: [03-web-crypto-and-editor-integration.md](issues/03-web-crypto-and-editor-integration.md) — Implementados controles do editor, Web Crypto API para AES-256-GCM, codificação Base64 e link com fragmento `#key` no modal de sucesso.
 - 04: [04-burn-after-read-interstitial-and-lifecycle.md](issues/04-burn-after-read-interstitial-and-lifecycle.md) — Implementada tela intermediária `burn_confirmation.html`, rota `/reveal` com expurgo permanente do banco/cache, e parâmetros de confirmação na API.
+- 05: [05-viewer-client-decryption-and-base64-toggle.md](issues/05-viewer-client-decryption-and-base64-toggle.md) — Implementada decifração client-side AES-256-GCM com tratamento de chave ausente/inválida, alternância Base64 (Decodificado/Bruto) e cópia contextual.
 
 ## Not yet specified
 

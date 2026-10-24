@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEditor();
   setupLocalHistory();
   setupViewerCopyActions();
+  setupViewerContent();
   setupMobileNavigation();
 });
 
@@ -689,3 +690,89 @@ function setupMobileNavigation() {
     }
   });
 }
+
+async function setupViewerContent() {
+  const viewerCard = document.querySelector('.viewer-card[data-content-format]');
+  if (!viewerCard) return;
+
+  const contentFormat = viewerCard.getAttribute('data-content-format');
+  const codeEl = document.getElementById('raw-code');
+  if (!codeEl) return;
+
+  const rawReceivedContent = codeEl.textContent || '';
+
+  // 1. Handling AES-256-GCM Decryption
+  if (contentFormat === 'aes-256-gcm') {
+    const errorNotice = document.getElementById('crypto-error-notice');
+    const errorText = document.getElementById('crypto-error-text');
+    const codeContainer = document.querySelector('.code-container');
+
+    const keyHash = window.location.hash ? window.location.hash.slice(1).trim() : '';
+
+    if (!keyHash) {
+      if (codeContainer) codeContainer.style.display = 'none';
+      if (errorNotice) {
+        if (errorText) errorText.textContent = t('viewer.encrypted_missing_key', 'Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.');
+        errorNotice.style.display = 'flex';
+      }
+      return;
+    }
+
+    try {
+      const key = await importKeyFromBase64Url(keyHash);
+      const decrypted = await decryptText(rawReceivedContent.trim(), key);
+      codeEl.textContent = decrypted;
+      if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+        codeEl.removeAttribute('data-highlighted');
+        hljs.highlightElement(codeEl);
+      }
+    } catch (err) {
+      console.error('Decryption failure:', err);
+      if (codeContainer) codeContainer.style.display = 'none';
+      if (errorNotice) {
+        if (errorText) errorText.textContent = t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
+        errorNotice.style.display = 'flex';
+      }
+    }
+  }
+
+  // 2. Handling Base64 Toggle
+  if (contentFormat === 'base64') {
+    const toggleBtn = document.getElementById('toggle-base64-btn');
+    const toggleText = document.getElementById('toggle-base64-text');
+
+    const rawBase64 = rawReceivedContent.trim();
+    let decodedText = '';
+    try {
+      decodedText = base64ToUtf8(rawBase64);
+    } catch (e) {
+      decodedText = rawBase64;
+    }
+
+    // Default view: Decoded
+    codeEl.textContent = decodedText;
+    if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+      codeEl.removeAttribute('data-highlighted');
+      hljs.highlightElement(codeEl);
+    }
+
+    if (toggleBtn) {
+      let isShowingRaw = false;
+      toggleBtn.addEventListener('click', () => {
+        isShowingRaw = !isShowingRaw;
+        if (isShowingRaw) {
+          codeEl.textContent = rawBase64;
+          if (toggleText) toggleText.textContent = t('viewer.base64_toggle_decoded', 'Visualizar Decodificado');
+        } else {
+          codeEl.textContent = decodedText;
+          if (toggleText) toggleText.textContent = t('viewer.base64_toggle_raw', 'Visualizar Base64 Bruto');
+        }
+        if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+          codeEl.removeAttribute('data-highlighted');
+          hljs.highlightElement(codeEl);
+        }
+      });
+    }
+  }
+}
+
