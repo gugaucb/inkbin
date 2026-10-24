@@ -15,6 +15,7 @@ Implementação das funcionalidades de segurança avançada e formatos de privac
 ## Decisions so far
 
 - 01: [01-schema-and-model-migrations.md](issues/01-schema-and-model-migrations.md) — Adicionados campos `content_format` e `burn_after_read` no modelo `Paste`, migração incremental em `_sync_migrate_schema`, esquemas Pydantic e serviços de persistência.
+- 02: [02-i18n-catalogs-and-editorial-labels.md](issues/02-i18n-catalogs-and-editorial-labels.md) — Adicionadas chaves de tradução i18n com 100% de paridade em `en`, `pt-br` e `cn` cobrindo editor, burn-after-read, avisos de transparência Base64 e Web Crypto.
 
 ## Not yet specified
 

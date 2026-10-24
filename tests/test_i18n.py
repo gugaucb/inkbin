@@ -213,3 +213,55 @@ async def test_platform_features_showcase_multilingual_rendering():
         sec_cn = html_cn.split('<section class="platform-features-section"')[1].split('</section>')[0]
         assert "features." not in sec_cn
 
+
+def test_security_and_encryption_i18n_keys():
+    load_catalogs(force=True)
+
+    required_keys = [
+        "editor.format_label",
+        "editor.format_plaintext",
+        "editor.format_aes_gcm",
+        "editor.format_base64",
+        "editor.format_base64_hint",
+        "editor.burn_label",
+        "editor.burn_hint",
+        "modal.encrypted_notice",
+        "burn.page_title",
+        "burn.badge",
+        "burn.title",
+        "burn.description",
+        "burn.confirm_btn",
+        "burn.cancel_btn",
+        "burn.burned_banner",
+        "viewer.base64_badge",
+        "viewer.base64_notice",
+        "viewer.base64_toggle_decoded",
+        "viewer.base64_toggle_raw",
+        "viewer.encrypted_badge",
+        "viewer.encrypted_missing_key",
+        "viewer.encrypted_error",
+    ]
+
+    for locale in SUPPORTED_LOCALES:
+        for key in required_keys:
+            val = t(key, locale=locale)
+            assert val != key, f"Missing key '{key}' in locale '{locale}'"
+            assert len(val.strip()) > 0, f"Empty key '{key}' in locale '{locale}'"
+
+
+def test_locale_key_parity():
+    catalogs = load_catalogs(force=True)
+    en_keys = set(catalogs["en"].keys())
+    pt_keys = set(catalogs["pt-br"].keys())
+    cn_keys = set(catalogs["cn"].keys())
+
+    missing_in_pt = en_keys - pt_keys
+    missing_in_cn = en_keys - cn_keys
+    extra_in_pt = pt_keys - en_keys
+    extra_in_cn = cn_keys - en_keys
+
+    assert not missing_in_pt, f"Keys missing in pt-br: {missing_in_pt}"
+    assert not missing_in_cn, f"Keys missing in cn: {missing_in_cn}"
+    assert not extra_in_pt, f"Extra keys in pt-br: {extra_in_pt}"
+    assert not extra_in_cn, f"Extra keys in cn: {extra_in_cn}"
+

@@ -43,6 +43,13 @@
     "content_placeholder": "Cole aqui o conteúdo a ser compartilhado...",
     "content_aria": "Conteúdo do texto ou código",
     "anonymous_hint": "Publicação anônima · Sem rastreamento",
+    "format_label": "Modo de Conteúdo / Segurança",
+    "format_plaintext": "Texto puro (Padrão)",
+    "format_aes_gcm": "Criptografar no navegador (AES-256-GCM)",
+    "format_base64": "Codificação Base64",
+    "format_base64_hint": "Base64 é uma codificação e não criptografia — qualquer pessoa com o link pode lê-lo.",
+    "burn_label": "Destruir após leitura (Burn after read)",
+    "burn_hint": "O paste será excluído permanentemente após a primeira visualização confirmada.",
     "submit_btn": "Publicar texto",
     "publishing_btn": "Publicando...",
     "alert_empty": "Por favor, insira o conteúdo do paste antes de publicar.",
@@ -82,8 +89,18 @@
     "admin_token": "Chave Secreta de Administração (Admin Delete Token)",
     "copy_token_aria": "Copiar token de exclusão",
     "warning": "Atenção: Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.",
+    "encrypted_notice": "Criptografado com AES-256-GCM. A chave de decifração reside unicamente após o '#' da URL e jamais foi enviada ao servidor. Se o link for perdido, o conteúdo não poderá ser recuperado.",
     "close": "Fechar",
     "open": "Abrir publicação"
+  },
+  "burn": {
+    "page_title": "Destruição Após Leitura — Inkbin",
+    "badge": "Ação Irreversível",
+    "title": "Este paste será destruído após a leitura",
+    "description": "O autor configurou este documento para ser excluído permanentemente do servidor assim que for aberto. Deseja revelar o conteúdo agora?",
+    "confirm_btn": "Revelar e Destruir Paste",
+    "cancel_btn": "Voltar para o Início",
+    "burned_banner": "Este documento foi destruído permanentemente do banco de dados na visualização atual."
   },
   "viewer": {
     "untitled": "Sem título",
@@ -101,7 +118,14 @@
     "delete": "Excluir",
     "delete_aria": "Excluir este paste com seu Admin Delete Token",
     "report": "Denunciar",
-    "report_aria": "Denunciar publicação"
+    "report_aria": "Denunciar publicação",
+    "base64_badge": "Base64 Codificado",
+    "base64_notice": "Aviso: Este conteúdo está codificado em Base64. Base64 é uma codificação, não criptografia — qualquer pessoa com o link pode lê-lo.",
+    "base64_toggle_decoded": "Visualizar Decodificado",
+    "base64_toggle_raw": "Visualizar Base64 Bruto",
+    "encrypted_badge": "AES-256-GCM Cifrado no Cliente",
+    "encrypted_missing_key": "Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.",
+    "encrypted_error": "Falha na decifração. A chave fornecida no link é inválida ou foi corrompida."
   },
   "report": {
     "modal_title": "Denunciar publicação",

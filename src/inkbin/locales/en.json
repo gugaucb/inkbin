@@ -43,6 +43,13 @@
     "content_placeholder": "Paste the content to share here...",
     "content_aria": "Paste content or code",
     "anonymous_hint": "Anonymous publication · No tracking",
+    "format_label": "Content format / Security",
+    "format_plaintext": "Plain text (Default)",
+    "format_aes_gcm": "Encrypt in browser (AES-256-GCM)",
+    "format_base64": "Base64 encoding",
+    "format_base64_hint": "Base64 is an encoding format, not encryption — anyone with the link can decode it.",
+    "burn_label": "Burn after read",
+    "burn_hint": "The paste will be permanently purged after the first confirmed view.",
     "submit_btn": "Publish paste",
     "publishing_btn": "Publishing...",
     "alert_empty": "Please enter paste content before publishing.",
@@ -82,8 +89,18 @@
     "admin_token": "Secret Administration Key (Admin Delete Token)",
     "copy_token_aria": "Copy delete token",
     "warning": "Attention: As publication is anonymous, save this key! It is required if you decide to delete the paste before expiration. It will not be shown again.",
+    "encrypted_notice": "Encrypted with AES-256-GCM. The decryption key resides exclusively after the '#' in the URL and was never sent to the server. If you lose this complete link, the content cannot be recovered.",
     "close": "Close",
     "open": "Open paste"
+  },
+  "burn": {
+    "page_title": "Burn After Read — Inkbin",
+    "badge": "Irreversible Action",
+    "title": "This paste will be destroyed after reading",
+    "description": "The author configured this document to be permanently purged from the server as soon as it is opened. Would you like to reveal the content now?",
+    "confirm_btn": "Reveal and Destroy Paste",
+    "cancel_btn": "Back to Home",
+    "burned_banner": "This document has been permanently purged from the database during this view."
   },
   "viewer": {
     "untitled": "Untitled",
@@ -101,7 +118,14 @@
     "delete": "Delete",
     "delete_aria": "Delete this paste with your Admin Delete Token",
     "report": "Report",
-    "report_aria": "Report publication"
+    "report_aria": "Report publication",
+    "base64_badge": "Base64 Encoded",
+    "base64_notice": "Notice: This content is Base64 encoded. Base64 is an encoding, not encryption — anyone with the link can read it.",
+    "base64_toggle_decoded": "View Decoded",
+    "base64_toggle_raw": "View Raw Base64",
+    "encrypted_badge": "AES-256-GCM Client Encrypted",
+    "encrypted_missing_key": "Decryption key missing from link (#key). Without the original key fragment, this document cannot be decrypted.",
+    "encrypted_error": "Decryption failed. The key in the link is invalid or corrupted."
   },
   "report": {
     "modal_title": "Report publication",

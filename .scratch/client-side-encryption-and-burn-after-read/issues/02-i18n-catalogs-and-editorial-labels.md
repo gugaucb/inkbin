@@ -1,6 +1,6 @@
 # 02 - Catálogos i18n para Formatos de Cifragem, Burn After Read e Avisos Editoriais
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: none
 
@@ -38,3 +38,12 @@ Como estruturar as chaves e textos nos catálogos de internacionalização (`src
      - `viewer.encrypted_missing_key`: "Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.".
 2. Garantir ausência de chaves órfãs e paridade total entre os três idiomas.
 3. Adicionar testes unitários em `tests/test_i18n.py`.
+
+## Answer
+
+Adicionadas todas as chaves e seções de internacionalização com 100% de paridade em `src/inkbin/locales/en.json`, `pt-br.json` e `cn.json`:
+1. `editor`: seletor de formato (`format_label`, `format_plaintext`, `format_aes_gcm`, `format_base64`, `format_base64_hint`) e opção de destruição após leitura (`burn_label`, `burn_hint`).
+2. `modal`: aviso de link cifrado no cliente (`modal.encrypted_notice`).
+3. `burn`: seção completa para a tela intermediária (`page_title`, `badge`, `title`, `description`, `confirm_btn`, `cancel_btn`, `burned_banner`).
+4. `viewer`: badges editoriais, mensagens de aviso de transparência Base64, alternadores e avisos de chave ausente/inválida (`base64_badge`, `base64_notice`, `base64_toggle_decoded`, `base64_toggle_raw`, `encrypted_badge`, `encrypted_missing_key`, `encrypted_error`).
+5. Testes unitários implementados em `tests/test_i18n.py` (`test_security_and_encryption_i18n_keys` e `test_locale_key_parity`), validando cobertura e ausência de chaves órfãs ou faltantes.
