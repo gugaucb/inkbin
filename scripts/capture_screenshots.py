@@ -1,29 +1,29 @@
 import asyncio
+import contextlib
 import os
 import signal
 import subprocess
+import sys
 import time
 from pathlib import Path
+
+import httpx
 from playwright.async_api import async_playwright
 
 PORT = 8765
 BASE_URL = f"http://127.0.0.1:{PORT}"
-OUT_DIR = Path("/Users/gustavoluiscosta/Downloads/projetos/TextEditor/docs/assets/screenshots")
+OUT_DIR = Path(__file__).resolve().parent.parent / "docs" / "assets" / "screenshots"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def wait_for_server(url: str, timeout: float = 15.0):
-    import httpx
-
     start = time.time()
     while time.time() - start < timeout:
-        try:
+        with contextlib.suppress(httpx.HTTPError, OSError):
             async with httpx.AsyncClient() as client:
                 res = await client.get(f"{url}/health")
                 if res.status_code == 200:
                     return True
-        except Exception:
-            pass
         await asyncio.sleep(0.3)
     return False
 
@@ -38,8 +38,15 @@ async def capture_all():
     if os.path.exists("test_screenshots.db"):
         os.remove("test_screenshots.db")
 
-    proc = subprocess.Popen(
-        ["./.venv/bin/uvicorn", "inkbin.main:app", "--port", str(PORT), "--host", "127.0.0.1"],
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-m",
+        "uvicorn",
+        "inkbin.main:app",
+        "--port",
+        str(PORT),
+        "--host",
+        "127.0.0.1",
         env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -50,8 +57,6 @@ async def capture_all():
         if not ok:
             print("Failed to start server!")
             return
-
-        import httpx
 
         # Create public paste
         async with httpx.AsyncClient() as client:
@@ -181,11 +186,13 @@ async def stream_events() -> AsyncGenerator[str, None]:
             print("All screenshots successfully captured!")
 
     finally:
-        proc.send_signal(signal.SIGINT)
-        try:
-            proc.wait(timeout=3)
-        except Exception:
-            proc.kill()
+        with contextlib.suppress(ProcessLookupError, OSError):
+            proc.send_signal(signal.SIGINT)
+        with contextlib.suppress(asyncio.TimeoutError, ProcessLookupError, OSError):
+            await asyncio.wait_for(proc.wait(), timeout=3)
+        if proc.returncode is None:
+            with contextlib.suppress(ProcessLookupError, OSError):
+                proc.kill()
         if os.path.exists("test_screenshots.db"):
             os.remove("test_screenshots.db")
 
