@@ -133,3 +133,125 @@ async def test_modals_and_special_pages_icons(client: AsyncClient):
     assert "ti ti-alert-triangle" in delete_res.text
     assert "ti ti-trash" in delete_res.text
     assert "ti ti-arrow-left" in delete_res.text
+
+
+@pytest.mark.asyncio
+async def test_responsive_viewport_and_drawer(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+
+    # Viewport meta tag
+    assert 'name="viewport"' in text
+    assert 'content="width=device-width, initial-scale=1.0"' in text
+
+    # Mobile nav drawer and backdrop
+    assert 'id="sidebar-backdrop"' in text
+    assert 'class="sidebar-backdrop"' in text
+    assert 'id="mobile-nav-toggle"' in text
+    assert 'class="mobile-nav-toggle"' in text
+    assert 'aria-controls="app-sidebar"' in text
+    assert 'id="app-sidebar"' in text
+    assert 'id="sidebar-close-btn"' in text
+    assert 'class="topbar-left"' in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_editor_form_classes(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+
+    # Form layout and fields
+    assert "editor-layout" in text
+    assert "editor-header-fields" in text
+    assert "field-language" in text
+    assert "field-expiration" in text
+    assert "field-password" in text
+    assert "editor-container" in text
+    assert "editor-toolbar" in text
+    assert "editor-stats" in text
+    assert "editor-footer-actions" in text
+    assert "editor-hint-text" in text
+    assert "btn-submit" in text
+
+    # Success modal responsive elements
+    assert "modal-input-group" in text
+    assert "modal-qr-container" in text
+    assert "qr-code-box" in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_viewer_code_containment(client: AsyncClient):
+    long_code = "const extremelyLongLine = " + "x" * 250 + ";"
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Wide Code Test", "content": long_code, "language": "javascript"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    response = await client.get(f"/p/{slug}")
+    assert response.status_code == 200
+    text = response.text
+
+    # Code container and pre formatting
+    assert "code-container" in text
+    assert "code-content" in text
+    assert "ink-code" in text
+    assert long_code in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_tokens_and_editorial_css(client: AsyncClient):
+    tokens_res = await client.get("/static/css/ink-tokens.css")
+    assert tokens_res.status_code == 200
+    assert "--breakpoint-mobile: 639px;" in tokens_res.text
+    assert "--breakpoint-tablet: 1023px;" in tokens_res.text
+    assert "--breakpoint-desktop: 1439px;" in tokens_res.text
+    assert "--topbar-height-mobile: 56px;" in tokens_res.text
+    assert "--topbar-height-desktop: 64px;" in tokens_res.text
+    assert "--touch-target-min: 44px;" in tokens_res.text
+
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+    assert "clamp(200px, 36vh, 320px)" in css_text
+    assert "clamp(300px, 45vh, 420px)" in css_text
+    assert "overflow-x: auto;" in css_text
+    assert "-webkit-overflow-scrolling: touch;" in css_text
+    assert "aux-card" in css_text
+    assert "error-card" in css_text
+
+
+@pytest.mark.asyncio
+async def test_responsive_auxiliary_and_error_pages(client: AsyncClient):
+    # 404 Error page
+    res_404 = await client.get("/p/non-existing-slug-12345")
+    assert res_404.status_code == 404
+    assert "error-card" in res_404.text
+    assert "error-icon" in res_404.text
+    assert "error-title" in res_404.text
+    assert "error-message" in res_404.text
+
+    # Create protected paste for challenge and delete confirmation tests
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Aux Test", "content": "protected", "password": "pass-aux-test"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    # Challenge page
+    challenge_res = await client.get(f"/p/{slug}")
+    assert challenge_res.status_code == 200
+    assert "aux-card" in challenge_res.text
+    assert "aux-card-header" in challenge_res.text
+    assert "aux-card-actions" in challenge_res.text
+
+    # Delete confirmation page
+    delete_res = await client.get(f"/p/{slug}/delete")
+    assert delete_res.status_code == 200
+    assert "aux-card" in delete_res.text
+    assert "aux-card-header" in delete_res.text
+    assert "aux-card-actions" in delete_res.text

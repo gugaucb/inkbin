@@ -5,6 +5,7 @@ from sqlalchemy.pool import StaticPool
 
 from inkbin.db import Base, get_db_session
 from inkbin.main import app
+from inkbin.rate_limit import get_rate_limiter
 
 TEST_DB_URL = "sqlite+aiosqlite:///:memory:"
 
@@ -36,6 +37,10 @@ async def test_session_factory(test_engine):
 
 @pytest.fixture
 async def client(test_session_factory):
+    limiter = get_rate_limiter()
+    if limiter and hasattr(limiter, "_fallback"):
+        await limiter._fallback.reset()
+
     async def override_get_db_session():
         async with test_session_factory() as session:
             yield session
