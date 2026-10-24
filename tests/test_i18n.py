@@ -116,3 +116,32 @@ async def test_set_locale_endpoint():
         resp3 = await client.get("/set-locale/xyz", follow_redirects=False)
         assert resp3.status_code in (302, 303, 307)
         assert resp3.cookies.get("inkbin_locale") == "en"
+
+
+@pytest.mark.asyncio
+async def test_qr_code_modal_translations_and_template():
+    load_catalogs(force=True)
+
+    # 1. Assert translations exist for all supported locales
+    for loc in ("en", "pt-br", "cn"):
+        assert t("modal.qr_code_label", locale=loc) != "modal.qr_code_label"
+        assert t("modal.qr_code_hint", locale=loc) != "modal.qr_code_hint"
+        assert t("modal.qr_code_aria", locale=loc) != "modal.qr_code_aria"
+
+    # Specific locale strings
+    assert "QR Code" in t("modal.qr_code_label", locale="en")
+    assert "celular" in t("modal.qr_code_label", locale="pt-br")
+    assert "二维码" in t("modal.qr_code_label", locale="cn")
+
+    # 2. Assert editor template renders modal QR code elements
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        resp = await client.get("/")
+        assert resp.status_code == 200
+        html = resp.text
+        assert 'id="modal-qrcode"' in html
+        assert 'class="qr-code-box"' in html
+        assert 'qrcode.min.js' in html
+        assert 'role="img"' in html
+        assert 'ti ti-qrcode' in html
+

@@ -128,6 +128,21 @@
         </div>
       </div>
 
+      <!-- QR Code para leitura no celular -->
+      <div class="modal-qr-section">
+        <label class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
+          <i class="ti ti-qrcode icon-sm" aria-hidden="true"></i>
+          <span>{{ t('modal.qr_code_label') }}</span>
+        </label>
+        <div class="modal-qr-container">
+          <div id="modal-qrcode" class="qr-code-box" role="img" aria-label="{{ t('modal.qr_code_aria') }}"></div>
+          <p class="qr-hint-text">
+            <i class="ti ti-device-mobile" aria-hidden="true"></i>
+            <span>{{ t('modal.qr_code_hint') }}</span>
+          </p>
+        </div>
+      </div>
+
       <div>
         <label class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
           <i class="ti ti-key icon-sm" aria-hidden="true"></i>
@@ -157,4 +172,8 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/qrcode.min.js"></script>
 {% endblock %}

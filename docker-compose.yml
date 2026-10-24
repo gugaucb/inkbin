@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     container_name: inkbin_app
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
@@ -17,7 +19,7 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
       - BASE_URL=http://localhost:8000
-      - EXPIRATION_OPTIONS=1h,1d,1w,1m,never
+      - EXPIRATION_OPTIONS=1h,1d,1w,1m
     depends_on:
       db:
         condition: service_healthy
