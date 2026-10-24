@@ -466,6 +466,7 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   justify-content: center;
   z-index: 500;
   padding: var(--space-4);
+  overflow-y: auto;
 }
 
 .modal-dialog {
@@ -473,14 +474,20 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-popover);
-  width: 100%;
-  max-width: 560px;
+  width: min(92vw, 480px);
+  max-width: 100%;
+  margin: 16px auto;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .modal-header {
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -493,6 +500,14 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  overflow-y: auto;
+}
+
+.modal-input-group {
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+  width: 100%;
 }
 
 .token-alert-box {
@@ -502,6 +517,7 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   padding: var(--space-4);
   font-family: var(--font-mono);
   font-size: 13px;
+  word-break: break-all;
   -webkit-user-select: all;
   user-select: all;
 }
@@ -522,6 +538,8 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   gap: var(--space-2);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .qr-code-box {
@@ -532,8 +550,9 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 144px;
-  min-height: 144px;
+  max-width: 100%;
+  min-width: 140px;
+  min-height: 140px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -541,6 +560,7 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
 .qr-code-box canvas {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
 .qr-hint-text {
@@ -550,6 +570,7 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   align-items: center;
   gap: var(--space-2);
   margin: 0;
+  text-align: center;
 }
 
 .modal-footer {
@@ -559,6 +580,61 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* Auxiliary Screens (Password Challenge, Delete Confirmation) */
+.aux-card {
+  max-width: 540px;
+  width: 100%;
+  margin: var(--space-8) auto;
+  padding: var(--space-8);
+  box-sizing: border-box;
+}
+
+.aux-card-header {
+  margin-bottom: var(--space-6);
+  text-align: left;
+}
+
+.aux-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Error Screens (404, 451) */
+.error-card {
+  padding: var(--space-12);
+  text-align: center;
+  max-width: 620px;
+  width: 100%;
+  margin: var(--space-8) auto;
+  box-sizing: border-box;
+}
+
+.error-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+}
+
+.error-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.error-message {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto var(--space-6);
+  word-break: break-word;
 }
 
 /* History list in sidebar */
@@ -888,6 +964,66 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   .code-content {
     padding: var(--space-4);
     font-size: 12px;
+  }
+
+  /* Modais no Mobile */
+  .modal-dialog {
+    width: min(94vw, 480px);
+    margin: 12px auto;
+  }
+
+  .modal-header {
+    padding: var(--space-4);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .modal-footer {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .modal-input-group {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .modal-input-group .btn {
+    width: 100%;
+    height: var(--touch-target-min);
+  }
+
+  /* Telas Auxiliares e Erros no Mobile */
+  .aux-card {
+    margin: var(--space-4) auto;
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .aux-card-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: var(--space-3);
+  }
+
+  .aux-card-actions .btn {
+    width: 100%;
+    height: var(--touch-target-min);
+    justify-content: center;
+  }
+
+  .error-card {
+    padding: var(--space-8) var(--space-4);
+    margin: var(--space-4) auto;
+  }
+
+  .error-title {
+    font-size: 22px;
+  }
+
+  .error-message {
+    font-size: 14px;
   }
 }
 

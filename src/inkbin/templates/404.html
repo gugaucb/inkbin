@@ -4,12 +4,12 @@
 {% block page_heading %}{{ t('error404.heading') }}{% endblock %}
 
 {% block content %}
-<div class="viewer-card" style="padding: var(--space-12); text-align: center;">
+<div class="viewer-card error-card">
   <div style="margin-bottom: var(--space-4);">
-    <i class="ti ti-file-x" style="font-size: 48px; color: var(--text-muted);" aria-hidden="true"></i>
+    <i class="ti ti-file-x error-icon" aria-hidden="true"></i>
   </div>
-  <h2 style="font-size: 28px; font-weight: 700; margin-bottom: var(--space-3);">{{ t('error404.title') }}</h2>
-  <p style="font-size: 15px; color: var(--text-secondary); max-width: 480px; margin: 0 auto var(--space-6);">
+  <h2 class="error-title">{{ t('error404.title') }}</h2>
+  <p class="error-message">
     {{ t('error404.message') }}
   </p>
   <div>

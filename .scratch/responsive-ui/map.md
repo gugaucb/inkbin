@@ -17,6 +17,7 @@ Implementação e refinamento da responsividade multiplataforma em todas as tela
 - [01 - Breakpoints Globais, Tokens de Viewport e Container Base](issues/01-global-breakpoints-and-layout-container.md): padronizados tokens canônicos do INK v2, layout responsivo da topbar (56px mobile / 64px desktop), drawer retrátil com backdrop e contenção de overflow global.
 - [02 - Editor Responsivo e Altura Adaptativa de Paste Content](issues/02-editor-responsive-and-adaptive-textarea.md): altura adaptativa proporcional em `.editor-textarea` com `clamp()` e `vh`, campos do formulário em coluna fluida com alvo de toque de 44px e botão de publicação visível sem rolagem forçada.
 - [03 - Visualizador Responsivo e Isolamento de Rolagem de Código](issues/03-viewer-responsive-and-code-scroll-containment.md): contenção rigorosa de overflow-x com touch scrolling em `<pre><code>` preservando quebras originais, metadados com wrap flexível e condensação elegante de ações do leitor em telas móveis.
+- [04 - Modais Responsivos, QR Code e Telas Auxiliares](issues/04-responsive-modals-qr-code-and-auxiliary-screens.md): modais fluidos com rolagem interna, QR Code centralizado auto-ajustável, `modal-input-group` responsivo e padronização tátil de telas auxiliares (`.aux-card`) e de erro (`.error-card`).
 
 ## Not yet specified
 

@@ -119,9 +119,9 @@
           <i class="ti ti-link icon-sm" aria-hidden="true"></i>
           <span>{{ t('modal.public_url') }}</span>
         </label>
-        <div style="display: flex; gap: var(--space-2);">
-          <input type="text" id="modal-slug-url" class="input-text" style="flex-grow: 1;" readonly>
-          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-slug-url', 'copy-url-btn')" id="copy-url-btn">
+        <div class="modal-input-group">
+          <input type="text" id="modal-slug-url" class="input-text modal-field-input" style="flex-grow: 1;" readonly>
+          <button type="button" class="btn btn-secondary btn-copy-action" onclick="copyToClipboard('modal-slug-url', 'copy-url-btn')" id="copy-url-btn">
             <i class="ti ti-copy" aria-hidden="true"></i>
             <span>{{ t('modal.copy_url') }}</span>
           </button>
@@ -148,9 +148,9 @@
           <i class="ti ti-key icon-sm" aria-hidden="true"></i>
           <span>{{ t('modal.admin_token') }}</span>
         </label>
-        <div style="display: flex; gap: var(--space-2); align-items: stretch;">
+        <div class="modal-input-group">
           <div class="token-alert-box" id="modal-delete-token" style="flex-grow: 1;"></div>
-          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-delete-token', 'copy-token-btn')" id="copy-token-btn" title="{{ t('modal.copy_token_aria') }}" aria-label="{{ t('modal.copy_token_aria') }}">
+          <button type="button" class="btn btn-secondary btn-copy-action" onclick="copyToClipboard('modal-delete-token', 'copy-token-btn')" id="copy-token-btn" title="{{ t('modal.copy_token_aria') }}" aria-label="{{ t('modal.copy_token_aria') }}">
             <i class="ti ti-copy" aria-hidden="true"></i>
           </button>
         </div>

@@ -1,6 +1,6 @@
 # 04 - Modais Responsivos, QR Code e Telas Auxiliares
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -19,3 +19,12 @@ Como otimizar os modais (sucesso com QR Code e denúncia de abuso) e as telas au
    - Formulários em `password_challenge.html` e `delete_confirmation.html` com cards centralizados, preenchimento fluído de 100% da largura útil e botões acessíveis.
 3. Telas de Erro (404 e 451):
    - Tipografia responsiva com ícones e mensagens centralizadas legíveis em celulares.
+
+## Answer
+
+Modais e telas auxiliares totalmente responsivos:
+- Modais (`.modal-dialog`) ajustados para `width: min(92vw, 480px)` no desktop e `width: min(94vw, 480px)` no mobile, com suporte a rolagem interna em `.modal-body` (`overflow-y: auto; max-height: 90vh/90dvh`).
+- QR code (`.modal-qr-container` / `.qr-code-box`) centralizado com imagem/canvas flexível (`max-width: 100%; height: auto;`).
+- Grupos de inputs e botões de cópia configurados com `.modal-input-group` que colapsam verticalmente no mobile para garantir alvos de clique confortáveis (44px).
+- Telas de autenticação (`password_challenge.html`) e exclusão (`delete_confirmation.html`) refatoradas para `.aux-card` com espaçamento fluido e botões em coluna inversa (`.aux-card-actions`).
+- Telas de erro (`404.html` e `451.html`) padronizadas com a classe `.error-card` com tipografia responsiva e quebra de palavras segura.
