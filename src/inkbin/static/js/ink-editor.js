@@ -139,9 +139,45 @@ function showSuccessModal(data) {
     return;
   }
 
-  document.getElementById('modal-slug-url').value = data.url;
+  // Resolve public URL for local and mobile access
+  let targetUrl = data.url;
+  try {
+    const parsed = new URL(data.url, window.location.origin);
+    if (parsed.hostname === 'localhost' && window.location.hostname !== 'localhost') {
+      parsed.hostname = window.location.hostname;
+      parsed.port = window.location.port;
+      parsed.protocol = window.location.protocol;
+      targetUrl = parsed.toString();
+    } else if (!data.url.startsWith('http://') && !data.url.startsWith('https://')) {
+      targetUrl = new URL(data.url, window.location.origin).toString();
+    }
+  } catch (e) {
+    targetUrl = data.url;
+  }
+
+  document.getElementById('modal-slug-url').value = targetUrl;
   document.getElementById('modal-delete-token').textContent = data.admin_delete_token;
-  document.getElementById('modal-view-link').href = data.url;
+  document.getElementById('modal-view-link').href = targetUrl;
+
+  // Render QR Code for mobile scanning
+  const qrContainer = document.getElementById('modal-qrcode');
+  if (qrContainer) {
+    qrContainer.innerHTML = '';
+    if (typeof QRCode !== 'undefined') {
+      try {
+        new QRCode(qrContainer, {
+          text: targetUrl,
+          width: 128,
+          height: 128,
+          colorDark: '#0a0a0a',
+          colorLight: '#ffffff',
+          correctLevel: typeof QRCode.CorrectLevel !== 'undefined' ? QRCode.CorrectLevel.M : 0
+        });
+      } catch (err) {
+        console.error('Failed to generate QR Code:', err);
+      }
+    }
+  }
 
   modal.style.display = 'flex';
 }
