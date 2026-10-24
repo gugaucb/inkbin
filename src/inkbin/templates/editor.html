@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Inkbin — Criar Novo Paste{% endblock %}
-{% block page_heading %}Criar publicação{% endblock %}
+{% block title %}{{ t('editor.page_title') }}{% endblock %}
+{% block page_heading %}{{ t('editor.heading') }}{% endblock %}
 
 {% block content %}
 <form id="paste-form" class="editor-layout">
@@ -9,7 +9,7 @@
     <div class="field-group input-title">
       <label for="paste-title" class="field-label">
         <i class="ti ti-heading icon-sm" aria-hidden="true"></i>
-        <span>Título do texto (opcional)</span>
+        <span>{{ t('editor.title_label') }}</span>
       </label>
       <input 
         type="text" 
@@ -17,14 +17,14 @@
         name="title" 
         class="input-text" 
         maxlength="200" 
-        placeholder="Ex.: docker-compose.yml ou Análise de logs de produção"
+        placeholder="{{ t('editor.title_placeholder') }}"
       >
     </div>
 
     <div class="field-group">
       <label for="paste-language" class="field-label">
         <i class="ti ti-code icon-sm" aria-hidden="true"></i>
-        <span>Linguagem / Sintaxe</span>
+        <span>{{ t('editor.syntax_label') }}</span>
       </label>
       <select id="paste-language" name="language" class="select-field">
         <option value="plaintext" selected>Texto puro (plaintext)</option>
@@ -47,21 +47,19 @@
     <div class="field-group">
       <label for="paste-expiration" class="field-label">
         <i class="ti ti-clock icon-sm" aria-hidden="true"></i>
-        <span>Prazo de expiração</span>
+        <span>{{ t('editor.expiration_label') }}</span>
       </label>
       <select id="paste-expiration" name="expiration" class="select-field">
-        <option value="never" selected>Nunca expirar</option>
-        <option value="1h">1 hora</option>
-        <option value="1d">1 dia</option>
-        <option value="1w">1 semana</option>
-        <option value="1m">1 mês</option>
+        {% for opt in expiration_options %}
+        <option value="{{ opt.value }}" {% if opt.value == 'never' or loop.first and 'never' not in expiration_options %}selected{% endif %}>{{ opt.label }}</option>
+        {% endfor %}
       </select>
     </div>
 
     <div class="field-group">
       <label for="paste-password" class="field-label">
         <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
-        <span>Senha de proteção (opcional)</span>
+        <span>{{ t('editor.password_label') }}</span>
       </label>
       <input 
         type="password" 
@@ -70,7 +68,7 @@
         class="input-text" 
         minlength="4"
         maxlength="50" 
-        placeholder="4 a 50 caracteres para proteger"
+        placeholder="{{ t('editor.password_placeholder') }}"
         autocomplete="new-password"
       >
     </div>
@@ -78,29 +76,29 @@
 
   <div class="editor-container">
     <div class="editor-toolbar">
-      <span>Cole seu código ou digite diretamente (Tab suportado)</span>
+      <span>{{ t('editor.toolbar_hint') }}</span>
       <div class="editor-stats">
-        <span id="char-count"><i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>0 caracteres</span></span>
+        <span id="char-count"><i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>0 {{ t('editor.chars', count=0).split(' ')[1] if ' ' in t('editor.chars', count=0) else 'chars' }}</span></span>
         <span>·</span>
-        <span id="byte-count"><i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>0 B / 1 MB máx</span></span>
+        <span id="byte-count"><i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>0 B / 1 MB {{ t('editor.bytes_max') }}</span></span>
       </div>
     </div>
     <textarea 
       id="paste-content" 
       name="content" 
       class="editor-textarea" 
-      placeholder="Cole aqui o conteúdo a ser compartilhado..." 
+      placeholder="{{ t('editor.content_placeholder') }}" 
       required
       spellcheck="false"
-      aria-label="Conteúdo do texto ou código"
+      aria-label="{{ t('editor.content_aria') }}"
     ></textarea>
   </div>
 
   <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4);">
-    <span style="font-size: 12px; color: var(--text-secondary);">Publicação anônima · Sem rastreamento</span>
+    <span style="font-size: 12px; color: var(--text-secondary);">{{ t('editor.anonymous_hint') }}</span>
     <button type="submit" id="submit-btn" class="btn btn-primary">
       <i class="ti ti-upload" aria-hidden="true"></i>
-      <span>Publicar texto</span>
+      <span>{{ t('editor.submit_btn') }}</span>
     </button>
   </div>
 </form>
@@ -111,7 +109,7 @@
     <div class="modal-header">
       <h2 id="modal-title" class="modal-title" style="display: flex; align-items: center; gap: var(--space-2);">
         <i class="ti ti-circle-check" aria-hidden="true"></i>
-        <span>Publicação criada com sucesso!</span>
+        <span>{{ t('modal.title') }}</span>
       </h2>
     </div>
 
@@ -119,13 +117,13 @@
       <div>
         <label for="modal-slug-url" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
           <i class="ti ti-link icon-sm" aria-hidden="true"></i>
-          <span>URL Pública de Acesso</span>
+          <span>{{ t('modal.public_url') }}</span>
         </label>
         <div style="display: flex; gap: var(--space-2);">
           <input type="text" id="modal-slug-url" class="input-text" style="flex-grow: 1;" readonly>
           <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-slug-url', 'copy-url-btn')" id="copy-url-btn">
             <i class="ti ti-copy" aria-hidden="true"></i>
-            <span>Copiar URL</span>
+            <span>{{ t('modal.copy_url') }}</span>
           </button>
         </div>
       </div>
@@ -133,16 +131,16 @@
       <div>
         <label class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
           <i class="ti ti-key icon-sm" aria-hidden="true"></i>
-          <span>Chave Secreta de Administração (Admin Delete Token)</span>
+          <span>{{ t('modal.admin_token') }}</span>
         </label>
         <div style="display: flex; gap: var(--space-2); align-items: stretch;">
           <div class="token-alert-box" id="modal-delete-token" style="flex-grow: 1;"></div>
-          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-delete-token', 'copy-token-btn')" id="copy-token-btn" title="Copiar token" aria-label="Copiar token de exclusão">
+          <button type="button" class="btn btn-secondary" onclick="copyToClipboard('modal-delete-token', 'copy-token-btn')" id="copy-token-btn" title="{{ t('modal.copy_token_aria') }}" aria-label="{{ t('modal.copy_token_aria') }}">
             <i class="ti ti-copy" aria-hidden="true"></i>
           </button>
         </div>
         <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
-          <strong>Atenção:</strong> Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.
+          <strong>{{ t('modal.warning').split(':')[0] }}:</strong> {{ t('modal.warning').split(':')[1] if ':' in t('modal.warning') else t('modal.warning') }}
         </p>
       </div>
     </div>
@@ -150,11 +148,11 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" onclick="closeSuccessModal()">
         <i class="ti ti-x" aria-hidden="true"></i>
-        <span>Fechar</span>
+        <span>{{ t('modal.close') }}</span>
       </button>
       <a href="#" id="modal-view-link" class="btn btn-primary">
         <i class="ti ti-external-link" aria-hidden="true"></i>
-        <span>Abrir publicação</span>
+        <span>{{ t('modal.open') }}</span>
       </a>
     </div>
   </div>

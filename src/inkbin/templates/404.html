@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Conteúdo Não Encontrado — Inkbin{% endblock %}
-{% block page_heading %}404 · Registro indisponível{% endblock %}
+{% block title %}{{ t('error404.page_title') }}{% endblock %}
+{% block page_heading %}{{ t('error404.heading') }}{% endblock %}
 
 {% block content %}
 <div class="viewer-card" style="padding: var(--space-12); text-align: center;">
   <div style="margin-bottom: var(--space-4);">
     <i class="ti ti-file-x" style="font-size: 48px; color: var(--text-muted);" aria-hidden="true"></i>
   </div>
-  <h2 style="font-size: 28px; font-weight: 700; margin-bottom: var(--space-3);">Publicação não encontrada</h2>
+  <h2 style="font-size: 28px; font-weight: 700; margin-bottom: var(--space-3);">{{ t('error404.title') }}</h2>
   <p style="font-size: 15px; color: var(--text-secondary); max-width: 480px; margin: 0 auto var(--space-6);">
-    O texto que você está procurando pode ter expirado conforme a política configurada, foi excluído pelo autor ou nunca existiu.
+    {{ t('error404.message') }}
   </p>
   <div>
     <a href="/" class="btn btn-primary">
       <i class="ti ti-plus" aria-hidden="true"></i>
-      <span>Criar novo texto</span>
+      <span>{{ t('error404.create_new') }}</span>
     </a>
   </div>
 </div>

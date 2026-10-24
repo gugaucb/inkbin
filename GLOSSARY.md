@@ -29,5 +29,10 @@ Paste cuja visualização requer validação de senha (armazenada com hash Argon
 _Avoid_: Paste privado, paste trancado
 
 **Expiration Policy**:
-Regra que determina o tempo de vida útil do paste (1 hora, 1 dia, 1 semana, 1 mês ou nunca), disparando sua remoção física ao expirar.
+Regra parametrizável (via configuração de ambiente `EXPIRATION_OPTIONS`) que determina os períodos de retenção permitidos para um paste (ex: 1 hora, 1 dia, 1 semana, 1 mês ou nunca), disparando sua remoção física ao expirar.
 _Avoid_: TTL, tempo de vida, prazo
+
+**Locale**:
+Identificador canônico do idioma e convenções regionais ativas na interface (`en`, `pt-br`, `cn`), com fallback padrão para inglês (`en`) e persistido via cookie `inkbin_locale`.
+_Avoid_: Language code, dialect, idioma local
+

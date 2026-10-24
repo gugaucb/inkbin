@@ -9,7 +9,7 @@ async def test_get_editor_page(client: AsyncClient):
     assert "text/html" in response.headers["content-type"]
     text = response.text
     assert "INKBIN" in text
-    assert "Publicar texto" in text
+    assert "Publish paste" in text or "Publicar texto" in text
     assert "paste-content" in text
     # Field labels icons
     assert "ti ti-heading" in text
@@ -76,7 +76,7 @@ async def test_get_viewer_page_success(client: AsyncClient):
     assert "Código Python Teste" in response.text
     assert "print(" in response.text
     assert "INK" in response.text
-    assert "Copiar código" in response.text
+    assert "Copy code" in response.text or "Copiar código" in response.text
 
     # Viewer metadata icons
     assert "ti ti-code" in response.text
@@ -89,17 +89,17 @@ async def test_get_viewer_page_success(client: AsyncClient):
     assert "ti ti-plus" in response.text
     assert "ti ti-trash" in response.text
     assert "ti ti-flag" in response.text
-    assert 'aria-label="Ver código bruto"' in response.text
-    assert 'aria-label="Criar nova publicação"' in response.text
-    assert 'aria-label="Excluir este paste"' in response.text
-    assert 'aria-label="Denunciar publicação"' in response.text
+    assert ('aria-label="View raw code"' in response.text or 'aria-label="Ver código bruto"' in response.text)
+    assert ('aria-label="Create new paste"' in response.text or 'aria-label="Criar nova publicação"' in response.text)
+    assert ('aria-label="Delete this paste with your Admin Delete Token"' in response.text or 'aria-label="Excluir este paste"' in response.text)
+    assert ('aria-label="Report publication"' in response.text or 'aria-label="Denunciar publicação"' in response.text)
 
 
 @pytest.mark.asyncio
 async def test_get_viewer_page_not_found(client: AsyncClient):
     response = await client.get("/p/notExists")
     assert response.status_code == 404
-    assert "Publicação não encontrada" in response.text
+    assert "Paste not found" in response.text or "Publicação não encontrada" in response.text
     assert "ti ti-file-x" in response.text
     assert "ti ti-plus" in response.text
 

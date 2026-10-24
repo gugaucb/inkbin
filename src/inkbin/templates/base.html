@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="{{ current_locale or 'en' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Inkbin — Publicação Editorial Anônima e Segura{% endblock %}</title>
-  <meta name="description" content="Plataforma open-source editorial para compartilhamento anônimo e seguro de código e textos com URLs curtas e não sequenciais.">
+  <title>{% block title %}{{ t('meta.title_default') }}{% endblock %}</title>
+  <meta name="description" content="{{ t('meta.description') }}">
   
   <!-- Tipografia canônica: Inter e JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,10 +15,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="/static/css/ink-tokens.css">
   <link rel="stylesheet" href="/static/css/ink-editorial.css">
+  <script>window.__INK_I18N__ = {{ client_i18n_json | safe if client_i18n_json else '{}' }};</script>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+  <a href="#main-content" class="skip-link">{{ t('a11y.skip_link') }}</a>
 
   <div class="app-shell">
     <!-- AppSidebar canônica (248px) -->
@@ -28,27 +29,42 @@
           <i class="ti ti-terminal icon-lg" aria-hidden="true"></i>
           <span>INKBIN</span>
         </a>
-        <div class="brand-subtitle">Editorial Pastebin</div>
       </div>
 
       <nav class="sidebar-nav">
-        <div class="nav-section-title">Ações</div>
+        <div class="nav-section-title">{{ t('nav.actions') }}</div>
         <a href="/" class="nav-link {% if active_page == 'editor' %}active{% endif %}">
           <i class="ti ti-plus" aria-hidden="true"></i>
-          <span>Novo texto</span>
+          <span>{{ t('nav.new_text') }}</span>
         </a>
 
-        <div class="nav-section-title">Histórico Local</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-right: var(--space-2);">
+          <div class="nav-section-title" style="padding-right: 0;">{{ t('nav.local_history') }}</div>
+          <button type="button" id="clear-history-btn" class="btn-clear-history" title="{{ t('nav.clear_history') }}" aria-label="{{ t('nav.clear_history') }}" style="display: none; background: none; border: none; font-size: 11px; color: var(--text-muted); cursor: pointer; padding: 2px 4px;">
+            <i class="ti ti-trash icon-sm" aria-hidden="true"></i>
+          </button>
+        </div>
         <div id="local-history-container" class="history-list">
-          <div style="font-size: 12px; color: var(--text-muted); padding: 8px;">Carregando histórico...</div>
+          <div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ t('nav.loading_history') }}</div>
         </div>
       </nav>
 
       <div class="sidebar-footer">
-        <div>Inkbin v0.1.0 · Open Source</div>
+        <div>{{ t('footer.version') }}</div>
         <div style="margin-top: 4px; font-size: 11px; display: flex; align-items: center; gap: 4px;">
           <i class="ti ti-shield-check icon-sm" aria-hidden="true"></i>
-          <span>Sem rastreamento · Anônimo</span>
+          <span>{{ t('footer.tagline') }}</span>
+        </div>
+
+        <div class="sidebar-language-switcher" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-default);">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <i class="ti ti-world icon-sm" aria-hidden="true" style="color: var(--text-secondary);"></i>
+            <select id="language-select" class="select-field" style="width: 100%; font-size: 11px; height: 28px; padding: 2px 6px; background: transparent; border-color: var(--border-default); color: var(--text-primary);" onchange="window.location.href='/set-locale/' + this.value;">
+              <option value="en" {% if current_locale == 'en' %}selected{% endif %}>English</option>
+              <option value="pt-br" {% if current_locale == 'pt-br' %}selected{% endif %}>Português (BR)</option>
+              <option value="cn" {% if current_locale == 'cn' %}selected{% endif %}>简体中文 (CN)</option>
+            </select>
+          </div>
         </div>
       </div>
     </aside>
@@ -56,12 +72,12 @@
     <!-- Região Principal -->
     <div class="main-wrapper">
       <header class="topbar">
-        <h1 class="topbar-title">{% block page_heading %}Nova publicação{% endblock %}</h1>
+        <h1 class="topbar-title">{% block page_heading %}{{ t('editor.heading') }}{% endblock %}</h1>
         <div class="topbar-actions">
           {% block topbar_actions %}
           <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
             <i class="ti ti-plus" aria-hidden="true"></i>
-            <span>Novo texto</span>
+            <span>{{ t('nav.new_text') }}</span>
           </a>
           {% endblock %}
         </div>

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     RATE_LIMIT_PER_MINUTE: int = 100
     MAX_PASTE_BYTES: int = 1_048_576  # 1 MB
+    EXPIRATION_OPTIONS: str = "1h,1d,1w,1m,never"
 
     model_config = SettingsConfigDict(
         env_file=".env",

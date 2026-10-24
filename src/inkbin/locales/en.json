@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title_default": "Inkbin — Anonymous and Secure Editorial Publishing",
+    "description": "Open-source editorial platform for anonymous and secure code and text sharing with short, non-sequential URLs."
+  },
+  "a11y": {
+    "skip_link": "Skip to main content"
+  },
+  "nav": {
+    "actions": "Actions",
+    "new_text": "New paste",
+    "local_history": "Local History",
+    "loading_history": "Loading history...",
+    "no_history": "No recent pastes in this browser.",
+    "clear_history": "Clear history",
+    "clear_history_confirm": "Are you sure you want to clear all local history?",
+    "delete_item_aria": "Remove this paste from history",
+    "delete_item_title": "Remove from history",
+    "language": "Language"
+  },
+  "footer": {
+    "version": "Inkbin v0.1.0 · Open Source",
+    "tagline": "No tracking · Anonymous"
+  },
+  "lang": {
+    "en": "English",
+    "pt_br": "Português (BR)",
+    "cn": "简体中文 (CN)"
+  },
+  "editor": {
+    "page_title": "Inkbin — Create New Paste",
+    "heading": "New publication",
+    "title_label": "Paste title (optional)",
+    "title_placeholder": "e.g.: docker-compose.yml or Production logs analysis",
+    "syntax_label": "Language / Syntax",
+    "expiration_label": "Expiration",
+    "password_label": "Password protection (optional)",
+    "password_placeholder": "4 to 50 characters to protect",
+    "toolbar_hint": "Paste your code or type directly (Tab supported)",
+    "chars": "{count} characters",
+    "bytes_max": "max",
+    "content_placeholder": "Paste the content to share here...",
+    "content_aria": "Paste content or code",
+    "anonymous_hint": "Anonymous publication · No tracking",
+    "submit_btn": "Publish paste",
+    "publishing_btn": "Publishing...",
+    "alert_empty": "Please enter paste content before publishing.",
+    "alert_error": "An error occurred while publishing the paste.",
+    "alert_network": "Connection failure while publishing paste."
+  },
+  "expiration": {
+    "never": "Never expire",
+    "10m": "10 minutes",
+    "30m": "30 minutes",
+    "1h": "1 hour",
+    "12h": "12 hours",
+    "1d": "1 day",
+    "7d": "7 days",
+    "1w": "1 week",
+    "2w": "2 weeks",
+    "1m": "1 month",
+    "custom_minutes": "{count} minute",
+    "custom_minutes_plural": "{count} minutes",
+    "custom_hours": "{count} hour",
+    "custom_hours_plural": "{count} hours",
+    "custom_days": "{count} day",
+    "custom_days_plural": "{count} days",
+    "custom_weeks": "{count} week",
+    "custom_weeks_plural": "{count} weeks",
+    "custom_months": "{count} month",
+    "custom_months_plural": "{count} months"
+  },
+  "modal": {
+    "title": "Paste created successfully!",
+    "public_url": "Public Access URL",
+    "copy_url": "Copy URL",
+    "copied": "Copied!",
+    "admin_token": "Secret Administration Key (Admin Delete Token)",
+    "copy_token_aria": "Copy delete token",
+    "warning": "Attention: As publication is anonymous, save this key! It is required if you decide to delete the paste before expiration. It will not be shown again.",
+    "close": "Close",
+    "open": "Open paste"
+  },
+  "viewer": {
+    "untitled": "Untitled",
+    "page_heading": "View paste",
+    "published_at": "Published on {date}",
+    "views_singular": "{count} view",
+    "views_plural": "{count} views",
+    "expires_at": "Expires in: {date}",
+    "copy_code": "Copy code",
+    "code_copied": "Code copied!",
+    "view_raw": "View Raw",
+    "view_raw_aria": "View raw code",
+    "new_paste": "New paste",
+    "new_paste_aria": "Create new paste",
+    "delete": "Delete",
+    "delete_aria": "Delete this paste with your Admin Delete Token",
+    "report": "Report",
+    "report_aria": "Report publication"
+  },
+  "report": {
+    "modal_title": "Report publication",
+    "reason_label": "Reason for report",
+    "reason_spam": "Spam or unwanted advertising",
+    "reason_malware": "Malicious code or phishing",
+    "reason_leak": "Confidential data or password leak",
+    "reason_abuse": "Abusive or illegal content",
+    "reason_other": "Other reason",
+    "details_label": "Additional details (optional)",
+    "details_placeholder": "Provide more information if needed...",
+    "cancel": "Cancel",
+    "submit": "Submit report",
+    "submitting": "Submitting...",
+    "success": "Report submitted successfully.",
+    "error": "Could not submit report.",
+    "network_error": "Server communication failure."
+  },
+  "delete": {
+    "page_title": "Delete Paste — Inkbin",
+    "page_heading": "Paste management",
+    "badge": "Destructive Action",
+    "title_prefix": "Delete \"{title}\"",
+    "description": "Definitive deletion physically removes this paste from the database and invalidates the cache. This operation is immediate and irreversible.",
+    "token_label": "Secret Administration Key (Admin Delete Token)",
+    "token_placeholder": "Paste the token received upon creation here",
+    "token_hint": "Exclusive 64-character token generated when the paste was created.",
+    "cancel": "Cancel and return",
+    "confirm": "Confirm definitive deletion",
+    "deleting": "Deleting...",
+    "success": "Paste deleted successfully! Redirecting...",
+    "error_invalid": "Invalid administrative delete token.",
+    "network_error": "Server communication failure."
+  },
+  "password": {
+    "page_title": "Protected Text — Inkbin",
+    "page_heading": "Protected access",
+    "badge": "Password protected",
+    "confidential": "Confidential text",
+    "description": "This document has been protected by its creator. Enter the credentials below to decrypt and view the full content.",
+    "label": "Access password",
+    "placeholder": "Enter the password for this paste",
+    "back": "Back to home",
+    "unlock": "Unlock paste",
+    "validating": "Validating...",
+    "error": "Incorrect password. Try again.",
+    "network_error": "Error connecting to server. Try again."
+  },
+  "error404": {
+    "page_title": "Content Not Found — Inkbin",
+    "heading": "404 · Record unavailable",
+    "title": "Paste not found",
+    "message": "The text you are looking for may have expired according to the configured policy, was deleted by the author, or never existed.",
+    "create_new": "Create new paste"
+  },
+  "error451": {
+    "page_title": "Content Unavailable for Legal Reasons — Inkbin",
+    "heading": "451 · Unavailable for legal reasons",
+    "badge": "Moderation Action (HTTP 451)",
+    "title": "Paste deactivated by moderation",
+    "message": "This document was administratively deactivated due to a report or detected violation of platform terms of service (e.g. malicious code, leak of private credentials, or abusive content).",
+    "back_home": "Back to homepage"
+  },
+  "clipboard": {
+    "copied": "Copied!",
+    "copy_failed": "Could not copy. Please select text and copy manually.",
+    "code_copied": "Code copied!"
+  }
+}

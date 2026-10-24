@@ -1,5 +1,16 @@
 // INK Editorial JavaScript Controller
 
+function t(key, fallback = key, params = {}) {
+  const dict = window.__INK_I18N__ || {};
+  let val = dict[key] !== undefined ? dict[key] : fallback;
+  if (params && typeof params === 'object') {
+    for (const [k, v] of Object.entries(params)) {
+      val = val.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    }
+  }
+  return val;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   setupEditor();
   setupLocalHistory();
@@ -35,16 +46,18 @@ function setupEditor() {
     const bytes = new Blob([text]).size;
 
     if (charCountEl) {
-      charCountEl.innerHTML = `<i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>${chars.toLocaleString()} caracteres</span>`;
+      const charsText = t('editor.chars', `${chars.toLocaleString()} caracteres`, { count: chars.toLocaleString() });
+      charCountEl.innerHTML = `<i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>${charsText}</span>`;
     }
     if (byteCountEl) {
+      const maxText = t('editor.bytes_max', 'máx');
       let byteStr = '';
       if (bytes < 1024) {
         byteStr = `${bytes} B`;
       } else if (bytes < 1024 * 1024) {
         byteStr = `${(bytes / 1024).toFixed(1)} KB`;
       } else {
-        byteStr = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB máx`;
+        byteStr = `${(bytes / (1024 * 1024)).toFixed(2)} MB / 1 MB ${maxText}`;
       }
       byteCountEl.innerHTML = `<i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>${byteStr}</span>`;
     }
@@ -59,7 +72,7 @@ function setupEditor() {
       e.preventDefault();
       const content = textarea.value;
       if (!content.trim()) {
-        alert('Por favor, insira o conteúdo do paste antes de publicar.');
+        alert(t('editor.alert_empty', 'Por favor, insira o conteúdo do paste antes de publicar.'));
         return;
       }
 
@@ -70,7 +83,7 @@ function setupEditor() {
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>Publicando...</span>';
+        submitBtn.innerHTML = `<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>${t('editor.publishing_btn', 'Publicando...')}</span>`;
       }
 
       try {
@@ -90,7 +103,7 @@ function setupEditor() {
 
         if (!response.ok) {
           const err = await response.json();
-          alert(err.detail || 'Ocorreu um erro ao publicar o paste.');
+          alert(err.detail || t('editor.alert_error', 'Ocorreu um erro ao publicar o paste.'));
           return;
         }
 
@@ -98,7 +111,7 @@ function setupEditor() {
         // Save to local history
         saveToLocalHistory({
           slug: data.slug,
-          title: data.title || 'Sem título',
+          title: data.title || t('viewer.untitled', 'Sem título'),
           language: data.language,
           created_at: data.created_at,
           admin_delete_token: data.admin_delete_token,
@@ -108,11 +121,11 @@ function setupEditor() {
         // Show Success Modal
         showSuccessModal(data);
       } catch (err) {
-        alert('Falha na conexão ao publicar o paste.');
+        alert(t('editor.alert_network', 'Falha na conexão ao publicar o paste.'));
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="ti ti-upload" aria-hidden="true"></i> <span>Publicar texto</span>';
+          submitBtn.innerHTML = `<i class="ti ti-upload" aria-hidden="true"></i> <span>${t('editor.submit_btn', 'Publicar texto')}</span>`;
         }
       }
     });
@@ -149,13 +162,13 @@ function copyToClipboard(elementId, feedbackBtnId) {
     const btn = document.getElementById(feedbackBtnId);
     if (btn) {
       const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Copiado!</span>';
+      btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('modal.copied', 'Copiado!')}</span>`;
       setTimeout(() => {
         btn.innerHTML = originalHtml;
       }, 2000);
     }
   }).catch(() => {
-    alert('Não foi possível copiar. Selecione o texto e copie manualmente.');
+    alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
   });
 }
 
@@ -166,9 +179,9 @@ function setupViewerCopyActions() {
       const codeEl = document.getElementById('raw-code');
       if (!codeEl) return;
       navigator.clipboard.writeText(codeEl.textContent).then(() => {
-        copyCodeBtn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> <span>Código copiado!</span>';
+        copyCodeBtn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('viewer.code_copied', 'Código copiado!')}</span>`;
         setTimeout(() => {
-          copyCodeBtn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> <span>Copiar código</span>';
+          copyCodeBtn.innerHTML = `<i class="ti ti-copy" aria-hidden="true"></i> <span>${t('viewer.copy_code', 'Copiar código')}</span>`;
         }, 2000);
       });
     });
@@ -178,15 +191,36 @@ function setupViewerCopyActions() {
 function saveToLocalHistory(item) {
   try {
     const history = JSON.parse(localStorage.getItem('inkbin_history') || '[]');
-    // Filter existing slug
     const filtered = history.filter(h => h.slug !== item.slug);
     filtered.unshift(item);
-    // Keep last 15
     const limited = filtered.slice(0, 15);
     localStorage.setItem('inkbin_history', JSON.stringify(limited));
     renderHistoryList(limited);
   } catch (e) {
-    console.warn('LocalStorage não disponível', e);
+    console.warn('LocalStorage error', e);
+  }
+}
+
+function removePasteFromHistory(slug) {
+  try {
+    const history = JSON.parse(localStorage.getItem('inkbin_history') || '[]');
+    const filtered = history.filter(h => h.slug !== slug);
+    localStorage.setItem('inkbin_history', JSON.stringify(filtered));
+    renderHistoryList(filtered);
+  } catch (e) {
+    console.warn('LocalStorage error', e);
+  }
+}
+
+function clearLocalHistory() {
+  const confirmMsg = t('nav.clear_history_confirm', 'Tem certeza de que deseja limpar todo o histórico local?');
+  if (confirm(confirmMsg)) {
+    try {
+      localStorage.removeItem('inkbin_history');
+      renderHistoryList([]);
+    } catch (e) {
+      console.warn('LocalStorage error', e);
+    }
   }
 }
 
@@ -194,6 +228,14 @@ function setupLocalHistory() {
   try {
     const history = JSON.parse(localStorage.getItem('inkbin_history') || '[]');
     renderHistoryList(history);
+
+    const clearBtn = document.getElementById('clear-history-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        clearLocalHistory();
+      });
+    }
   } catch (e) {
     // Ignore
   }
@@ -201,19 +243,40 @@ function setupLocalHistory() {
 
 function renderHistoryList(items) {
   const container = document.getElementById('local-history-container');
+  const clearBtn = document.getElementById('clear-history-btn');
   if (!container) return;
 
   if (!items || items.length === 0) {
-    container.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">Nenhum paste recente neste navegador.</div>';
+    if (clearBtn) clearBtn.style.display = 'none';
+    container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">${t('nav.no_history', 'Nenhum paste recente neste navegador.')}</div>`;
     return;
   }
 
+  if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+  const deleteTitle = t('nav.delete_item_title', 'Remover do histórico');
+  const deleteAria = t('nav.delete_item_aria', 'Remover este paste do histórico');
+
   container.innerHTML = items.map(item => `
-    <a href="/p/${item.slug}" class="history-item">
-      <span class="history-title"><i class="ti ti-file-text icon-sm" aria-hidden="true"></i> <span>${escapeHtml(item.title)}</span></span>
-      <span class="history-date">${item.language} · ${new Date(item.created_at).toLocaleDateString('pt-BR')}</span>
-    </a>
+    <div class="history-item-wrapper">
+      <a href="/p/${item.slug}" class="history-item">
+        <span class="history-title"><i class="ti ti-file-text icon-sm" aria-hidden="true"></i> <span>${escapeHtml(item.title || t('viewer.untitled', 'Sem título'))}</span></span>
+        <span class="history-date">${item.language} · ${new Date(item.created_at).toLocaleDateString()}</span>
+      </a>
+      <button type="button" class="btn-delete-history-item" data-slug="${item.slug}" title="${deleteTitle}" aria-label="${deleteAria}">
+        <i class="ti ti-x icon-sm" aria-hidden="true"></i>
+      </button>
+    </div>
   `).join('');
+
+  container.querySelectorAll('.btn-delete-history-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const slug = btn.getAttribute('data-slug');
+      removePasteFromHistory(slug);
+    });
+  });
 }
 
 function escapeHtml(str) {
