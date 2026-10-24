@@ -36,3 +36,16 @@ _Avoid_: TTL, tempo de vida, prazo
 Identificador canônico do idioma e convenções regionais ativas na interface (`en`, `pt-br`, `cn`), com fallback padrão para inglês (`en`) e persistido via cookie `inkbin_locale`.
 _Avoid_: Language code, dialect, idioma local
 
+**Client-Side Encryption**:
+Processo de cifragem simétrica com AES-256-GCM executado integralmente no navegador do autor via Web Crypto API antes do envio, onde a chave secreta reside exclusivamente no fragmento da URL (`#key`) e nunca é transmitida ou armazenada no servidor.
+_Avoid_: Server-side encryption, criptografia em repouso, chave de servidor
+
+**Burn After Read**:
+Política de retenção e descarte permanente em que o paste é fisicamente expurgado após a primeira visualização confirmada pelo leitor, resguardada por uma tela intermediária de confirmação para impedir consumo involuntário por rastreadores e pré-visualizadores de links.
+_Avoid_: Auto-delete, leitura efêmera desprotegida, one-time link sem confirmação
+
+**Base64 Encoding**:
+Formato de transformação e representação textual que não provê segurança criptográfica, acompanhado de aviso editorial transparente e alternância entre conteúdo decodificado e bruto.
+_Avoid_: Criptografia Base64, encriptação leve, cifra Base64
+
+
