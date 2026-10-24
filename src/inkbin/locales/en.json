@@ -16,6 +16,7 @@
     "clear_history_confirm": "Are you sure you want to clear all local history?",
     "delete_item_aria": "Remove this paste from history",
     "delete_item_title": "Remove from history",
+    "toggle_menu": "Toggle navigation menu",
     "language": "Language"
   },
   "footer": {

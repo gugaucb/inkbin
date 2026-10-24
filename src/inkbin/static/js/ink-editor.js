@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEditor();
   setupLocalHistory();
   setupViewerCopyActions();
+  setupMobileNavigation();
 });
 
 function setupEditor() {
@@ -189,22 +190,164 @@ function closeSuccessModal() {
   }
 }
 
+/**
+ * Synchronous clipboard copy fallback via document.execCommand('copy').
+ * Highly compatible with Mobile Safari (iOS WebKit), older browsers, and non-secure HTTP contexts.
+ * @param {string} text
+ * @param {HTMLElement} [sourceEl]
+ * @returns {boolean}
+ */
+function copyUsingExecCommand(text, sourceEl) {
+  let successful = false;
+
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    // Set 16px to prevent iOS Safari auto-zoom on element focus
+    textArea.style.fontSize = '16px';
+    // Position fixed and off-screen to prevent iOS viewport jumping/scrolling
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '-9999px';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    // Set readonly to avoid triggering iOS virtual keyboard
+    textArea.setAttribute('readonly', '');
+
+    document.body.appendChild(textArea);
+
+    const selection = window.getSelection();
+    const originalRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, text.length);
+
+    try {
+      successful = document.execCommand('copy');
+    } catch (e) {
+      successful = false;
+    }
+
+    document.body.removeChild(textArea);
+
+    if (selection && originalRange) {
+      selection.removeAllRanges();
+      selection.addRange(originalRange);
+    }
+
+    if (successful) return true;
+  } catch (err) {
+    successful = false;
+  }
+
+  // Secondary fallback for inputs or elements already attached to DOM
+  if (!successful && sourceEl) {
+    try {
+      if (typeof sourceEl.select === 'function') {
+        sourceEl.focus();
+        if (typeof sourceEl.setSelectionRange === 'function') {
+          sourceEl.setSelectionRange(0, (sourceEl.value || '').length);
+        } else {
+          sourceEl.select();
+        }
+        successful = document.execCommand('copy');
+      } else {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          range.selectNodeContents(sourceEl);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          successful = document.execCommand('copy');
+          selection.removeAllRanges();
+        }
+      }
+    } catch (e) {
+      successful = false;
+    }
+  }
+
+  return successful;
+}
+
+/**
+ * Universal cross-browser copy function supporting iOS Safari,
+ * non-HTTPS (local development) and modern Clipboard API.
+ * @param {string} text
+ * @param {HTMLElement} [sourceEl]
+ * @returns {Promise<boolean>}
+ */
+async function copyTextToClipboard(text, sourceEl) {
+  if (text === undefined || text === null) {
+    text = '';
+  }
+  text = String(text);
+
+  // 1. Try synchronous execCommand first — preserves user activation on iOS Safari & works on HTTP
+  const execSuccess = copyUsingExecCommand(text, sourceEl);
+  if (execSuccess) {
+    return true;
+  }
+
+  // 2. Try modern Clipboard API if supported and in secure context
+  if (navigator.clipboard && window.isSecureContext && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      console.warn('navigator.clipboard.writeText failed:', err);
+    }
+  }
+
+  return false;
+}
+
 function copyToClipboard(elementId, feedbackBtnId) {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const text = el.value || el.textContent;
+  const text = (el.value !== undefined ? el.value : el.textContent) || '';
 
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById(feedbackBtnId);
-    if (btn) {
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('modal.copied', 'Copiado!')}</span>`;
-      setTimeout(() => {
-        btn.innerHTML = originalHtml;
-      }, 2000);
+  const btn = document.getElementById(feedbackBtnId);
+
+  copyTextToClipboard(text, el).then((success) => {
+    if (success) {
+      if (btn) {
+        const originalHtml = btn.innerHTML;
+        const originalTitle = btn.getAttribute('title') || '';
+        const originalAria = btn.getAttribute('aria-label') || '';
+        const hasText = btn.querySelector('span') !== null;
+        const copiedText = t('modal.copied', 'Copiado!');
+
+        if (hasText) {
+          btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${copiedText}</span>`;
+        } else {
+          btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i>`;
+        }
+        btn.setAttribute('aria-label', copiedText);
+
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          if (originalTitle) btn.setAttribute('title', originalTitle);
+          if (originalAria) btn.setAttribute('aria-label', originalAria);
+        }, 2000);
+      }
+    } else {
+      if (typeof el.select === 'function') {
+        el.focus();
+        if (typeof el.setSelectionRange === 'function') {
+          el.setSelectionRange(0, (el.value || '').length);
+        } else {
+          el.select();
+        }
+      }
+      alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
     }
-  }).catch(() => {
-    alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
   });
 }
 
@@ -214,15 +357,40 @@ function setupViewerCopyActions() {
     copyCodeBtn.addEventListener('click', () => {
       const codeEl = document.getElementById('raw-code');
       if (!codeEl) return;
-      navigator.clipboard.writeText(codeEl.textContent).then(() => {
-        copyCodeBtn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('viewer.code_copied', 'Código copiado!')}</span>`;
-        setTimeout(() => {
-          copyCodeBtn.innerHTML = `<i class="ti ti-copy" aria-hidden="true"></i> <span>${t('viewer.copy_code', 'Copiar código')}</span>`;
-        }, 2000);
+      const text = codeEl.textContent || '';
+
+      copyTextToClipboard(text, codeEl).then((success) => {
+        if (success) {
+          const originalHtml = copyCodeBtn.innerHTML;
+          const originalTitle = copyCodeBtn.getAttribute('title') || '';
+          const originalAria = copyCodeBtn.getAttribute('aria-label') || '';
+          const copiedText = t('viewer.code_copied', 'Código copiado!');
+
+          copyCodeBtn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${copiedText}</span>`;
+          copyCodeBtn.setAttribute('aria-label', copiedText);
+
+          setTimeout(() => {
+            copyCodeBtn.innerHTML = originalHtml;
+            if (originalTitle) copyCodeBtn.setAttribute('title', originalTitle);
+            if (originalAria) copyCodeBtn.setAttribute('aria-label', originalAria);
+          }, 2000);
+        } else {
+          const selection = window.getSelection();
+          if (selection) {
+            const range = document.createRange();
+            range.selectNodeContents(codeEl);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+          alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
+        }
       });
     });
   }
 }
+
+window.copyToClipboard = copyToClipboard;
+window.copyTextToClipboard = copyTextToClipboard;
 
 function saveToLocalHistory(item) {
   try {
@@ -322,4 +490,61 @@ function escapeHtml(str) {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+}
+
+function setupMobileNavigation() {
+  const toggleBtn = document.getElementById('mobile-nav-toggle');
+  const sidebar = document.getElementById('app-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const closeBtn = document.getElementById('sidebar-close-btn');
+
+  if (!toggleBtn || !sidebar || !backdrop) return;
+
+  function openDrawer() {
+    document.body.classList.add('sidebar-open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    if (closeBtn) {
+      setTimeout(() => closeBtn.focus(), 50);
+    }
+  }
+
+  function closeDrawer() {
+    document.body.classList.remove('sidebar-open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.focus();
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = document.body.classList.contains('sidebar-open');
+    if (isOpen) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDrawer();
+    });
+  }
+
+  backdrop.addEventListener('click', () => {
+    closeDrawer();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+      closeDrawer();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024 && document.body.classList.contains('sidebar-open')) {
+      document.body.classList.remove('sidebar-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
 }

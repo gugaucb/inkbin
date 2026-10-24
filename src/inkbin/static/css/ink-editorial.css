@@ -7,7 +7,9 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
   background-color: var(--canvas);
   color: var(--text-primary);
   font-family: var(--font-ui);
@@ -15,6 +17,10 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Skip link for accessibility */
@@ -132,23 +138,38 @@ html, body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: var(--canvas);
 }
 
 .topbar {
-  height: 64px;
+  height: var(--topbar-height-desktop);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-8);
   background-color: var(--canvas);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
 .topbar-title {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar-actions {
@@ -158,11 +179,12 @@ html, body {
 }
 
 .page-container {
-  max-width: 1120px;
+  max-width: var(--container-max-width);
   width: 100%;
   margin: 0 auto;
   padding: var(--space-8);
   flex-grow: 1;
+  box-sizing: border-box;
 }
 
 /* Editor Form */
@@ -299,6 +321,8 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   cursor: pointer;
   text-decoration: none;
   border: 1px solid transparent;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: background-color var(--transition-fast), opacity var(--transition-fast);
 }
 
@@ -393,8 +417,16 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
 
 .code-content {
   padding: var(--space-6);
-  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
   tab-size: 4;
+}
+
+.code-content code {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* Modal Dialog */
@@ -443,6 +475,8 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   padding: var(--space-4);
   font-family: var(--font-mono);
   font-size: 13px;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 /* QR Code no Modal de Sucesso */
@@ -582,31 +616,149 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   color: var(--text-primary) !important;
 }
 
-/* Mobile responsive drawer */
+/* ==========================================================================
+   Mobile Nav, Drawer & Responsive Layout Breakpoints (INK Design System v2)
+   ========================================================================== */
+
 .mobile-nav-toggle {
   display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-@media (max-width: 768px) {
-  .app-sidebar {
-    display: none;
-  }
+.mobile-nav-toggle:hover {
+  background-color: var(--surface-hover);
+}
+
+.mobile-nav-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.sidebar-close-btn:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-close-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay);
+  z-index: 490;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+/* 1. Mobile & Tablet (< 1024px): Drawer Navigation */
+@media (max-width: 1023px) {
   .mobile-nav-toggle {
     display: inline-flex;
   }
-  .page-container {
-    padding: var(--space-4);
+
+  .sidebar-close-btn {
+    display: inline-flex;
   }
-  .viewer-actions {
-    flex-wrap: wrap;
+
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: min(280px, 85vw);
+    z-index: 500;
+    transform: translateX(-100%);
+    transition: transform var(--transition-fast);
+    box-shadow: none;
+  }
+
+  body.sidebar-open .app-sidebar {
+    transform: translateX(0);
+    box-shadow: var(--shadow-popover);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.sidebar-open {
+    overflow: hidden;
   }
 }
 
-@media (max-width: 640px) {
-  .viewer-actions .btn-secondary span {
-    display: none;
+/* 2. Tablet (640px–1023px) */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .topbar {
+    height: var(--topbar-height-desktop);
+    padding: 0 var(--space-6);
   }
-  .viewer-actions .btn-secondary {
-    padding: 0 var(--space-3);
+
+  .page-container {
+    padding: var(--space-6);
+  }
+}
+
+/* 3. Mobile (<= 639px) */
+@media (max-width: 639px) {
+  .topbar {
+    height: var(--topbar-height-mobile);
+    padding: 0 var(--space-4);
+  }
+
+  .page-container {
+    padding: var(--space-4);
+  }
+}
+
+/* 4. Wide Viewports (>= 1440px) */
+@media (min-width: 1440px) {
+  .page-container {
+    padding: var(--space-8) var(--space-10);
+    max-width: var(--container-max-width);
   }
 }

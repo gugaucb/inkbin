@@ -64,38 +64,36 @@ def test_get_expiration_choices():
 
 
 @pytest.mark.asyncio
-async def test_api_expiration_validation(monkeypatch):
+async def test_api_expiration_validation(monkeypatch, client):
     settings = get_settings()
     monkeypatch.setattr(settings, "EXPIRATION_OPTIONS", "1h,1d,never")
 
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # Allowed option
-        res_ok = await client.post(
-            "/api/pastes",
-            json={"content": "Valid expiration test", "expiration": "1h"},
-        )
-        assert res_ok.status_code == 201
+    # Allowed option
+    res_ok = await client.post(
+        "/api/pastes",
+        json={"content": "Valid expiration test", "expiration": "1h"},
+    )
+    assert res_ok.status_code == 201
 
-        # Disallowed option (1w not in 1h,1d,never)
-        res_invalid = await client.post(
-            "/api/pastes",
-            json={"content": "Invalid expiration test", "expiration": "1w"},
-        )
-        assert res_invalid.status_code == 422
+    # Disallowed option (1w not in 1h,1d,never)
+    res_invalid = await client.post(
+        "/api/pastes",
+        json={"content": "Invalid expiration test", "expiration": "1w"},
+    )
+    assert res_invalid.status_code == 422
 
-        # Completely invalid format
-        res_bogus = await client.post(
-            "/api/pastes",
-            json={"content": "Bogus expiration test", "expiration": "invalid_duration"},
-        )
-        assert res_bogus.status_code == 422
+    # Completely invalid format
+    res_bogus = await client.post(
+        "/api/pastes",
+        json={"content": "Bogus expiration test", "expiration": "invalid_duration"},
+    )
+    assert res_bogus.status_code == 422
 
-        # Default fallback when expiration is omitted
-        res_omitted = await client.post(
-            "/api/pastes",
-            json={"content": "Omitted expiration test"},
-        )
-        assert res_omitted.status_code == 201
-        data = res_omitted.json()
-        assert data["slug"]
+    # Default fallback when expiration is omitted
+    res_omitted = await client.post(
+        "/api/pastes",
+        json={"content": "Omitted expiration test"},
+    )
+    assert res_omitted.status_code == 201
+    data = res_omitted.json()
+    assert data["slug"]

@@ -16,6 +16,7 @@
     "clear_history_confirm": "确定要清空所有本地历史记录吗？",
     "delete_item_aria": "从历史中删除此文本",
     "delete_item_title": "从历史中移除",
+    "toggle_menu": "切换导航菜单",
     "language": "语言"
   },
   "footer": {

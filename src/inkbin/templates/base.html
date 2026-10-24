@@ -21,14 +21,22 @@
 <body>
   <a href="#main-content" class="skip-link">{{ t('a11y.skip_link') }}</a>
 
+  <!-- Backdrop para Drawer Mobile -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
   <div class="app-shell">
     <!-- AppSidebar canônica (248px) -->
-    <aside class="app-sidebar" aria-label="Navegação da aplicação">
+    <aside id="app-sidebar" class="app-sidebar" aria-label="Navegação da aplicação">
       <div class="sidebar-header">
-        <a href="/" class="brand-title">
-          <i class="ti ti-terminal icon-lg" aria-hidden="true"></i>
-          <span>INKBIN</span>
-        </a>
+        <div class="sidebar-header-row">
+          <a href="/" class="brand-title">
+            <i class="ti ti-terminal icon-lg" aria-hidden="true"></i>
+            <span>INKBIN</span>
+          </a>
+          <button type="button" id="sidebar-close-btn" class="sidebar-close-btn" aria-label="{{ t('modal.close') }}" title="{{ t('modal.close') }}">
+            <i class="ti ti-x icon-md" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
 
       <nav class="sidebar-nav">
@@ -72,7 +80,12 @@
     <!-- Região Principal -->
     <div class="main-wrapper">
       <header class="topbar">
-        <h1 class="topbar-title">{% block page_heading %}{{ t('editor.heading') }}{% endblock %}</h1>
+        <div class="topbar-left">
+          <button type="button" id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="{{ t('nav.toggle_menu') }}" aria-expanded="false" aria-controls="app-sidebar">
+            <i class="ti ti-menu-2 icon-md" aria-hidden="true"></i>
+          </button>
+          <h1 class="topbar-title">{% block page_heading %}{{ t('editor.heading') }}{% endblock %}</h1>
+        </div>
         <div class="topbar-actions">
           {% block topbar_actions %}
           <a href="/" class="btn btn-secondary" style="font-size: 13px; height: 36px;">
