@@ -58,13 +58,18 @@ A starting situation that generates work, then merges onto the main flow.
 Not feature work, just upkeep.
 
 - **`/improve-codebase-architecture`** runs whenever you have a spare moment to keep the codebase good for agents to operate in. It surfaces **deepening opportunities**; picking one _generates an idea_ you can take into the main flow at `/grill-with-docs`. It's the survey that finds the candidates; **`/codebase-design`** (below) is the bench you design the chosen one on.
+- **Branch: where is the architectural friction located?**
+  - **Subsystem borders or dependency flow** → **`/architecture-patterns`**. Reach here to isolate domain logic from external drivers, enforce the Dependency Rule (inward pointing dependencies), establish directory layouts, or guide Strangler Fig legacy extractions without premature asynchrony.
+  - **Module seams or swappable policies** → **`/design-patterns`**. Reach here to resolve implementation variation, isolate creation seams, or encapsulate subsystem complexity behind deep Facades, bounded strictly by the **Variation Test** (require 2+ concrete implementations before introducing an adapter).
 
 ## Vocabulary underneath
 
-Two model-invoked references that run *beneath* the other skills, each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
+Four model-invoked references that run *beneath* the other skills, each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
 
 - **`/domain-modeling`**: sharpen the project's *domain* language: challenge a fuzzy term, resolve an overloaded word ("account" doing three jobs), record a hard-to-reverse decision as an ADR. It's the active discipline `/grill-with-docs` drives to keep `GLOSSARY.md` a clean glossary.
 - **`/codebase-design`** is the deep-module vocabulary (module, interface, depth, seam, adapter, leverage, locality) for designing a module's *shape*: a lot of behaviour behind a small interface at a clean seam. `/tdd` and `/improve-codebase-architecture` both speak it.
+- **`/architecture-patterns`**: the application macro-structure vocabulary (Modular Monolith, Ports & Adapters, CQRS, Pipe & Filter, Strangler Fig) governing subsystem boundaries and dependency directions. Enforces the Dependency Rule (domain core shielded from frameworks and databases) and the Cost of Asynchrony.
+- **`/design-patterns`**: the seam-level GoF pattern vocabulary (Factory, Strategy, Adapter, Facade) resolving concrete implementation friction. Governed by the Variation Test (2+ concrete implementations required, banning hypothetical single-implementation seams) and modern idiomatic simplicity.
 
 ## Phase boundaries
 
