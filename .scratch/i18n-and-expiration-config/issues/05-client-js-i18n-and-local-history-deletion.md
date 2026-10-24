@@ -1,6 +1,6 @@
 # 05 - Internacionalização do JavaScript do Cliente e Exclusão no Histórico Local
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 04
 

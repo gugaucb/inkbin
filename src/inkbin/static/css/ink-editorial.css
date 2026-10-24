@@ -493,6 +493,50 @@ i.ti, [class^="ti-"], [class*=" ti-"] {
   color: var(--text-secondary);
 }
 
+.history-item-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+}
+
+.history-item-wrapper .history-item {
+  flex-grow: 1;
+  padding-right: 32px;
+}
+
+.btn-delete-history-item {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.history-item-wrapper:hover .btn-delete-history-item,
+.btn-delete-history-item:focus {
+  opacity: 1;
+}
+
+.btn-delete-history-item:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-subtle);
+}
+
+.btn-clear-history:hover {
+  color: var(--text-primary) !important;
+}
+
 /* Mobile responsive drawer */
 .mobile-nav-toggle {
   display: none;
