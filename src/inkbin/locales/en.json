@@ -54,7 +54,16 @@
     "publishing_btn": "Publishing...",
     "alert_empty": "Please enter paste content before publishing.",
     "alert_error": "An error occurred while publishing the paste.",
-    "alert_network": "Connection failure while publishing paste."
+    "alert_network": "Connection failure while publishing paste.",
+    "options_expires_in": "Expires in",
+    "option_password": "Password",
+    "option_encrypt": "Encrypt in browser",
+    "option_burn": "Burn after read",
+    "option_base64": "Base64",
+    "desc_encrypt": "Encrypt in browser: content is encrypted with AES-256-GCM before upload. The key is added to the share link after “#” and never sent to the server — lose the full link and the paste can't be decrypted.",
+    "desc_burn": "Burn after read: the paste is deleted after the first confirmed view — readers are asked to confirm before it opens.",
+    "desc_base64": "Base64: Base64 is encoding, not encryption — anyone with the link can decode it.",
+    "desc_password": "Password: the paste requires a password to view, verified securely with Argon2id."
   },
   "expiration": {
     "never": "Never expire",

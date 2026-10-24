@@ -54,7 +54,16 @@
     "publishing_btn": "Publicando...",
     "alert_empty": "Por favor, insira o conteúdo do paste antes de publicar.",
     "alert_error": "Ocorreu um erro ao publicar o paste.",
-    "alert_network": "Falha na conexão ao publicar o paste."
+    "alert_network": "Falha na conexão ao publicar o paste.",
+    "options_expires_in": "Expira em",
+    "option_password": "Senha",
+    "option_encrypt": "Encrypt in browser",
+    "option_burn": "Burn after read",
+    "option_base64": "Base64",
+    "desc_encrypt": "Encrypt in browser: o conteúdo é criptografado com AES-256-GCM antes do envio. A chave é adicionada ao link após “#” e nunca é enviada ao servidor — perder o link completo impede a decifração.",
+    "desc_burn": "Burn after read: o paste é excluído após a primeira visualização confirmada — os leitores precisam confirmar antes de abrir.",
+    "desc_base64": "Base64: Base64 é apenas uma codificação, não criptografia — qualquer pessoa com o link pode decodificá-lo.",
+    "desc_password": "Senha: o paste requer uma senha para ser visualizado, validada com segurança via Argon2id."
   },
   "expiration": {
     "never": "Nunca expirar",

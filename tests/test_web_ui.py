@@ -366,3 +366,37 @@ async def test_viewer_aes_and_base64_elements(client: AsyncClient):
     assert 'id="toggle-base64-btn"' in html_b64
 
 
+@pytest.mark.asyncio
+async def test_editor_options_bar_elements_and_styles(client: AsyncClient):
+    # 1. HTML structure
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    assert 'class="editor-options-bar"' in html
+    assert 'class="expiration-control-card' in html
+    assert 'id="paste-expiration"' in html
+    assert 'id="paste-password-toggle"' in html
+    assert 'id="password-reveal-container"' in html
+    assert 'id="paste-password"' in html
+    assert 'id="paste-format-encrypt"' in html
+    assert 'id="paste-format-base64"' in html
+    assert 'id="paste-burn-after-read"' in html
+    assert 'id="editor-options-explanations"' in html
+    assert 'data-desc-encrypt=' in html
+    assert 'data-desc-burn=' in html
+    assert 'data-desc-base64=' in html
+    assert 'data-desc-password=' in html
+
+    # 2. CSS rules
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+    assert ".editor-options-bar" in css_text
+    assert ".expiration-control-card" in css_text
+    assert ".option-pill-custom" in css_text
+    assert ".explanation-bullet-dot" in css_text
+    assert "#00d4b8" in css_text
+
+
+

@@ -68,14 +68,123 @@ function setupEditor() {
   textarea.addEventListener('input', updateStats);
   updateStats();
 
-  // Format change hint listener
-  const formatSelect = document.getElementById('paste-content-format');
+  // Options Bar Interactivity & Format Toggles
+  const formatInput = document.getElementById('paste-content-format');
   const base64Hint = document.getElementById('base64-warning-hint');
-  if (formatSelect && base64Hint) {
-    formatSelect.addEventListener('change', () => {
-      base64Hint.style.display = formatSelect.value === 'base64' ? 'flex' : 'none';
+  const encryptRadio = document.getElementById('paste-format-encrypt');
+  const base64Radio = document.getElementById('paste-format-base64');
+  const burnCheckbox = document.getElementById('paste-burn-after-read');
+  const passwordToggle = document.getElementById('paste-password-toggle');
+  const passwordContainer = document.getElementById('password-reveal-container');
+  const passwordInput = document.getElementById('paste-password');
+  const explanationsContainer = document.getElementById('editor-options-explanations');
+
+  let currentFormat = formatInput ? formatInput.value : 'plaintext';
+
+  function updateExplanations() {
+    if (!explanationsContainer) return;
+
+    const bullets = [];
+
+    // Encrypt in browser explanation
+    if (currentFormat === 'aes-256-gcm') {
+      const text = explanationsContainer.dataset.descEncrypt || 
+        t('editor.desc_encrypt', 'Encrypt in browser: content is encrypted with AES-256-GCM before upload. The key is added to the share link after “#” and never sent to the server — lose the full link and the paste can\'t be decrypted.');
+      bullets.push(text);
+    }
+
+    // Base64 explanation
+    if (currentFormat === 'base64') {
+      const text = explanationsContainer.dataset.descBase64 || 
+        t('editor.desc_base64', 'Base64: Base64 is encoding, not encryption — anyone with the link can decode it.');
+      bullets.push(text);
+    }
+
+    // Burn after read explanation
+    if (burnCheckbox && burnCheckbox.checked) {
+      const text = explanationsContainer.dataset.descBurn || 
+        t('editor.desc_burn', 'Burn after read: the paste is deleted after the first confirmed view — readers are asked to confirm before it opens.');
+      bullets.push(text);
+    }
+
+    // Password explanation
+    if (passwordToggle && passwordToggle.checked) {
+      const text = explanationsContainer.dataset.descPassword || 
+        t('editor.desc_password', 'Password: the paste requires a password to view, verified securely with Argon2id.');
+      bullets.push(text);
+    }
+
+    if (bullets.length === 0) {
+      explanationsContainer.innerHTML = '';
+      explanationsContainer.style.display = 'none';
+      return;
+    }
+
+    explanationsContainer.style.display = 'flex';
+    explanationsContainer.innerHTML = bullets.map((b) => `
+      <div class="explanation-bullet-item">
+        <span class="explanation-bullet-dot" aria-hidden="true">•</span>
+        <span class="explanation-bullet-content">${b}</span>
+      </div>
+    `).join('');
+  }
+
+  function setFormat(newFormat) {
+    currentFormat = newFormat;
+    if (formatInput) {
+      formatInput.value = newFormat;
+    }
+    if (base64Hint) {
+      base64Hint.style.display = newFormat === 'base64' ? 'flex' : 'none';
+    }
+    if (encryptRadio) {
+      encryptRadio.checked = newFormat === 'aes-256-gcm';
+    }
+    if (base64Radio) {
+      base64Radio.checked = newFormat === 'base64';
+    }
+    updateExplanations();
+  }
+
+  // Radio button click behavior: Clicking checked radio toggles off back to plaintext
+  [encryptRadio, base64Radio].forEach((radio) => {
+    if (!radio) return;
+    radio.addEventListener('click', () => {
+      const val = radio.value;
+      if (currentFormat === val) {
+        radio.checked = false;
+        setFormat('plaintext');
+      } else {
+        setFormat(val);
+      }
+    });
+  });
+
+  // Password toggle behavior
+  if (passwordToggle && passwordContainer) {
+    passwordToggle.addEventListener('change', () => {
+      if (passwordToggle.checked) {
+        passwordContainer.style.display = 'flex';
+        passwordInput?.focus();
+      } else {
+        passwordContainer.style.display = 'none';
+        if (passwordInput) {
+          passwordInput.value = '';
+        }
+      }
+      updateExplanations();
     });
   }
+
+  // Burn checkbox listener
+  if (burnCheckbox) {
+    burnCheckbox.addEventListener('change', () => {
+      updateExplanations();
+    });
+  }
+
+  // Initial call to update explanations
+  updateExplanations();
 
   // Async form submission
   if (form) {
@@ -90,9 +199,9 @@ function setupEditor() {
       const title = document.getElementById('paste-title')?.value || null;
       const language = document.getElementById('paste-language')?.value || 'plaintext';
       const expiration = document.getElementById('paste-expiration')?.value || 'never';
-      const password = document.getElementById('paste-password')?.value || null;
-      const contentFormat = formatSelect ? formatSelect.value : 'plaintext';
-      const burnAfterRead = Boolean(document.getElementById('paste-burn-after-read')?.checked);
+      const password = (passwordToggle?.checked && passwordInput?.value?.trim()) ? passwordInput.value.trim() : null;
+      const contentFormat = formatInput ? formatInput.value : currentFormat;
+      const burnAfterRead = Boolean(burnCheckbox?.checked);
 
       if (submitBtn) {
         submitBtn.disabled = true;

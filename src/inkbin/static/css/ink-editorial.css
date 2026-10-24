@@ -358,6 +358,275 @@ body {
   align-items: center;
 }
 
+/* Nova Barra de Opções e Segurança (Editor Options Bar) */
+.editor-options-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: calc(-1 * var(--space-2));
+  padding: var(--space-2) 0;
+}
+
+.options-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+/* Seletor Estilizado de Expiração (Expires in) */
+.expiration-control-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 136px;
+  height: 52px;
+  padding: 4px var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-subtle);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+
+.expiration-control-card:hover,
+.expiration-control-card:focus-within {
+  border-color: #00d4b8;
+}
+
+.expiration-control-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.expiration-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.expiration-inline-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  padding-right: var(--space-4);
+  cursor: pointer;
+  outline: none;
+}
+
+.expiration-select-chevron {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Grupo de Toggles e Radios de Opções */
+.options-toggles-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.option-pill-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
+}
+
+.option-pill-label:hover {
+  color: #00d4b8;
+}
+
+.option-pill-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Custom Checkbox & Radio Indicator */
+.option-pill-custom {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.option-pill-custom.radio-custom {
+  border-radius: var(--radius-pill);
+}
+
+.option-pill-label:hover .option-pill-custom {
+  border-color: #00d4b8;
+}
+
+.option-pill-input:focus-visible + .option-pill-custom {
+  outline: 2px solid #00d4b8;
+  outline-offset: 2px;
+}
+
+/* Checked state: Cyan/Teal fill with icon */
+.option-pill-input:checked + .option-pill-custom {
+  background-color: #00d4b8;
+  border-color: #00d4b8;
+}
+
+.option-pill-input:checked + .option-pill-custom.checkbox-custom::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 8px;
+  border: solid #0a0a0a;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+.option-pill-input:checked + .option-pill-custom.radio-custom::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #0a0a0a;
+  border: none;
+  transform: none;
+  margin-top: 0;
+}
+
+.option-pill-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Container de Senha Retrátil */
+.password-reveal-container {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-subtle);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-2);
+  max-width: 440px;
+}
+
+.password-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-inline-input {
+  width: 100%;
+  height: 36px;
+  font-size: 13px;
+}
+
+/* Explicações Dinâmicas (Marcadores de ponto ciano) */
+.editor-options-explanations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.explanation-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.explanation-bullet-dot {
+  color: #00d4b8;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.explanation-bullet-content {
+  color: var(--text-secondary);
+}
+
+.explanation-bullet-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Responsividade da Barra de Opções */
+@media (max-width: 899px) {
+  .options-bar-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .options-toggles-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3) var(--space-4);
+    width: 100%;
+  }
+
+  .expiration-control-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  .options-toggles-group {
+    grid-template-columns: 1fr;
+  }
+}
+
 .editor-footer-actions {
   display: flex;
   justify-content: flex-end;

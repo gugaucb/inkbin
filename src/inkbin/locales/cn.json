@@ -54,7 +54,16 @@
     "publishing_btn": "正在发布...",
     "alert_empty": "发布前请输入内容。",
     "alert_error": "发布文本时出错。",
-    "alert_network": "发布文本时网络连接失败。"
+    "alert_network": "发布文本时网络连接失败。",
+    "options_expires_in": "过期时间",
+    "option_password": "密码",
+    "option_encrypt": "Encrypt in browser",
+    "option_burn": "Burn after read",
+    "option_base64": "Base64",
+    "desc_encrypt": "Encrypt in browser：内容在上传前采用 AES-256-GCM 加密。密钥附加在分享链接的 “#” 之后且永不发送至服务器 — 丢失完整链接将无法解密。",
+    "desc_burn": "Burn after read：文档在首次确认查看后立即删除 — 读者在打开前需进行确认。",
+    "desc_base64": "Base64：Base64 仅为编码而非加密 — 任何拥有链接的人均可解码。",
+    "desc_password": "密码：查看该文档需输入密码，通过 Argon2id 进行安全验证。"
   },
   "expiration": {
     "never": "永不过期",

@@ -43,60 +43,6 @@
         <option value="dockerfile">Dockerfile</option>
       </select>
     </div>
-
-    <div class="field-group field-expiration">
-      <label for="paste-expiration" class="field-label">
-        <i class="ti ti-clock icon-sm" aria-hidden="true"></i>
-        <span>{{ t('editor.expiration_label') }}</span>
-      </label>
-      <select id="paste-expiration" name="expiration" class="select-field">
-        {% for opt in expiration_options %}
-        <option value="{{ opt.value }}" {% if opt.value == 'never' or loop.first and 'never' not in expiration_options %}selected{% endif %}>{{ opt.label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="field-group field-format">
-      <label for="paste-content-format" class="field-label">
-        <i class="ti ti-shield-lock icon-sm" aria-hidden="true"></i>
-        <span>{{ t('editor.format_label') }}</span>
-      </label>
-      <select id="paste-content-format" name="content_format" class="select-field">
-        <option value="plaintext" selected>{{ t('editor.format_plaintext') }}</option>
-        <option value="aes-256-gcm">{{ t('editor.format_aes_gcm') }}</option>
-        <option value="base64">{{ t('editor.format_base64') }}</option>
-      </select>
-    </div>
-
-    <div class="field-group field-burn">
-      <label for="paste-burn-after-read" class="field-label field-checkbox-label">
-        <input type="checkbox" id="paste-burn-after-read" name="burn_after_read" class="checkbox-input">
-        <i class="ti ti-flame icon-sm" aria-hidden="true"></i>
-        <span>{{ t('editor.burn_label') }}</span>
-      </label>
-    </div>
-
-    <div class="field-group field-password">
-      <label for="paste-password" class="field-label">
-        <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
-        <span>{{ t('editor.password_label') }}</span>
-      </label>
-      <input 
-        type="password" 
-        id="paste-password" 
-        name="password" 
-        class="input-text" 
-        minlength="4"
-        maxlength="50" 
-        placeholder="{{ t('editor.password_placeholder') }}"
-        autocomplete="new-password"
-      >
-    </div>
-  </div>
-
-  <div id="base64-warning-hint" class="editor-format-hint" style="display: none;" role="note">
-    <i class="ti ti-info-circle icon-sm" aria-hidden="true"></i>
-    <span>{{ t('editor.format_base64_hint') }}</span>
   </div>
 
   <div class="editor-container">
@@ -117,6 +63,110 @@
       spellcheck="false"
       aria-label="{{ t('editor.content_aria') }}"
     ></textarea>
+  </div>
+
+  <!-- Hidden format sync input to preserve form serialization & API contracts -->
+  <input type="hidden" id="paste-content-format" name="content_format" value="plaintext">
+  <div id="base64-warning-hint" style="display: none;" aria-hidden="true"></div>
+
+  <!-- Barra de Opções e Segurança abaixo do editor-container -->
+  <div class="editor-options-bar" role="group" aria-label="{{ t('editor.format_label') }}">
+    <div class="options-bar-row">
+      <!-- Seletor Estilizado de Expiração (Expires in) -->
+      <div class="expiration-control-card field-expiration">
+        <label for="paste-expiration" class="expiration-control-label">
+          <i class="ti ti-clock icon-xs" aria-hidden="true"></i>
+          <span>{{ t('editor.options_expires_in') }}</span>
+        </label>
+        <div class="expiration-select-wrapper">
+          <select id="paste-expiration" name="expiration" class="expiration-inline-select" aria-label="{{ t('editor.expiration_label') }}">
+            {% for opt in expiration_options %}
+            <option value="{{ opt.value }}" {% if opt.value == '1d' or (opt.value == 'never' and '1d' not in expiration_options) or (loop.first and 'never' not in expiration_options and '1d' not in expiration_options) %}selected{% endif %}>{{ opt.label }}</option>
+            {% endfor %}
+          </select>
+          <i class="ti ti-chevron-down expiration-select-chevron" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <!-- Grupo de Toggles e Radios de Opções -->
+      <div class="options-toggles-group">
+        <!-- Password Toggle -->
+        <label class="option-pill-label" for="paste-password-toggle">
+          <input type="checkbox" id="paste-password-toggle" class="option-pill-input">
+          <span class="option-pill-custom checkbox-custom"></span>
+          <span class="option-pill-text">
+            <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
+            <span>{{ t('editor.option_password') }}</span>
+          </span>
+        </label>
+
+        <!-- Encrypt in Browser (Radio) -->
+        <label class="option-pill-label" for="paste-format-encrypt">
+          <input type="radio" id="paste-format-encrypt" name="format_radio" value="aes-256-gcm" class="option-pill-input option-format-radio">
+          <span class="option-pill-custom radio-custom"></span>
+          <span class="option-pill-text">
+            <i class="ti ti-shield-lock icon-sm" aria-hidden="true"></i>
+            <span>{{ t('editor.option_encrypt') }}</span>
+          </span>
+        </label>
+
+        <!-- Base64 (Radio) -->
+        <label class="option-pill-label" for="paste-format-base64">
+          <input type="radio" id="paste-format-base64" name="format_radio" value="base64" class="option-pill-input option-format-radio">
+          <span class="option-pill-custom radio-custom"></span>
+          <span class="option-pill-text">
+            <i class="ti ti-code icon-sm" aria-hidden="true"></i>
+            <span>{{ t('editor.option_base64') }}</span>
+          </span>
+        </label>
+
+        <!-- Burn After Read (Checkbox) -->
+        <label class="option-pill-label" for="paste-burn-after-read">
+          <input type="checkbox" id="paste-burn-after-read" name="burn_after_read" class="option-pill-input">
+          <span class="option-pill-custom checkbox-custom"></span>
+          <span class="option-pill-text">
+            <i class="ti ti-flame icon-sm" aria-hidden="true"></i>
+            <span>{{ t('editor.option_burn') }}</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Container Retrátil para Input de Senha -->
+    <div id="password-reveal-container" class="password-reveal-container field-password" style="display: none;">
+      <div class="password-input-group">
+        <label for="paste-password" class="field-label">
+          <i class="ti ti-key icon-sm" aria-hidden="true"></i>
+          <span>{{ t('editor.password_label') }}</span>
+        </label>
+        <div class="password-input-wrapper">
+          <input 
+            type="password" 
+            id="paste-password" 
+            name="password" 
+            class="input-text password-inline-input" 
+            minlength="4"
+            maxlength="50" 
+            placeholder="{{ t('editor.password_placeholder') }}"
+            autocomplete="new-password"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista Dinâmica de Explicações com Marcadores Ciano -->
+    <div 
+      id="editor-options-explanations" 
+      class="editor-options-explanations" 
+      role="note" 
+      aria-live="polite"
+      data-desc-encrypt="{{ t('editor.desc_encrypt') }}"
+      data-desc-burn="{{ t('editor.desc_burn') }}"
+      data-desc-base64="{{ t('editor.desc_base64') }}"
+      data-desc-password="{{ t('editor.desc_password') }}"
+    >
+      <!-- Populated dynamically via JS -->
+    </div>
   </div>
 
   <div class="editor-footer-actions">
