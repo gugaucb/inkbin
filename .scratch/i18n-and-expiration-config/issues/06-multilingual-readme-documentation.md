@@ -1,6 +1,6 @@
 # 06 - Documentação Multilíngue do Repositório (READMEs en, pt-BR e zh-CN)
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 03, 04, 05
 
