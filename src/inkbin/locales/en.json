@@ -169,5 +169,24 @@
     "copied": "Copied!",
     "copy_failed": "Could not copy. Please select text and copy manually.",
     "code_copied": "Code copied!"
+  },
+  "features": {
+    "heading": "Platform Guarantees & Features",
+    "anonymous": "Anonymous",
+    "anonymous_desc": "No account, no raw IPs stored",
+    "encryption": "Encrypted sharing",
+    "encryption_desc": "Optional password and Argon2id protection",
+    "expiry": "Auto-expiry",
+    "expiry_desc": "Configurable retention from 10 minutes to 1 week",
+    "developer": "Developer ready",
+    "developer_desc": "HTTP API, curl and raw text links",
+    "privacy": "Privacy focused",
+    "privacy_desc": "No analytics, zero tracking cookies",
+    "syntax": "Syntax highlighting",
+    "syntax_desc": "100+ languages, clean mono formatting",
+    "no_signup": "No sign-up",
+    "no_signup_desc": "Open and simple, you stay in total control",
+    "delete_token": "Admin Delete Token",
+    "delete_token_desc": "One-time delete code for instant removal"
   }
 }

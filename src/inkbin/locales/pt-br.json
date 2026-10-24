@@ -169,5 +169,24 @@
     "copied": "Copiado!",
     "copy_failed": "Não foi possível copiar. Selecione o texto e copie manualmente.",
     "code_copied": "Código copiado!"
+  },
+  "features": {
+    "heading": "Garantias e Recursos da Plataforma",
+    "anonymous": "Criação anônima",
+    "anonymous_desc": "Sem contas, sem registro de IPs brutos em banco ou logs",
+    "encryption": "Compartilhamento protegido",
+    "encryption_desc": "Proteção por senha opcional com derivação Argon2id",
+    "expiry": "Expiração automática",
+    "expiry_desc": "Retenção configurável de 10 minutos a 1 semana ou permanente",
+    "developer": "Pronto para desenvolvedores",
+    "developer_desc": "API HTTP REST completa, suporte nativo a cURL e visualização raw",
+    "privacy": "Foco em privacidade",
+    "privacy_desc": "Sem scripts de analytics, zero cookies de rastreamento",
+    "syntax": "Destaque de sintaxe",
+    "syntax_desc": "Mais de 100 linguagens com formatação mono editorial",
+    "no_signup": "Sem necessidade de cadastro",
+    "no_signup_desc": "Livre e transparente, você mantém total controle",
+    "delete_token": "Admin Delete Token",
+    "delete_token_desc": "Código de remoção único para exclusão instantânea"
   }
 }

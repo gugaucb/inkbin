@@ -169,5 +169,24 @@
     "copied": "已复制！",
     "copy_failed": "无法自动复制，请手动选择文本并复制。",
     "code_copied": "代码已复制！"
+  },
+  "features": {
+    "heading": "平台保障与特性",
+    "anonymous": "匿名创建",
+    "anonymous_desc": "无需注册账号，不保存原始 IP 地址或日志",
+    "encryption": "加密保护",
+    "encryption_desc": "可选密码加密保护与 Argon2id 密钥派生",
+    "expiry": "自动过期",
+    "expiry_desc": "支持 10 分钟至 1 周的可配置保留与定期清除",
+    "developer": "开发者友好",
+    "developer_desc": "完整的 HTTP REST API、cURL 终端支持与 raw 链接",
+    "privacy": "注重隐私",
+    "privacy_desc": "无第三方分析脚本，零跟踪 Cookie",
+    "syntax": "语法高亮",
+    "syntax_desc": "支持 100+ 种编程语言与社论级等宽排版",
+    "no_signup": "免登录使用",
+    "no_signup_desc": "完全开放简便，一切尽在您的掌控之中",
+    "delete_token": "管理员删除令牌",
+    "delete_token_desc": "发布时生成一次性删除密钥，支持立即销毁"
   }
 }

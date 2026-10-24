@@ -145,3 +145,33 @@ async def test_qr_code_modal_translations_and_template():
         assert 'role="img"' in html
         assert 'ti ti-qrcode' in html
 
+
+def test_platform_features_showcase_translations():
+    load_catalogs(force=True)
+
+    expected_feature_keys = [
+        "features.heading",
+        "features.anonymous",
+        "features.anonymous_desc",
+        "features.encryption",
+        "features.encryption_desc",
+        "features.expiry",
+        "features.expiry_desc",
+        "features.developer",
+        "features.developer_desc",
+        "features.privacy",
+        "features.privacy_desc",
+        "features.syntax",
+        "features.syntax_desc",
+        "features.no_signup",
+        "features.no_signup_desc",
+        "features.delete_token",
+        "features.delete_token_desc",
+    ]
+
+    for locale in SUPPORTED_LOCALES:
+        for key in expected_feature_keys:
+            val = t(key, locale=locale)
+            assert val != key, f"Missing translation for key '{key}' in locale '{locale}'"
+            assert len(val.strip()) > 0, f"Empty translation for key '{key}' in locale '{locale}'"
+
