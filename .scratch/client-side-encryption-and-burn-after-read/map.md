@@ -17,6 +17,7 @@ Implementação das funcionalidades de segurança avançada e formatos de privac
 - 01: [01-schema-and-model-migrations.md](issues/01-schema-and-model-migrations.md) — Adicionados campos `content_format` e `burn_after_read` no modelo `Paste`, migração incremental em `_sync_migrate_schema`, esquemas Pydantic e serviços de persistência.
 - 02: [02-i18n-catalogs-and-editorial-labels.md](issues/02-i18n-catalogs-and-editorial-labels.md) — Adicionadas chaves de tradução i18n com 100% de paridade em `en`, `pt-br` e `cn` cobrindo editor, burn-after-read, avisos de transparência Base64 e Web Crypto.
 - 03: [03-web-crypto-and-editor-integration.md](issues/03-web-crypto-and-editor-integration.md) — Implementados controles do editor, Web Crypto API para AES-256-GCM, codificação Base64 e link com fragmento `#key` no modal de sucesso.
+- 04: [04-burn-after-read-interstitial-and-lifecycle.md](issues/04-burn-after-read-interstitial-and-lifecycle.md) — Implementada tela intermediária `burn_confirmation.html`, rota `/reveal` com expurgo permanente do banco/cache, e parâmetros de confirmação na API.
 
 ## Not yet specified
 

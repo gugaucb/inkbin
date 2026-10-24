@@ -4,6 +4,13 @@
 {% block page_heading %}{{ t('viewer.page_heading') }}{% endblock %}
 
 {% block content %}
+{% if was_burned %}
+<div class="burned-status-banner" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3); margin-bottom: var(--space-4); border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border-strong); color: var(--text-primary); font-size: 13px;" role="status">
+  <i class="ti ti-flame icon-sm" aria-hidden="true"></i>
+  <span>{{ t('burn.burned_banner') }}</span>
+</div>
+{% endif %}
+
 <div class="viewer-card">
   <div class="viewer-header">
     <h2 class="viewer-title">{{ paste.title or t('viewer.untitled') }}</h2>
@@ -32,10 +39,12 @@
         <i class="ti ti-plus" aria-hidden="true"></i>
         <span>{{ t('viewer.new_paste') }}</span>
       </a>
+      {% if not was_burned %}
       <a href="/p/{{ paste.slug }}/delete" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" title="{{ t('viewer.delete_aria') }}" aria-label="{{ t('viewer.delete_aria') }}">
         <i class="ti ti-trash" aria-hidden="true"></i>
         <span>{{ t('viewer.delete') }}</span>
       </a>
+      {% endif %}
       <button type="button" id="open-report-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" onclick="openReportModal()" title="{{ t('viewer.report_aria') }}" aria-label="{{ t('viewer.report_aria') }}">
         <i class="ti ti-flag" aria-hidden="true"></i>
         <span>{{ t('viewer.report') }}</span>

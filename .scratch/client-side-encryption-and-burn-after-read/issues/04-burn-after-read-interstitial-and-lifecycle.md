@@ -1,6 +1,6 @@
 # 04 - Tela Intermediária e Ciclo de Vida do Burn After Read
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01, 02
 
@@ -29,3 +29,12 @@ Como implementar a rota de interceptação web (`src/inkbin/routes/web.py`), o t
    - Acesso inicial a paste com `burn_after_read` retorna a tela intermediária sem alterar o banco.
    - Revelação confirmada entrega o paste e expurga permanentemente.
    - Acesso subsequente ao mesmo slug retorna estritamente 404.
+
+## Answer
+
+Implementado com sucesso o ciclo de vida e tela intermediária para pastes com Burn After Read:
+1. Template editorial `burn_confirmation.html` criado em conformidade com o INK Design System v2, exibindo metadados prévios sem revelar o conteúdo, prevenindo que crawlers ou prévias de mensageiros destruam o paste prematuramente. O formulário preserva fragmentos de URL `#key` em submits client-side.
+2. Rota `viewer_page()` em `src/inkbin/routes/web.py` atualizada para retornar `burn_confirmation.html` sem incrementar visualizações ou expurgar dados quando `paste.burn_after_read == True`.
+3. Rota de confirmação `POST /p/{slug}/reveal` criada para capturar os dados do documento, expurgar permanentemente o registro de `Paste` do banco relacional, invalidar o cache e renderizar `viewer.html` com banner editorial de descarte permanente (`was_burned=True`).
+4. Endpoint `GET /api/pastes/{slug}` atualizado para exigir confirmação ativa `confirm_burn=true` antes de entregar o payload e expurgar os dados, retornando HTTP 400 informativo caso omitido.
+5. Suíte de testes `tests/test_burn_after_read.py` cobrindo o fluxo completo end-to-end de retenção, expurgo e acesso 404 subsequente aprovada com sucesso.
