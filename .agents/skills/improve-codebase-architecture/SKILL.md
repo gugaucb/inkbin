@@ -11,6 +11,8 @@ Surface architectural friction and propose **deepening opportunities**: refactor
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
 - Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
+- Consult `architecture-patterns` for macro-structure and dependency flow (Modular Monolith baseline, Strangler Fig for legacy migrations, Ports & Adapters for domain shielding, the Dependency Rule) and the Cost of Asynchrony.
+- Consult `design-patterns` for structural and behavioral pattern remedies at seams (Facade for consolidating shallow clusters into a deep module, Adapter at external boundaries, Strategy for swappable policies), bounded strictly by the Variation Test (2+ concrete implementations).
 - The domain language in `GLOSSARY.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
 
 ## Process
@@ -26,10 +28,12 @@ Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you'
 
 Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
 
-- Where does understanding one concept require bouncing between many small modules?
+- Where does understanding one concept require bouncing between many small modules? (Candidate for a **Facade**)
 - Where are modules **shallow**, with an interface nearly as complex as the implementation?
+- Where do domain models import database drivers or external frameworks, violating the **Dependency Rule**?
 - Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
 - Where do tightly-coupled modules leak across their seams?
+- Where is a legacy module being modified that would benefit from a **Strangler Fig** extraction boundary?
 - Which parts of the codebase are untested, or hard to test through their current interface?
 
 Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
@@ -45,9 +49,12 @@ For each candidate, render a card with:
 - **Files**: which files/modules are involved
 - **Problem**: why the current architecture is causing friction
 - **Solution**: plain English description of what would change
+- **Pattern classification**: structural or architectural blueprint (e.g. Facade for consolidating shallow clusters into a deep module, Adapter at external boundaries, Strangler Fig for legacy migrations, Ports & Adapters for domain shielding)
 - **Benefits**: explained in terms of locality and leverage, and how tests would improve
 - **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
 - **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
+
+Reference Strangler Fig and Modular Monolith principles when proposing extractions or legacy migrations; do not suggest microservices or message queues when in-process modular monolith seams suffice.
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 
@@ -63,9 +70,14 @@ Do NOT propose interfaces yet. After the file is written, ask the user: "Which o
 
 Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
+Reference `architecture-patterns` and `design-patterns` during this exploration:
+- Verify proposed boundaries respect the **Dependency Rule** and preserve synchronous testability (Modular Monolith baseline).
+- Test candidate patterns against the **Variation Test**: require 2+ concrete implementations before introducing an adapter seam.
+- Challenge any premature asynchrony or speculative microservice extractions using the Cost of Asynchrony.
+
 Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
 
 - **Naming a deepened module after a concept not in `GLOSSARY.md`?** Add the term to `GLOSSARY.md`. Create the file lazily if it doesn't exist.
 - **Sharpening a fuzzy term during the conversation?** Update `GLOSSARY.md` right there.
 - **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
+- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern, evaluating candidate interfaces against Facade and Strategy patterns from `design-patterns`.
