@@ -175,3 +175,41 @@ def test_platform_features_showcase_translations():
             assert val != key, f"Missing translation for key '{key}' in locale '{locale}'"
             assert len(val.strip()) > 0, f"Empty translation for key '{key}' in locale '{locale}'"
 
+
+@pytest.mark.asyncio
+async def test_platform_features_showcase_multilingual_rendering():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # 1. English
+        resp_en = await client.get("/?lang=en")
+        assert resp_en.status_code == 200
+        html_en = resp_en.text
+        assert "platform-features-section" in html_en
+        assert "Platform Guarantees & Features" in html_en
+        assert "Anonymous" in html_en
+        assert "Encrypted sharing" in html_en
+        sec_en = html_en.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        assert "features." not in sec_en
+
+        # 2. Portuguese
+        resp_pt = await client.get("/?lang=pt-br")
+        assert resp_pt.status_code == 200
+        html_pt = resp_pt.text
+        assert "platform-features-section" in html_pt
+        assert "Garantias e Recursos da Plataforma" in html_pt
+        assert "Criação anônima" in html_pt
+        assert "Compartilhamento protegido" in html_pt
+        sec_pt = html_pt.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        assert "features." not in sec_pt
+
+        # 3. Chinese
+        resp_cn = await client.get("/?lang=cn")
+        assert resp_cn.status_code == 200
+        html_cn = resp_cn.text
+        assert "platform-features-section" in html_cn
+        assert "平台保障与特性" in html_cn
+        assert "匿名创建" in html_cn
+        assert "加密保护" in html_cn
+        sec_cn = html_cn.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        assert "features." not in sec_cn
+

@@ -17,6 +17,7 @@ Inclusão de uma vitrine informativa monocromática de recursos, privacidade e g
 - **[01 - Catálogos i18n para Recursos e Garantias da Plataforma](issues/01-i18n-catalogs-features-and-guarantees.md)**: Adicionada a seção `features` com 8 pilares nos catálogos `en.json`, `pt-br.json` e `cn.json`, com testes em `test_i18n.py`.
 - **[02 - Marcação Semântica e Componente Editorial na Página Principal](issues/02-semantic-markup-and-editorial-component.md)**: Implementada a marcação Jinja2 semântica de `platform-features-section` em `editor.html` com 8 micro-cards acessíveis e ícones Tabler.
 - **[03 - Estilos Responsivos e Otimização para Telas Menores](issues/03-responsive-css-and-small-screen-optimization.md)**: Implementado layout em grid responsivo com tokens INK, `--border-focus`, otimização compacta para mobile `<= 639px` e tablet `640-1023px`.
+- **[04 - Testes Automatizados, Validação de i18n e Sincronização do Grafo](issues/04-automated-tests-and-graph-sync.md)**: Validados testes multilíngues ponta a ponta em `test_i18n.py`, suíte completa do pytest 100% verde (76 testes) e grafo sincronizado via `graphify update .`.
 
 ## Not yet specified
 
