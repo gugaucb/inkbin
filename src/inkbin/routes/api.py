@@ -99,6 +99,8 @@ async def create_paste_endpoint(
         language=payload.language,
         expires_at=expires_at,
         password=payload.password,
+        content_format=payload.content_format,
+        burn_after_read=payload.burn_after_read,
     )
 
     await cache.set(spam_key, paste.slug, ttl_seconds=60)
@@ -115,6 +117,8 @@ async def create_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
         is_protected=paste.is_protected,
+        content_format=paste.content_format,
+        burn_after_read=paste.burn_after_read,
     )
 
 
@@ -355,6 +359,7 @@ async def get_paste_endpoint(
     slug: str,
     request: Request,
     session: DbSession,
+    confirm_burn: bool = False,
 ) -> PasteDetailResponse:
     cache = get_cache_service()
     cache_key = f"paste:{slug}"
@@ -382,6 +387,18 @@ async def get_paste_endpoint(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Paste protegido por senha. Autenticação necessária.",
             )
+        if data.get("burn_after_read", False):
+            if not confirm_burn:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Este paste foi configurado com Burn After Read. Para confirmar a visualização e destruição definitiva, passe o parâmetro ?confirm_burn=true.",
+                )
+            await session.execute(delete(Paste).where(Paste.slug == slug))
+            await session.commit()
+            await cache.delete(cache_key)
+            data["views_count"] = data.get("views_count", 0) + 1
+            return PasteDetailResponse(**data)
+
         await session.execute(
             update(Paste).where(Paste.slug == slug).values(views_count=Paste.views_count + 1)
         )
@@ -414,6 +431,30 @@ async def get_paste_endpoint(
             detail="Paste protegido por senha. Autenticação necessária.",
         )
 
+    if paste.burn_after_read:
+        if not confirm_burn:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Este paste foi configurado com Burn After Read. Para confirmar a visualização e destruição definitiva, passe o parâmetro ?confirm_burn=true.",
+            )
+        response = PasteDetailResponse(
+            slug=paste.slug,
+            title=paste.title,
+            content=paste.content,
+            language=paste.language,
+            views_count=paste.views_count + 1,
+            expires_at=paste.expires_at,
+            created_at=paste.created_at,
+            is_protected=paste.is_protected,
+            is_active=paste.is_active,
+            content_format=paste.content_format,
+            burn_after_read=paste.burn_after_read,
+        )
+        await session.execute(delete(Paste).where(Paste.id == paste.id))
+        await session.commit()
+        await cache.delete(cache_key)
+        return response
+
     # Atomic increment of views_count
     await session.execute(
         update(Paste).where(Paste.id == paste.id).values(views_count=Paste.views_count + 1)
@@ -431,6 +472,8 @@ async def get_paste_endpoint(
         created_at=paste.created_at,
         is_protected=paste.is_protected,
         is_active=paste.is_active,
+        content_format=paste.content_format,
+        burn_after_read=paste.burn_after_read,
     )
 
     ttl = 3600

@@ -72,6 +72,18 @@ def _sync_migrate_schema(connection) -> None:
                     f"ALTER TABLE pastes ADD COLUMN is_active BOOLEAN DEFAULT {bool_true} NOT NULL"
                 )
             )
+        if "content_format" not in existing_cols:
+            connection.execute(
+                text(
+                    "ALTER TABLE pastes ADD COLUMN content_format VARCHAR(20) DEFAULT 'plaintext' NOT NULL"
+                )
+            )
+        if "burn_after_read" not in existing_cols:
+            connection.execute(
+                text(
+                    f"ALTER TABLE pastes ADD COLUMN burn_after_read BOOLEAN DEFAULT {bool_false} NOT NULL"
+                )
+            )
 
 
 async def init_db(engine: AsyncEngine | None = None) -> None:

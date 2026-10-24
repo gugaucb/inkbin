@@ -39,6 +39,18 @@ class PasteCreateRequest(BaseModel):
     language: str = Field(default="plaintext", max_length=50)
     expiration: ExpirationValue = Field(default_factory=lambda: ExpirationValue("never"))
     password: str | None = Field(default=None, max_length=50)
+    content_format: str = Field(default="plaintext", max_length=20)
+    burn_after_read: bool = Field(default=False)
+
+    @field_validator("content_format")
+    @classmethod
+    def validate_content_format(cls, value: str) -> str:
+        valid_formats = {"plaintext", "aes-256-gcm", "base64"}
+        if value not in valid_formats:
+            raise ValueError(
+                f"Formato de conteúdo '{value}' inválido. Valores permitidos: {', '.join(sorted(valid_formats))}."
+            )
+        return value
 
     @field_validator("expiration", mode="before")
     @classmethod
@@ -86,6 +98,8 @@ class PasteCreateResponse(BaseModel):
     expires_at: datetime | None
     created_at: datetime
     is_protected: bool = False
+    content_format: str = "plaintext"
+    burn_after_read: bool = False
 
 
 class PasteDetailResponse(BaseModel):
@@ -98,6 +112,8 @@ class PasteDetailResponse(BaseModel):
     created_at: datetime
     is_protected: bool = False
     is_active: bool = True
+    content_format: str = "plaintext"
+    burn_after_read: bool = False
 
 
 class PasteUnlockRequest(BaseModel):

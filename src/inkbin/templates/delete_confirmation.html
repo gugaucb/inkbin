@@ -4,13 +4,13 @@
 {% block page_heading %}{{ t('delete.page_heading') }}{% endblock %}
 
 {% block content %}
-<div class="viewer-card" style="max-width: 560px; margin: var(--space-8) auto; padding: var(--space-8);">
-  <div style="margin-bottom: var(--space-6); text-align: left;">
+<div class="viewer-card aux-card">
+  <div class="aux-card-header">
     <span class="badge" style="background: var(--ink-950); color: var(--ink-0); margin-bottom: var(--space-3); display: inline-flex; align-items: center; gap: 4px;">
       <i class="ti ti-alert-triangle icon-sm" aria-hidden="true"></i>
       <span>{{ t('delete.badge') }}</span>
     </span>
-    <h2 style="font-size: 22px; font-weight: 650; margin: var(--space-2) 0; color: var(--text-primary);">
+    <h2 style="font-size: 22px; font-weight: 650; margin: var(--space-2) 0; color: var(--text-primary); word-break: break-word;">
       {{ t('delete.title_prefix', title=paste.title or t('viewer.untitled')) }}
     </h2>
     <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
@@ -50,8 +50,8 @@
       </span>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <a href="/p/{{ paste.slug }}" class="btn btn-secondary" style="font-size: 13px; height: 38px;">
+    <div class="aux-card-actions">
+      <a href="/p/{{ paste.slug }}" class="btn btn-secondary">
         <i class="ti ti-arrow-left" aria-hidden="true"></i>
         <span>{{ t('delete.cancel') }}</span>
       </a>
@@ -59,7 +59,7 @@
         type="submit" 
         id="confirm-delete-btn" 
         class="btn btn-primary" 
-        style="font-size: 13px; height: 38px; background: var(--ink-950);"
+        style="background: var(--ink-950);"
       >
         <i class="ti ti-trash" aria-hidden="true"></i>
         <span>{{ t('delete.confirm') }}</span>

@@ -19,3 +19,12 @@ Codebase, docs, SQL schemas, configs, and PDFs mapped into a queryable graph (`g
 ### Design system (INK)
 
 Monochrome editorial UI specifications, tokens (`ink-tokens.css`), component contracts, typography, responsive layout blueprints, and WCAG accessibility rules. See `docs/agents/INK_Design_System_v2.md`.
+
+### Architecture patterns
+
+Macro-structure, subsystem boundaries, and dependency directions. Enforces the Dependency Rule (domain core shielded from frameworks and databases), the Modular Monolith baseline, and the Cost of Asynchrony. See `.agents/skills/architecture-patterns/SKILL.md`.
+
+### Design patterns
+
+GoF patterns at module seams (Factory, Strategy, Adapter, Facade) applied to concrete implementation friction. Governed by the Variation Test (strict 2+ concrete implementations rule, banning hypothetical single-implementation seams). See `.agents/skills/design-patterns/SKILL.md`.
+

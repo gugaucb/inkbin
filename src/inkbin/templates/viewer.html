@@ -4,12 +4,24 @@
 {% block page_heading %}{{ t('viewer.page_heading') }}{% endblock %}
 
 {% block content %}
-<div class="viewer-card">
+{% if was_burned %}
+<div class="burned-status-banner" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3); margin-bottom: var(--space-4); border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border-strong); color: var(--text-primary); font-size: 13px;" role="status">
+  <i class="ti ti-flame icon-sm" aria-hidden="true"></i>
+  <span>{{ t('burn.burned_banner') }}</span>
+</div>
+{% endif %}
+
+<div class="viewer-card" data-content-format="{{ paste.content_format }}" data-slug="{{ paste.slug }}">
   <div class="viewer-header">
     <h2 class="viewer-title">{{ paste.title or t('viewer.untitled') }}</h2>
     
     <div class="viewer-meta">
       <span class="badge"><i class="ti ti-code icon-sm" aria-hidden="true"></i> <span>{{ paste.language }}</span></span>
+      {% if paste.content_format == 'aes-256-gcm' %}
+      <span class="badge" id="badge-encrypted" style="background: var(--ink-900); color: var(--ink-0);"><i class="ti ti-shield-lock icon-sm" aria-hidden="true"></i> <span>{{ t('viewer.encrypted_badge') }}</span></span>
+      {% elif paste.content_format == 'base64' %}
+      <span class="badge" id="badge-base64"><i class="ti ti-binary icon-sm" aria-hidden="true"></i> <span>{{ t('viewer.base64_badge') }}</span></span>
+      {% endif %}
       <span class="meta-item"><i class="ti ti-calendar icon-sm" aria-hidden="true"></i> <span>{{ t('viewer.published_at', date=formatted_date) }}</span></span>
       <span>·</span>
       <span class="meta-item"><i class="ti ti-eye icon-sm" aria-hidden="true"></i> <span>{{ t('viewer.views_singular', count=paste.views_count) if paste.views_count == 1 else t('viewer.views_plural', count=paste.views_count) }}</span></span>
@@ -20,6 +32,12 @@
     </div>
 
     <div class="viewer-actions">
+      {% if paste.content_format == 'base64' %}
+      <button type="button" id="toggle-base64-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px;" data-mode="decoded">
+        <i class="ti ti-code" aria-hidden="true"></i>
+        <span id="toggle-base64-text">{{ t('viewer.base64_toggle_raw') }}</span>
+      </button>
+      {% endif %}
       <button type="button" id="copy-code-btn" class="btn btn-primary" style="font-size: 13px; height: 36px;">
         <i class="ti ti-copy" aria-hidden="true"></i>
         <span>{{ t('viewer.copy_code') }}</span>
@@ -32,14 +50,31 @@
         <i class="ti ti-plus" aria-hidden="true"></i>
         <span>{{ t('viewer.new_paste') }}</span>
       </a>
+      {% if not was_burned %}
       <a href="/p/{{ paste.slug }}/delete" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" title="{{ t('viewer.delete_aria') }}" aria-label="{{ t('viewer.delete_aria') }}">
         <i class="ti ti-trash" aria-hidden="true"></i>
         <span>{{ t('viewer.delete') }}</span>
       </a>
+      {% endif %}
       <button type="button" id="open-report-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px; color: var(--text-secondary);" onclick="openReportModal()" title="{{ t('viewer.report_aria') }}" aria-label="{{ t('viewer.report_aria') }}">
         <i class="ti ti-flag" aria-hidden="true"></i>
         <span>{{ t('viewer.report') }}</span>
       </button>
+    </div>
+  </div>
+
+  {% if paste.content_format == 'base64' %}
+  <div class="base64-notice-banner" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3); margin: var(--space-4); border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border-subtle); color: var(--text-secondary); font-size: 13px;" role="note">
+    <i class="ti ti-info-circle icon-sm" aria-hidden="true"></i>
+    <span>{{ t('viewer.base64_notice') }}</span>
+  </div>
+  {% endif %}
+
+  <div id="crypto-error-notice" class="crypto-error-banner" style="display: none; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); margin: var(--space-4); border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border-strong); color: var(--text-primary); font-size: 14px; line-height: 1.5;" role="alert">
+    <i class="ti ti-key-off" style="font-size: 20px; flex-shrink: 0; margin-top: 2px;" aria-hidden="true"></i>
+    <div>
+      <strong id="crypto-error-title" style="display: block; margin-bottom: 4px;">{{ t('viewer.encrypted_badge') }}</strong>
+      <span id="crypto-error-text">{{ t('viewer.encrypted_missing_key') }}</span>
     </div>
   </div>
 

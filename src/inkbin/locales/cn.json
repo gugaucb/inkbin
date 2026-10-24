@@ -16,6 +16,7 @@
     "clear_history_confirm": "确定要清空所有本地历史记录吗？",
     "delete_item_aria": "从历史中删除此文本",
     "delete_item_title": "从历史中移除",
+    "toggle_menu": "切换导航菜单",
     "language": "语言"
   },
   "footer": {
@@ -42,11 +43,27 @@
     "content_placeholder": "在此粘贴要分享的内容...",
     "content_aria": "文本或代码内容",
     "anonymous_hint": "匿名发布 · 无追踪",
+    "format_label": "内容格式 / 安全",
+    "format_plaintext": "纯文本 (默认)",
+    "format_aes_gcm": "浏览器端加密 (AES-256-GCM)",
+    "format_base64": "Base64 编码",
+    "format_base64_hint": "Base64 仅为传输编码而非加密 — 任何拥有链接的人均可解码阅读。",
+    "burn_label": "阅后即焚 (Burn after read)",
+    "burn_hint": "首次确认查看后，文档将被永久销毁。",
     "submit_btn": "发布文本",
     "publishing_btn": "正在发布...",
     "alert_empty": "发布前请输入内容。",
     "alert_error": "发布文本时出错。",
-    "alert_network": "发布文本时网络连接失败。"
+    "alert_network": "发布文本时网络连接失败。",
+    "options_expires_in": "过期时间",
+    "option_password": "密码",
+    "option_encrypt": "Encrypt in browser",
+    "option_burn": "Burn after read",
+    "option_base64": "Base64",
+    "desc_encrypt": "Encrypt in browser：内容在上传前采用 AES-256-GCM 加密。密钥附加在分享链接的 “#” 之后且永不发送至服务器 — 丢失完整链接将无法解密。",
+    "desc_burn": "Burn after read：文档在首次确认查看后立即删除 — 读者在打开前需进行确认。",
+    "desc_base64": "Base64：Base64 仅为编码而非加密 — 任何拥有链接的人均可解码。",
+    "desc_password": "密码：查看该文档需输入密码，通过 Argon2id 进行安全验证。"
   },
   "expiration": {
     "never": "永不过期",
@@ -81,8 +98,18 @@
     "admin_token": "管理密钥（管理员删除凭证）",
     "copy_token_aria": "复制删除密钥",
     "warning": "请注意：由于文本为匿名发布，请妥善保存此密钥！若需提前删除文本，此密钥为唯一凭据，且不会再次显示。",
+    "encrypted_notice": "使用 AES-256-GCM 算法加密。解密密钥仅存在于 URL 的 '#' 之后，从未传输至服务器。若遗失完整链接，内容将无法恢复。",
     "close": "关闭",
     "open": "打开文本"
+  },
+  "burn": {
+    "page_title": "阅后即焚 — Inkbin",
+    "badge": "不可逆操作",
+    "title": "此文档在阅读后将被销毁",
+    "description": "作者已将此文档配置为一旦打开即从服务器永久清除。您现在要查看内容吗？",
+    "confirm_btn": "查看并销毁文档",
+    "cancel_btn": "返回首页",
+    "burned_banner": "此文档已在本次查看中从数据库中永久清除。"
   },
   "viewer": {
     "untitled": "无标题",
@@ -100,7 +127,14 @@
     "delete": "删除",
     "delete_aria": "使用删除密钥删除此文本",
     "report": "举报",
-    "report_aria": "举报此发布内容"
+    "report_aria": "举报此发布内容",
+    "base64_badge": "Base64 已编码",
+    "base64_notice": "提示：此内容经过 Base64 编码。Base64 仅为传输编码而非加密 — 任何拥有链接的人均可查看。",
+    "base64_toggle_decoded": "查看解码内容",
+    "base64_toggle_raw": "查看原始 Base64",
+    "encrypted_badge": "AES-256-GCM 客户端加密",
+    "encrypted_missing_key": "链接中缺少解密密钥 (#key)。没有原始密钥片段，无法解密本文档。",
+    "encrypted_error": "解密失败。链接中的密钥无效或已损坏。"
   },
   "report": {
     "modal_title": "举报此内容",
@@ -168,5 +202,24 @@
     "copied": "已复制！",
     "copy_failed": "无法自动复制，请手动选择文本并复制。",
     "code_copied": "代码已复制！"
+  },
+  "features": {
+    "heading": "平台保障与特性",
+    "anonymous": "匿名创建",
+    "anonymous_desc": "无需注册账号，不保存原始 IP 地址或日志",
+    "encryption": "加密保护",
+    "encryption_desc": "可选密码加密保护与 Argon2id 密钥派生",
+    "expiry": "自动过期",
+    "expiry_desc": "支持 10 分钟至 1 周的可配置保留与定期清除",
+    "developer": "开发者友好",
+    "developer_desc": "完整的 HTTP REST API、cURL 终端支持与 raw 链接",
+    "privacy": "注重隐私",
+    "privacy_desc": "无第三方分析脚本，零跟踪 Cookie",
+    "syntax": "语法高亮",
+    "syntax_desc": "支持 100+ 种编程语言与社论级等宽排版",
+    "no_signup": "免登录使用",
+    "no_signup_desc": "完全开放简便，一切尽在您的掌控之中",
+    "delete_token": "管理员删除令牌",
+    "delete_token_desc": "发布时生成一次性删除密钥，支持立即销毁"
   }
 }

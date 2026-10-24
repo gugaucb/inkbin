@@ -27,6 +27,8 @@ class Paste(Base):
     content_hash: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
     report_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    content_format: Mapped[str] = mapped_column(String(20), default="plaintext", nullable=False)
+    burn_after_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     def is_expired(self) -> bool:
         if self.expires_at is None:

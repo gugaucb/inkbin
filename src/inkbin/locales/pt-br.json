@@ -16,6 +16,7 @@
     "clear_history_confirm": "Tem certeza de que deseja limpar todo o histórico local?",
     "delete_item_aria": "Remover este paste do histórico",
     "delete_item_title": "Remover do histórico",
+    "toggle_menu": "Alternar menu de navegação",
     "language": "Idioma"
   },
   "footer": {
@@ -42,11 +43,27 @@
     "content_placeholder": "Cole aqui o conteúdo a ser compartilhado...",
     "content_aria": "Conteúdo do texto ou código",
     "anonymous_hint": "Publicação anônima · Sem rastreamento",
+    "format_label": "Modo de Conteúdo / Segurança",
+    "format_plaintext": "Texto puro (Padrão)",
+    "format_aes_gcm": "Criptografar no navegador (AES-256-GCM)",
+    "format_base64": "Codificação Base64",
+    "format_base64_hint": "Base64 é uma codificação e não criptografia — qualquer pessoa com o link pode lê-lo.",
+    "burn_label": "Destruir após leitura (Burn after read)",
+    "burn_hint": "O paste será excluído permanentemente após a primeira visualização confirmada.",
     "submit_btn": "Publicar texto",
     "publishing_btn": "Publicando...",
     "alert_empty": "Por favor, insira o conteúdo do paste antes de publicar.",
     "alert_error": "Ocorreu um erro ao publicar o paste.",
-    "alert_network": "Falha na conexão ao publicar o paste."
+    "alert_network": "Falha na conexão ao publicar o paste.",
+    "options_expires_in": "Expira em",
+    "option_password": "Senha",
+    "option_encrypt": "Encrypt in browser",
+    "option_burn": "Burn after read",
+    "option_base64": "Base64",
+    "desc_encrypt": "Encrypt in browser: o conteúdo é criptografado com AES-256-GCM antes do envio. A chave é adicionada ao link após “#” e nunca é enviada ao servidor — perder o link completo impede a decifração.",
+    "desc_burn": "Burn after read: o paste é excluído após a primeira visualização confirmada — os leitores precisam confirmar antes de abrir.",
+    "desc_base64": "Base64: Base64 é apenas uma codificação, não criptografia — qualquer pessoa com o link pode decodificá-lo.",
+    "desc_password": "Senha: o paste requer uma senha para ser visualizado, validada com segurança via Argon2id."
   },
   "expiration": {
     "never": "Nunca expirar",
@@ -81,8 +98,18 @@
     "admin_token": "Chave Secreta de Administração (Admin Delete Token)",
     "copy_token_aria": "Copiar token de exclusão",
     "warning": "Atenção: Como a publicação é anônima, guarde esta chave! Ela é necessária caso você decida excluir o paste antes do prazo. Ela não será exibida novamente.",
+    "encrypted_notice": "Criptografado com AES-256-GCM. A chave de decifração reside unicamente após o '#' da URL e jamais foi enviada ao servidor. Se o link for perdido, o conteúdo não poderá ser recuperado.",
     "close": "Fechar",
     "open": "Abrir publicação"
+  },
+  "burn": {
+    "page_title": "Destruição Após Leitura — Inkbin",
+    "badge": "Ação Irreversível",
+    "title": "Este paste será destruído após a leitura",
+    "description": "O autor configurou este documento para ser excluído permanentemente do servidor assim que for aberto. Deseja revelar o conteúdo agora?",
+    "confirm_btn": "Revelar e Destruir Paste",
+    "cancel_btn": "Voltar para o Início",
+    "burned_banner": "Este documento foi destruído permanentemente do banco de dados na visualização atual."
   },
   "viewer": {
     "untitled": "Sem título",
@@ -100,7 +127,14 @@
     "delete": "Excluir",
     "delete_aria": "Excluir este paste com seu Admin Delete Token",
     "report": "Denunciar",
-    "report_aria": "Denunciar publicação"
+    "report_aria": "Denunciar publicação",
+    "base64_badge": "Base64 Codificado",
+    "base64_notice": "Aviso: Este conteúdo está codificado em Base64. Base64 é uma codificação, não criptografia — qualquer pessoa com o link pode lê-lo.",
+    "base64_toggle_decoded": "Visualizar Decodificado",
+    "base64_toggle_raw": "Visualizar Base64 Bruto",
+    "encrypted_badge": "AES-256-GCM Cifrado no Cliente",
+    "encrypted_missing_key": "Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.",
+    "encrypted_error": "Falha na decifração. A chave fornecida no link é inválida ou foi corrompida."
   },
   "report": {
     "modal_title": "Denunciar publicação",
@@ -168,5 +202,24 @@
     "copied": "Copiado!",
     "copy_failed": "Não foi possível copiar. Selecione o texto e copie manualmente.",
     "code_copied": "Código copiado!"
+  },
+  "features": {
+    "heading": "Garantias e Recursos da Plataforma",
+    "anonymous": "Criação anônima",
+    "anonymous_desc": "Sem contas, sem registro de IPs brutos em banco ou logs",
+    "encryption": "Compartilhamento protegido",
+    "encryption_desc": "Proteção por senha opcional com derivação Argon2id",
+    "expiry": "Expiração automática",
+    "expiry_desc": "Retenção configurável de 10 minutos a 1 semana ou permanente",
+    "developer": "Pronto para desenvolvedores",
+    "developer_desc": "API HTTP REST completa, suporte nativo a cURL e visualização raw",
+    "privacy": "Foco em privacidade",
+    "privacy_desc": "Sem scripts de analytics, zero cookies de rastreamento",
+    "syntax": "Destaque de sintaxe",
+    "syntax_desc": "Mais de 100 linguagens com formatação mono editorial",
+    "no_signup": "Sem necessidade de cadastro",
+    "no_signup_desc": "Livre e transparente, você mantém total controle",
+    "delete_token": "Admin Delete Token",
+    "delete_token_desc": "Código de remoção único para exclusão instantânea"
   }
 }

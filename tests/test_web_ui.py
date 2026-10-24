@@ -133,3 +133,270 @@ async def test_modals_and_special_pages_icons(client: AsyncClient):
     assert "ti ti-alert-triangle" in delete_res.text
     assert "ti ti-trash" in delete_res.text
     assert "ti ti-arrow-left" in delete_res.text
+
+
+@pytest.mark.asyncio
+async def test_responsive_viewport_and_drawer(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+
+    # Viewport meta tag
+    assert 'name="viewport"' in text
+    assert 'content="width=device-width, initial-scale=1.0"' in text
+
+    # Mobile nav drawer and backdrop
+    assert 'id="sidebar-backdrop"' in text
+    assert 'class="sidebar-backdrop"' in text
+    assert 'id="mobile-nav-toggle"' in text
+    assert 'class="mobile-nav-toggle"' in text
+    assert 'aria-controls="app-sidebar"' in text
+    assert 'id="app-sidebar"' in text
+    assert 'id="sidebar-close-btn"' in text
+    assert 'class="topbar-left"' in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_editor_form_classes(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    text = response.text
+
+    # Form layout and fields
+    assert "editor-layout" in text
+    assert "editor-header-fields" in text
+    assert "field-language" in text
+    assert "field-expiration" in text
+    assert "field-password" in text
+    assert "editor-container" in text
+    assert "editor-toolbar" in text
+    assert "editor-stats" in text
+    assert "editor-footer-actions" in text
+    assert "editor-hint-text" in text
+    assert "btn-submit" in text
+
+    # Success modal responsive elements
+    assert "modal-input-group" in text
+    assert "modal-qr-container" in text
+    assert "qr-code-box" in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_viewer_code_containment(client: AsyncClient):
+    long_code = "const extremelyLongLine = " + "x" * 250 + ";"
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Wide Code Test", "content": long_code, "language": "javascript"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    response = await client.get(f"/p/{slug}")
+    assert response.status_code == 200
+    text = response.text
+
+    # Code container and pre formatting
+    assert "code-container" in text
+    assert "code-content" in text
+    assert "ink-code" in text
+    assert long_code in text
+
+
+@pytest.mark.asyncio
+async def test_responsive_tokens_and_editorial_css(client: AsyncClient):
+    tokens_res = await client.get("/static/css/ink-tokens.css")
+    assert tokens_res.status_code == 200
+    assert "--breakpoint-mobile: 639px;" in tokens_res.text
+    assert "--breakpoint-tablet: 1023px;" in tokens_res.text
+    assert "--breakpoint-desktop: 1439px;" in tokens_res.text
+    assert "--topbar-height-mobile: 56px;" in tokens_res.text
+    assert "--topbar-height-desktop: 64px;" in tokens_res.text
+    assert "--touch-target-min: 44px;" in tokens_res.text
+
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+    assert "clamp(200px, 36vh, 320px)" in css_text
+    assert "clamp(300px, 45vh, 420px)" in css_text
+    assert "overflow-x: auto;" in css_text
+    assert "-webkit-overflow-scrolling: touch;" in css_text
+    assert "aux-card" in css_text
+    assert "error-card" in css_text
+
+
+@pytest.mark.asyncio
+async def test_responsive_auxiliary_and_error_pages(client: AsyncClient):
+    # 404 Error page
+    res_404 = await client.get("/p/non-existing-slug-12345")
+    assert res_404.status_code == 404
+    assert "error-card" in res_404.text
+    assert "error-icon" in res_404.text
+    assert "error-title" in res_404.text
+    assert "error-message" in res_404.text
+
+    # Create protected paste for challenge and delete confirmation tests
+    create_res = await client.post(
+        "/api/pastes",
+        json={"title": "Aux Test", "content": "protected", "password": "pass-aux-test"},
+    )
+    assert create_res.status_code == 201
+    slug = create_res.json()["slug"]
+
+    # Challenge page
+    challenge_res = await client.get(f"/p/{slug}")
+    assert challenge_res.status_code == 200
+    assert "aux-card" in challenge_res.text
+    assert "aux-card-header" in challenge_res.text
+    assert "aux-card-actions" in challenge_res.text
+
+    # Delete confirmation page
+    delete_res = await client.get(f"/p/{slug}/delete")
+    assert delete_res.status_code == 200
+    assert "aux-card" in delete_res.text
+    assert "aux-card-header" in delete_res.text
+    assert "aux-card-actions" in delete_res.text
+
+
+@pytest.mark.asyncio
+async def test_editor_platform_features_showcase_markup(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    # Section and accessibility
+    assert '<section class="platform-features-section" aria-labelledby="features-section-title">' in html
+    assert 'id="features-section-title"' in html
+    assert 'class="platform-features-grid"' in html
+
+    # 8 feature cards
+    assert html.count('class="feature-card"') == 8
+
+    # All 8 required Tabler icons
+    expected_icons = [
+        "ti ti-ghost",
+        "ti ti-lock",
+        "ti ti-clock",
+        "ti ti-terminal-2",
+        "ti ti-shield-check",
+        "ti ti-code",
+        "ti ti-user-off",
+        "ti ti-trash",
+    ]
+    for icon in expected_icons:
+        assert icon in html
+
+
+@pytest.mark.asyncio
+async def test_platform_features_css_and_responsiveness(client: AsyncClient):
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+
+    # Base classes
+    assert ".platform-features-section" in css_text
+    assert ".platform-features-header" in css_text
+    assert ".platform-features-grid" in css_text
+    assert ".feature-card" in css_text
+    assert ".feature-card-icon" in css_text
+    assert ".feature-card-title" in css_text
+    assert ".feature-card-desc" in css_text
+
+    # Responsive rules
+    assert "platform-features-grid" in css_text
+    assert "platform-features-section" in css_text
+
+
+@pytest.mark.asyncio
+async def test_editor_format_and_burn_after_read_elements(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    assert 'id="paste-content-format"' in html
+    assert 'id="paste-burn-after-read"' in html
+    assert 'id="base64-warning-hint"' in html
+    assert 'id="modal-encrypted-notice"' in html
+    assert "ti ti-lock" in html
+    assert "ti ti-flame" in html
+    assert "aes-256-gcm" in html
+    assert "base64" in html
+
+
+@pytest.mark.asyncio
+async def test_viewer_aes_and_base64_elements(client: AsyncClient):
+    # 1. AES-256-GCM paste
+    aes_create = await client.post(
+        "/api/pastes",
+        json={
+            "title": "Encrypted Test",
+            "content": "b64ciphertext",
+            "language": "python",
+            "content_format": "aes-256-gcm",
+        },
+    )
+    assert aes_create.status_code == 201
+    aes_slug = aes_create.json()["slug"]
+
+    resp_aes = await client.get(f"/p/{aes_slug}")
+    assert resp_aes.status_code == 200
+    html_aes = resp_aes.text
+    assert 'data-content-format="aes-256-gcm"' in html_aes
+    assert 'id="crypto-error-notice"' in html_aes
+    assert 'id="badge-encrypted"' in html_aes
+
+    # 2. Base64 paste
+    b64_create = await client.post(
+        "/api/pastes",
+        json={
+            "title": "Base64 Test",
+            "content": "SGVsbG8gSW5rYmlu",
+            "language": "plaintext",
+            "content_format": "base64",
+        },
+    )
+    assert b64_create.status_code == 201
+    b64_slug = b64_create.json()["slug"]
+
+    resp_b64 = await client.get(f"/p/{b64_slug}")
+    assert resp_b64.status_code == 200
+    html_b64 = resp_b64.text
+    assert 'data-content-format="base64"' in html_b64
+    assert 'id="badge-base64"' in html_b64
+    assert "base64-notice-banner" in html_b64
+    assert 'id="toggle-base64-btn"' in html_b64
+
+
+@pytest.mark.asyncio
+async def test_editor_options_bar_elements_and_styles(client: AsyncClient):
+    # 1. HTML structure
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    assert 'class="editor-options-bar"' in html
+    assert 'class="expiration-control-card' in html
+    assert 'id="paste-expiration"' in html
+    assert 'id="paste-password-toggle"' in html
+    assert 'id="password-reveal-container"' in html
+    assert 'id="paste-password"' in html
+    assert 'id="paste-format-encrypt"' in html
+    assert 'id="paste-format-base64"' in html
+    assert 'id="paste-burn-after-read"' in html
+    assert 'id="editor-options-explanations"' in html
+    assert 'data-desc-encrypt=' in html
+    assert 'data-desc-burn=' in html
+    assert 'data-desc-base64=' in html
+    assert 'data-desc-password=' in html
+
+    # 2. CSS rules
+    css_res = await client.get("/static/css/ink-editorial.css")
+    assert css_res.status_code == 200
+    css_text = css_res.text
+    assert ".editor-options-bar" in css_text
+    assert ".expiration-control-card" in css_text
+    assert ".option-pill-custom" in css_text
+    assert ".explanation-bullet-dot" in css_text
+    assert "#00d4b8" in css_text
+
+
+

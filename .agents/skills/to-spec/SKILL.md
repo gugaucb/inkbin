@@ -12,7 +12,11 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+2. Sketch out the seams at which you're going to test the feature:
+- Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+- Enforce the **Dependency Rule** (`architecture-patterns`): dependencies must point strictly inward toward high-policy business logic. Core domain models must never import database drivers, ORMs, or web frameworks.
+- Apply the **Variation Test** (`design-patterns`): do not introduce an adapter seam or abstract interface unless there are at least two concrete implementations today. One adapter is a hypothetical seam—indirection masquerading as architecture.
+- Keep test seams high-level and synchronous to protect fast feedback loops; do not introduce speculative asynchronous boundaries or code scaffolding.
 
 Check with the user that these seams match their expectations.
 
@@ -47,7 +51,8 @@ A list of implementation decisions that were made. This can include:
 - The modules that will be built/modified
 - The interfaces of those modules that will be modified
 - Technical clarifications from the developer
-- Architectural decisions
+- Architectural decisions: enforce the Dependency Rule and module depth. Reject anemic 5-layer pass-through architectures (controller → service → port → adapter → repo) for standard CRUD or data operations; keep modules deep (broad behavior behind a narrow interface).
+- Seam and pattern validation: confirm any proposed GoF structural or behavioral pattern (Factory, Strategy, Adapter) satisfies the Variation Test (at least 2 concrete implementations). Prohibit speculative code scaffolding while keeping existing high-level test seams.
 - Schema changes
 - API contracts
 - Specific interactions

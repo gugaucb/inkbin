@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEditor();
   setupLocalHistory();
   setupViewerCopyActions();
+  setupViewerContent();
+  setupMobileNavigation();
 });
 
 function setupEditor() {
@@ -66,6 +68,124 @@ function setupEditor() {
   textarea.addEventListener('input', updateStats);
   updateStats();
 
+  // Options Bar Interactivity & Format Toggles
+  const formatInput = document.getElementById('paste-content-format');
+  const base64Hint = document.getElementById('base64-warning-hint');
+  const encryptRadio = document.getElementById('paste-format-encrypt');
+  const base64Radio = document.getElementById('paste-format-base64');
+  const burnCheckbox = document.getElementById('paste-burn-after-read');
+  const passwordToggle = document.getElementById('paste-password-toggle');
+  const passwordContainer = document.getElementById('password-reveal-container');
+  const passwordInput = document.getElementById('paste-password');
+  const explanationsContainer = document.getElementById('editor-options-explanations');
+
+  let currentFormat = formatInput ? formatInput.value : 'plaintext';
+
+  function updateExplanations() {
+    if (!explanationsContainer) return;
+
+    const bullets = [];
+
+    // Encrypt in browser explanation
+    if (currentFormat === 'aes-256-gcm') {
+      const text = explanationsContainer.dataset.descEncrypt || 
+        t('editor.desc_encrypt', 'Encrypt in browser: content is encrypted with AES-256-GCM before upload. The key is added to the share link after “#” and never sent to the server — lose the full link and the paste can\'t be decrypted.');
+      bullets.push(text);
+    }
+
+    // Base64 explanation
+    if (currentFormat === 'base64') {
+      const text = explanationsContainer.dataset.descBase64 || 
+        t('editor.desc_base64', 'Base64: Base64 is encoding, not encryption — anyone with the link can decode it.');
+      bullets.push(text);
+    }
+
+    // Burn after read explanation
+    if (burnCheckbox && burnCheckbox.checked) {
+      const text = explanationsContainer.dataset.descBurn || 
+        t('editor.desc_burn', 'Burn after read: the paste is deleted after the first confirmed view — readers are asked to confirm before it opens.');
+      bullets.push(text);
+    }
+
+    // Password explanation
+    if (passwordToggle && passwordToggle.checked) {
+      const text = explanationsContainer.dataset.descPassword || 
+        t('editor.desc_password', 'Password: the paste requires a password to view, verified securely with Argon2id.');
+      bullets.push(text);
+    }
+
+    if (bullets.length === 0) {
+      explanationsContainer.innerHTML = '';
+      explanationsContainer.style.display = 'none';
+      return;
+    }
+
+    explanationsContainer.style.display = 'flex';
+    explanationsContainer.innerHTML = bullets.map((b) => `
+      <div class="explanation-bullet-item">
+        <span class="explanation-bullet-dot" aria-hidden="true">•</span>
+        <span class="explanation-bullet-content">${b}</span>
+      </div>
+    `).join('');
+  }
+
+  function setFormat(newFormat) {
+    currentFormat = newFormat;
+    if (formatInput) {
+      formatInput.value = newFormat;
+    }
+    if (base64Hint) {
+      base64Hint.style.display = newFormat === 'base64' ? 'flex' : 'none';
+    }
+    if (encryptRadio) {
+      encryptRadio.checked = newFormat === 'aes-256-gcm';
+    }
+    if (base64Radio) {
+      base64Radio.checked = newFormat === 'base64';
+    }
+    updateExplanations();
+  }
+
+  // Radio button click behavior: Clicking checked radio toggles off back to plaintext
+  [encryptRadio, base64Radio].forEach((radio) => {
+    if (!radio) return;
+    radio.addEventListener('click', () => {
+      const val = radio.value;
+      if (currentFormat === val) {
+        radio.checked = false;
+        setFormat('plaintext');
+      } else {
+        setFormat(val);
+      }
+    });
+  });
+
+  // Password toggle behavior
+  if (passwordToggle && passwordContainer) {
+    passwordToggle.addEventListener('change', () => {
+      if (passwordToggle.checked) {
+        passwordContainer.style.display = 'flex';
+        passwordInput?.focus();
+      } else {
+        passwordContainer.style.display = 'none';
+        if (passwordInput) {
+          passwordInput.value = '';
+        }
+      }
+      updateExplanations();
+    });
+  }
+
+  // Burn checkbox listener
+  if (burnCheckbox) {
+    burnCheckbox.addEventListener('change', () => {
+      updateExplanations();
+    });
+  }
+
+  // Initial call to update explanations
+  updateExplanations();
+
   // Async form submission
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -79,14 +199,27 @@ function setupEditor() {
       const title = document.getElementById('paste-title')?.value || null;
       const language = document.getElementById('paste-language')?.value || 'plaintext';
       const expiration = document.getElementById('paste-expiration')?.value || 'never';
-      const password = document.getElementById('paste-password')?.value || null;
+      const password = (passwordToggle?.checked && passwordInput?.value?.trim()) ? passwordInput.value.trim() : null;
+      const contentFormat = formatInput ? formatInput.value : currentFormat;
+      const burnAfterRead = Boolean(burnCheckbox?.checked);
 
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>${t('editor.publishing_btn', 'Publicando...')}</span>`;
       }
 
+      let contentToSend = content;
+      let keyFragment = null;
+
       try {
+        if (contentFormat === 'aes-256-gcm') {
+          const key = await generateAesKey();
+          contentToSend = await encryptText(content, key);
+          keyFragment = await exportKeyToBase64Url(key);
+        } else if (contentFormat === 'base64') {
+          contentToSend = utf8ToBase64(content);
+        }
+
         const response = await fetch('/api/pastes', {
           method: 'POST',
           headers: {
@@ -94,10 +227,12 @@ function setupEditor() {
           },
           body: JSON.stringify({
             title: title || null,
-            content,
+            content: contentToSend,
             language,
             expiration,
             password: password || null,
+            content_format: contentFormat,
+            burn_after_read: burnAfterRead,
           }),
         });
 
@@ -108,6 +243,8 @@ function setupEditor() {
         }
 
         const data = await response.json();
+        const fullShareUrl = keyFragment ? `${data.url}#${keyFragment}` : data.url;
+
         // Save to local history
         saveToLocalHistory({
           slug: data.slug,
@@ -115,12 +252,15 @@ function setupEditor() {
           language: data.language,
           created_at: data.created_at,
           admin_delete_token: data.admin_delete_token,
-          url: data.url,
+          url: fullShareUrl,
+          content_format: data.content_format,
+          burn_after_read: data.burn_after_read,
         });
 
         // Show Success Modal
-        showSuccessModal(data);
+        showSuccessModal(data, keyFragment);
       } catch (err) {
+        console.error('Submission error:', err);
         alert(t('editor.alert_network', 'Falha na conexão ao publicar o paste.'));
       } finally {
         if (submitBtn) {
@@ -132,10 +272,113 @@ function setupEditor() {
   }
 }
 
-function showSuccessModal(data) {
+// --- Client-Side Cryptography (Web Crypto API) & Base64 ---
+
+function bufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function bufferToBase64Url(buffer) {
+  const base64 = bufferToBase64(buffer);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlToBuffer(base64url) {
+  let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  return base64ToBuffer(base64);
+}
+
+function utf8ToBase64(text) {
+  const bytes = new TextEncoder().encode(text);
+  return bufferToBase64(bytes);
+}
+
+function base64ToUtf8(base64) {
+  const bytes = base64ToBuffer(base64);
+  return new TextDecoder().decode(bytes);
+}
+
+async function generateAesKey() {
+  if (!window.crypto || !window.crypto.subtle) {
+    throw new Error('Web Crypto API não disponível neste navegador.');
+  }
+  return await window.crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptText(text, key) {
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const encodedText = new TextEncoder().encode(text);
+  const ciphertextBuffer = await window.crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encodedText
+  );
+
+  const combined = new Uint8Array(iv.length + ciphertextBuffer.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(ciphertextBuffer), iv.length);
+  return bufferToBase64(combined);
+}
+
+async function exportKeyToBase64Url(key) {
+  const rawKey = await window.crypto.subtle.exportKey('raw', key);
+  return bufferToBase64Url(rawKey);
+}
+
+async function importKeyFromBase64Url(base64url) {
+  const keyBytes = base64UrlToBuffer(base64url);
+  return await window.crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  );
+}
+
+async function decryptText(base64Combined, key) {
+  const combined = base64ToBuffer(base64Combined);
+  if (combined.byteLength < 13) {
+    throw new Error('Payload cifrado corrompido ou tamanho insuficiente.');
+  }
+  const iv = combined.slice(0, 12);
+  const ciphertext = combined.slice(12);
+
+  const decryptedBuffer = await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    ciphertext
+  );
+  return new TextDecoder().decode(decryptedBuffer);
+}
+
+function showSuccessModal(data, keyFragment = null) {
   const modal = document.getElementById('success-modal');
   if (!modal) {
-    window.location.href = data.url;
+    const redirectUrl = keyFragment ? `${data.url}#${keyFragment}` : data.url;
+    window.location.href = redirectUrl;
     return;
   }
 
@@ -153,6 +396,15 @@ function showSuccessModal(data) {
     }
   } catch (e) {
     targetUrl = data.url;
+  }
+
+  if (keyFragment) {
+    targetUrl = `${targetUrl}#${keyFragment}`;
+  }
+
+  const encryptedNotice = document.getElementById('modal-encrypted-notice');
+  if (encryptedNotice) {
+    encryptedNotice.style.display = keyFragment ? 'flex' : 'none';
   }
 
   document.getElementById('modal-slug-url').value = targetUrl;
@@ -189,22 +441,164 @@ function closeSuccessModal() {
   }
 }
 
+/**
+ * Synchronous clipboard copy fallback via document.execCommand('copy').
+ * Highly compatible with Mobile Safari (iOS WebKit), older browsers, and non-secure HTTP contexts.
+ * @param {string} text
+ * @param {HTMLElement} [sourceEl]
+ * @returns {boolean}
+ */
+function copyUsingExecCommand(text, sourceEl) {
+  let successful = false;
+
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    // Set 16px to prevent iOS Safari auto-zoom on element focus
+    textArea.style.fontSize = '16px';
+    // Position fixed and off-screen to prevent iOS viewport jumping/scrolling
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '-9999px';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    // Set readonly to avoid triggering iOS virtual keyboard
+    textArea.setAttribute('readonly', '');
+
+    document.body.appendChild(textArea);
+
+    const selection = window.getSelection();
+    const originalRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, text.length);
+
+    try {
+      successful = document.execCommand('copy');
+    } catch (e) {
+      successful = false;
+    }
+
+    document.body.removeChild(textArea);
+
+    if (selection && originalRange) {
+      selection.removeAllRanges();
+      selection.addRange(originalRange);
+    }
+
+    if (successful) return true;
+  } catch (err) {
+    successful = false;
+  }
+
+  // Secondary fallback for inputs or elements already attached to DOM
+  if (!successful && sourceEl) {
+    try {
+      if (typeof sourceEl.select === 'function') {
+        sourceEl.focus();
+        if (typeof sourceEl.setSelectionRange === 'function') {
+          sourceEl.setSelectionRange(0, (sourceEl.value || '').length);
+        } else {
+          sourceEl.select();
+        }
+        successful = document.execCommand('copy');
+      } else {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          range.selectNodeContents(sourceEl);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          successful = document.execCommand('copy');
+          selection.removeAllRanges();
+        }
+      }
+    } catch (e) {
+      successful = false;
+    }
+  }
+
+  return successful;
+}
+
+/**
+ * Universal cross-browser copy function supporting iOS Safari,
+ * non-HTTPS (local development) and modern Clipboard API.
+ * @param {string} text
+ * @param {HTMLElement} [sourceEl]
+ * @returns {Promise<boolean>}
+ */
+async function copyTextToClipboard(text, sourceEl) {
+  if (text === undefined || text === null) {
+    text = '';
+  }
+  text = String(text);
+
+  // 1. Try synchronous execCommand first — preserves user activation on iOS Safari & works on HTTP
+  const execSuccess = copyUsingExecCommand(text, sourceEl);
+  if (execSuccess) {
+    return true;
+  }
+
+  // 2. Try modern Clipboard API if supported and in secure context
+  if (navigator.clipboard && window.isSecureContext && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      console.warn('navigator.clipboard.writeText failed:', err);
+    }
+  }
+
+  return false;
+}
+
 function copyToClipboard(elementId, feedbackBtnId) {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const text = el.value || el.textContent;
+  const text = (el.value !== undefined ? el.value : el.textContent) || '';
 
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById(feedbackBtnId);
-    if (btn) {
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('modal.copied', 'Copiado!')}</span>`;
-      setTimeout(() => {
-        btn.innerHTML = originalHtml;
-      }, 2000);
+  const btn = document.getElementById(feedbackBtnId);
+
+  copyTextToClipboard(text, el).then((success) => {
+    if (success) {
+      if (btn) {
+        const originalHtml = btn.innerHTML;
+        const originalTitle = btn.getAttribute('title') || '';
+        const originalAria = btn.getAttribute('aria-label') || '';
+        const hasText = btn.querySelector('span') !== null;
+        const copiedText = t('modal.copied', 'Copiado!');
+
+        if (hasText) {
+          btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${copiedText}</span>`;
+        } else {
+          btn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i>`;
+        }
+        btn.setAttribute('aria-label', copiedText);
+
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          if (originalTitle) btn.setAttribute('title', originalTitle);
+          if (originalAria) btn.setAttribute('aria-label', originalAria);
+        }, 2000);
+      }
+    } else {
+      if (typeof el.select === 'function') {
+        el.focus();
+        if (typeof el.setSelectionRange === 'function') {
+          el.setSelectionRange(0, (el.value || '').length);
+        } else {
+          el.select();
+        }
+      }
+      alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
     }
-  }).catch(() => {
-    alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
   });
 }
 
@@ -214,15 +608,40 @@ function setupViewerCopyActions() {
     copyCodeBtn.addEventListener('click', () => {
       const codeEl = document.getElementById('raw-code');
       if (!codeEl) return;
-      navigator.clipboard.writeText(codeEl.textContent).then(() => {
-        copyCodeBtn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${t('viewer.code_copied', 'Código copiado!')}</span>`;
-        setTimeout(() => {
-          copyCodeBtn.innerHTML = `<i class="ti ti-copy" aria-hidden="true"></i> <span>${t('viewer.copy_code', 'Copiar código')}</span>`;
-        }, 2000);
+      const text = codeEl.textContent || '';
+
+      copyTextToClipboard(text, codeEl).then((success) => {
+        if (success) {
+          const originalHtml = copyCodeBtn.innerHTML;
+          const originalTitle = copyCodeBtn.getAttribute('title') || '';
+          const originalAria = copyCodeBtn.getAttribute('aria-label') || '';
+          const copiedText = t('viewer.code_copied', 'Código copiado!');
+
+          copyCodeBtn.innerHTML = `<i class="ti ti-check" aria-hidden="true"></i> <span>${copiedText}</span>`;
+          copyCodeBtn.setAttribute('aria-label', copiedText);
+
+          setTimeout(() => {
+            copyCodeBtn.innerHTML = originalHtml;
+            if (originalTitle) copyCodeBtn.setAttribute('title', originalTitle);
+            if (originalAria) copyCodeBtn.setAttribute('aria-label', originalAria);
+          }, 2000);
+        } else {
+          const selection = window.getSelection();
+          if (selection) {
+            const range = document.createRange();
+            range.selectNodeContents(codeEl);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+          alert(t('clipboard.copy_failed', 'Não foi possível copiar. Selecione o texto e copie manualmente.'));
+        }
       });
     });
   }
 }
+
+window.copyToClipboard = copyToClipboard;
+window.copyTextToClipboard = copyTextToClipboard;
 
 function saveToLocalHistory(item) {
   try {
@@ -323,3 +742,146 @@ function escapeHtml(str) {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
 }
+
+function setupMobileNavigation() {
+  const toggleBtn = document.getElementById('mobile-nav-toggle');
+  const sidebar = document.getElementById('app-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const closeBtn = document.getElementById('sidebar-close-btn');
+
+  if (!toggleBtn || !sidebar || !backdrop) return;
+
+  function openDrawer() {
+    document.body.classList.add('sidebar-open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    if (closeBtn) {
+      setTimeout(() => closeBtn.focus(), 50);
+    }
+  }
+
+  function closeDrawer() {
+    document.body.classList.remove('sidebar-open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.focus();
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = document.body.classList.contains('sidebar-open');
+    if (isOpen) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeDrawer();
+    });
+  }
+
+  backdrop.addEventListener('click', () => {
+    closeDrawer();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+      closeDrawer();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024 && document.body.classList.contains('sidebar-open')) {
+      document.body.classList.remove('sidebar-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+async function setupViewerContent() {
+  const viewerCard = document.querySelector('.viewer-card[data-content-format]');
+  if (!viewerCard) return;
+
+  const contentFormat = viewerCard.getAttribute('data-content-format');
+  const codeEl = document.getElementById('raw-code');
+  if (!codeEl) return;
+
+  const rawReceivedContent = codeEl.textContent || '';
+
+  // 1. Handling AES-256-GCM Decryption
+  if (contentFormat === 'aes-256-gcm') {
+    const errorNotice = document.getElementById('crypto-error-notice');
+    const errorText = document.getElementById('crypto-error-text');
+    const codeContainer = document.querySelector('.code-container');
+
+    const keyHash = window.location.hash ? window.location.hash.slice(1).trim() : '';
+
+    if (!keyHash) {
+      if (codeContainer) codeContainer.style.display = 'none';
+      if (errorNotice) {
+        if (errorText) errorText.textContent = t('viewer.encrypted_missing_key', 'Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.');
+        errorNotice.style.display = 'flex';
+      }
+      return;
+    }
+
+    try {
+      const key = await importKeyFromBase64Url(keyHash);
+      const decrypted = await decryptText(rawReceivedContent.trim(), key);
+      codeEl.textContent = decrypted;
+      if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+        codeEl.removeAttribute('data-highlighted');
+        hljs.highlightElement(codeEl);
+      }
+    } catch (err) {
+      console.error('Decryption failure:', err);
+      if (codeContainer) codeContainer.style.display = 'none';
+      if (errorNotice) {
+        if (errorText) errorText.textContent = t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
+        errorNotice.style.display = 'flex';
+      }
+    }
+  }
+
+  // 2. Handling Base64 Toggle
+  if (contentFormat === 'base64') {
+    const toggleBtn = document.getElementById('toggle-base64-btn');
+    const toggleText = document.getElementById('toggle-base64-text');
+
+    const rawBase64 = rawReceivedContent.trim();
+    let decodedText = '';
+    try {
+      decodedText = base64ToUtf8(rawBase64);
+    } catch (e) {
+      decodedText = rawBase64;
+    }
+
+    // Default view: Decoded
+    codeEl.textContent = decodedText;
+    if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+      codeEl.removeAttribute('data-highlighted');
+      hljs.highlightElement(codeEl);
+    }
+
+    if (toggleBtn) {
+      let isShowingRaw = false;
+      toggleBtn.addEventListener('click', () => {
+        isShowingRaw = !isShowingRaw;
+        if (isShowingRaw) {
+          codeEl.textContent = rawBase64;
+          if (toggleText) toggleText.textContent = t('viewer.base64_toggle_decoded', 'Visualizar Decodificado');
+        } else {
+          codeEl.textContent = decodedText;
+          if (toggleText) toggleText.textContent = t('viewer.base64_toggle_raw', 'Visualizar Base64 Bruto');
+        }
+        if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+          codeEl.removeAttribute('data-highlighted');
+          hljs.highlightElement(codeEl);
+        }
+      });
+    }
+  }
+}
+
