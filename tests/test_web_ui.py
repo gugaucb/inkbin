@@ -255,3 +255,32 @@ async def test_responsive_auxiliary_and_error_pages(client: AsyncClient):
     assert "aux-card" in delete_res.text
     assert "aux-card-header" in delete_res.text
     assert "aux-card-actions" in delete_res.text
+
+
+@pytest.mark.asyncio
+async def test_editor_platform_features_showcase_markup(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    # Section and accessibility
+    assert '<section class="platform-features-section" aria-labelledby="features-section-title">' in html
+    assert 'id="features-section-title"' in html
+    assert 'class="platform-features-grid"' in html
+
+    # 8 feature cards
+    assert html.count('class="feature-card"') == 8
+
+    # All 8 required Tabler icons
+    expected_icons = [
+        "ti ti-ghost",
+        "ti ti-lock",
+        "ti ti-clock",
+        "ti ti-terminal-2",
+        "ti ti-shield-check",
+        "ti ti-code",
+        "ti ti-user-off",
+        "ti ti-trash",
+    ]
+    for icon in expected_icons:
+        assert icon in html

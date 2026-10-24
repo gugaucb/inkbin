@@ -1,6 +1,6 @@
 # 02 - Marcação Semântica e Componente Editorial na Página Principal
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -17,3 +17,7 @@ Como estruturar a marcação HTML semântica da seção de garantias e recursos 
    - Breve descrição objetiva derivada das chaves i18n (`t('features....')`).
 3. Manter a hierarquia de cabeçalhos semânticos e tags semânticas (evitando poluição na leitura por leitores de tela).
 4. Posicionar o componente de forma não intrusiva abaixo do rodapé de publicação (`.editor-footer-actions`).
+
+## Answer
+
+Adicionada a seção `<section class="platform-features-section" aria-labelledby="features-section-title">` em `src/inkbin/templates/editor.html` posicionada abaixo do formulário de submissão do editor. A vitrine contém o cabeçalho editorial com ícone `ti-shield-check` e um grid semântico de 8 micro-cards (`.feature-card`), cada um estruturado com seu respectivo ícone Tabler (`ti-ghost`, `ti-lock`, `ti-clock`, `ti-terminal-2`, `ti-shield-check`, `ti-code`, `ti-user-off`, `ti-trash`) marcado com `aria-hidden="true"`, título editorial e descrição localizada via Jinja2 `t('features.*')`. O teste `test_editor_platform_features_showcase_markup` foi adicionado em `tests/test_web_ui.py` cobrindo toda a marcação e acessibilidade.

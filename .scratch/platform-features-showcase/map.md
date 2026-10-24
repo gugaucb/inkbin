@@ -15,6 +15,7 @@ Inclusão de uma vitrine informativa monocromática de recursos, privacidade e g
 ## Decisions so far
 
 - **[01 - Catálogos i18n para Recursos e Garantias da Plataforma](issues/01-i18n-catalogs-features-and-guarantees.md)**: Adicionada a seção `features` com 8 pilares nos catálogos `en.json`, `pt-br.json` e `cn.json`, com testes em `test_i18n.py`.
+- **[02 - Marcação Semântica e Componente Editorial na Página Principal](issues/02-semantic-markup-and-editorial-component.md)**: Implementada a marcação Jinja2 semântica de `platform-features-section` em `editor.html` com 8 micro-cards acessíveis e ícones Tabler.
 
 ## Not yet specified
 
