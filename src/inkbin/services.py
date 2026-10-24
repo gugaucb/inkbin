@@ -25,6 +25,8 @@ async def create_paste_record(
     language: str = "plaintext",
     expires_at: datetime | None = None,
     password: str | None = None,
+    content_format: str = "plaintext",
+    burn_after_read: bool = False,
     slug_generator: Callable[[], str] = generate_slug,
     max_retries: int = 3,
 ) -> tuple[Paste, str]:
@@ -55,6 +57,8 @@ async def create_paste_record(
             content_hash=content_hash,
             report_count=0,
             is_active=True,
+            content_format=content_format,
+            burn_after_read=burn_after_read,
         )
 
         try:

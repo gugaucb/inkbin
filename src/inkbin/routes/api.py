@@ -99,6 +99,8 @@ async def create_paste_endpoint(
         language=payload.language,
         expires_at=expires_at,
         password=payload.password,
+        content_format=payload.content_format,
+        burn_after_read=payload.burn_after_read,
     )
 
     await cache.set(spam_key, paste.slug, ttl_seconds=60)
@@ -115,6 +117,8 @@ async def create_paste_endpoint(
         expires_at=paste.expires_at,
         created_at=paste.created_at,
         is_protected=paste.is_protected,
+        content_format=paste.content_format,
+        burn_after_read=paste.burn_after_read,
     )
 
 
@@ -431,6 +435,8 @@ async def get_paste_endpoint(
         created_at=paste.created_at,
         is_protected=paste.is_protected,
         is_active=paste.is_active,
+        content_format=paste.content_format,
+        burn_after_read=paste.burn_after_read,
     )
 
     ttl = 3600

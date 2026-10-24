@@ -58,6 +58,8 @@ async def test_init_db_migrates_legacy_pastes_table():
         assert legacy_paste.is_protected is False
         assert legacy_paste.is_active is True
         assert legacy_paste.report_count == 0
+        assert legacy_paste.content_format == "plaintext"
+        assert legacy_paste.burn_after_read is False
 
         # New records with new columns can be inserted without UndefinedColumn / OperationalError
         new_paste = Paste(

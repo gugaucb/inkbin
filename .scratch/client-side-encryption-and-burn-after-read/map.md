@@ -14,7 +14,7 @@ Implementação das funcionalidades de segurança avançada e formatos de privac
 
 ## Decisions so far
 
-<!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
+- 01: [01-schema-and-model-migrations.md](issues/01-schema-and-model-migrations.md) — Adicionados campos `content_format` e `burn_after_read` no modelo `Paste`, migração incremental em `_sync_migrate_schema`, esquemas Pydantic e serviços de persistência.
 
 ## Not yet specified
 

@@ -1,6 +1,6 @@
 # 01 - Modelo de Domínio, Esquema de Banco de Dados e Migração
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: none
 
@@ -22,3 +22,12 @@ Como atualizar o modelo relacional `Paste` (`src/inkbin/models.py`), a migraçã
    - `PasteDetailResponse`: expor `content_format` e `burn_after_read`.
 4. Atualizar serviço de persistência em `src/inkbin/services.py` para repassar os novos campos na criação do paste.
 5. Escrever testes unitários em `tests/test_models.py` e `tests/test_schemas.py` cobrindo a validação e persistência dos novos campos.
+
+## Answer
+
+Implementados com sucesso os campos `content_format` (`plaintext`, `aes-256-gcm`, `base64`) e `burn_after_read` (`bool`):
+1. Modelo `Paste` atualizado com as duas colunas mapeadas e padrões seguros.
+2. `_sync_migrate_schema` em `src/inkbin/db.py` atualizado com migrações incrementais DDL para SQLite e PostgreSQL sem quebra de registros legados.
+3. Esquemas `PasteCreateRequest`, `PasteCreateResponse` e `PasteDetailResponse` atualizados com validações estritas (`valid_formats`) e valores padrão compatíveis.
+4. `create_paste_record` em `src/inkbin/services.py` e rotas `POST /api/pastes` e `GET /api/pastes/{slug}` em `src/inkbin/routes/api.py` integrados para receber e expor os novos metadados.
+5. Testes unitários implementados e aprovados em `tests/test_models.py`, `tests/test_migration.py` e `tests/test_schemas.py`.
