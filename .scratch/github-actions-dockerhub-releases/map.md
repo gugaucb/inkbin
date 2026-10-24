@@ -1,0 +1,31 @@
+# Map: GitHub Actions, Docker Hub & Release Management
+
+## Destination
+
+Pipeline de CI/CD automatizado via GitHub Actions para build e publicação multi-arquitetura (`linux/amd64`, `linux/arm64`) no Docker Hub (`gugaucb/inkbin`), automação de versionamento semântico gerando tags e GitHub Releases correspondentes, atualização de `docker-compose.yml` para consumo da imagem oficial, captura de screenshots atualizados da UI com as novas features e atualização completa dos três READMEs (`README.md`, `README.pt-BR.md`, `README.zh-CN.md`).
+
+## Notes
+
+- **Domínio**: DevOps, CI/CD, GitHub Actions, Docker Hub, SemVer e Documentação Técnica.
+- **Repositório GitHub**: `gugaucb/inkbin` (branch principal: `main`).
+- **Repositório Docker Hub**: `gugaucb/inkbin` (secrets configuradas no GitHub: `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`).
+- **Modo de execução**: *Execution carried into the map* — este esforço governa as decisões e a implementação direta dos workflows de actions, arquivos de configuração, screenshots e documentação.
+- **Skills relevantes**: `architecture-patterns`, `codebase-design`, `writing-for-agents`.
+
+## Decisions so far
+
+<!-- O índice: uma linha por ticket fechado apontando para o arquivo com o resumo da resolução -->
+
+*(Nenhum ticket fechado ainda. O mapa acabou de ser traçado.)*
+
+## Not yet specified
+
+- **Notificação e Deploy Contínuo Automatizado**: Caso desejado no futuro, configurar webhook ou runner SSH para auto-deploy em servidor de produção quando uma nova release for publicada no Docker Hub.
+- **Assinatura Criptográfica de Imagens (Cosign/Sigstore)**: Assinatura das imagens publicadas no Docker Hub e emissão de atestado de proveniência / SBOM para segurança da cadeia de suprimentos.
+- **Categorização Automática de Changelog via Release Drafter**: Agrupamento visual refinado de notas de lançamento por labels (`feature`, `bugfix`, `security`).
+
+## Out of scope
+
+- Publicação de pacote Python no PyPI (o Inkbin é uma aplicação/serviço autocontido para self-hosting em Docker, não uma biblioteca).
+- Configuração de charts de Kubernetes / Helm (o escopo de orquestração oficial é focado em Docker Compose).
+- Alterações em regras de negócio ou refatoração de endpoints da API (o escopo é estritamente infraestrutura, automação de release e documentação).
