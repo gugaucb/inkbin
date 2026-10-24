@@ -11,8 +11,10 @@ BASE_URL = f"http://127.0.0.1:{PORT}"
 OUT_DIR = Path("/Users/gustavoluiscosta/Downloads/projetos/TextEditor/docs/assets/screenshots")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+
 async def wait_for_server(url: str, timeout: float = 15.0):
     import httpx
+
     start = time.time()
     while time.time() - start < timeout:
         try:
@@ -24,6 +26,7 @@ async def wait_for_server(url: str, timeout: float = 15.0):
             pass
         await asyncio.sleep(0.3)
     return False
+
 
 async def capture_all():
     env = os.environ.copy()
@@ -49,6 +52,7 @@ async def capture_all():
             return
 
         import httpx
+
         # Create public paste
         async with httpx.AsyncClient() as client:
             resp_pub = await client.post(
@@ -57,8 +61,8 @@ async def capture_all():
                     "title": "infrastructure/deploy.sh",
                     "language": "bash",
                     "expiration": "1w",
-                    "content": "#!/usr/bin/env bash\nset -euo pipefail\n\n# Inkbin Zero-Downtime Deployment & Health Verification\necho \"==> Pulling official image from Docker Hub (gugaucb/inkbin:latest)...\"\ndocker compose pull app redis db\n\necho \"==> Initializing PostgreSQL schemas and migrations...\"\ndocker compose run --rm app python -m inkbin.db_init\n\necho \"==> Starting high-performance web cluster...\"\ndocker compose up -d\n\necho \"==> Verifying system health and readiness probe...\"\ncurl -fsS http://localhost:8000/health\n\necho \"==> Deploy finished successfully under INK Design System v2!\"\n"
-                }
+                    "content": '#!/usr/bin/env bash\nset -euo pipefail\n\n# Inkbin Zero-Downtime Deployment & Health Verification\necho "==> Pulling official image from Docker Hub (gugaucb/inkbin:latest)..."\ndocker compose pull app redis db\n\necho "==> Initializing PostgreSQL schemas and migrations..."\ndocker compose run --rm app python -m inkbin.db_init\n\necho "==> Starting high-performance web cluster..."\ndocker compose up -d\n\necho "==> Verifying system health and readiness probe..."\ncurl -fsS http://localhost:8000/health\n\necho "==> Deploy finished successfully under INK Design System v2!"\n',
+                },
             )
             pub_data = resp_pub.json()
             pub_slug = pub_data["slug"]
@@ -71,8 +75,8 @@ async def capture_all():
                     "language": "yaml",
                     "expiration": "1d",
                     "password": "supersecretpassword123",
-                    "content": "database:\n  host: db.internal.net\n  user: ink_admin\n  port: 5432\napi_token: ink_sec_live_9a8f27c3d1\ncluster_nodes:\n  - node-01.prod.lan\n  - node-02.prod.lan"
-                }
+                    "content": "database:\n  host: db.internal.net\n  user: ink_admin\n  port: 5432\napi_token: ink_sec_live_9a8f27c3d1\ncluster_nodes:\n  - node-01.prod.lan\n  - node-02.prod.lan",
+                },
             )
             prot_data = resp_prot.json()
             prot_slug = prot_data["slug"]
@@ -85,8 +89,8 @@ async def capture_all():
                     "language": "text",
                     "expiration": "1h",
                     "burn_after_read": True,
-                    "content": "MASTER_RECOVERY_KEY=a7f29b01c3d4e5f60718293a4b5c6d7e8f901234\nTOKEN_SECRET=ink_live_ephemeral_token_burn_guard\n"
-                }
+                    "content": "MASTER_RECOVERY_KEY=a7f29b01c3d4e5f60718293a4b5c6d7e8f901234\nTOKEN_SECRET=ink_live_ephemeral_token_burn_guard\n",
+                },
             )
             burn_data = resp_burn.json()
             burn_slug = burn_data["slug"]
@@ -94,8 +98,7 @@ async def capture_all():
         async with async_playwright() as p:
             browser = await p.chromium.launch()
             context = await browser.new_context(
-                viewport={"width": 1280, "height": 840},
-                device_scale_factor=1.5
+                viewport={"width": 1280, "height": 840}, device_scale_factor=1.5
             )
             page = await context.new_page()
 
@@ -170,7 +173,9 @@ async def stream_events() -> AsyncGenerator[str, None]:
             await page.goto(f"{BASE_URL}/p/{burn_slug}")
             await page.wait_for_selector(".viewer-card, #burn-reveal-form")
             await asyncio.sleep(0.8)
-            await page.screenshot(path=str(OUT_DIR / "burn-after-read-interstitial.png"), full_page=False)
+            await page.screenshot(
+                path=str(OUT_DIR / "burn-after-read-interstitial.png"), full_page=False
+            )
 
             await browser.close()
             print("All screenshots successfully captured!")
@@ -183,6 +188,7 @@ async def stream_events() -> AsyncGenerator[str, None]:
             proc.kill()
         if os.path.exists("test_screenshots.db"):
             os.remove("test_screenshots.db")
+
 
 if __name__ == "__main__":
     asyncio.run(capture_all())
