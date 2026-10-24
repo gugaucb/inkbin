@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.requests import Request
 
 from inkbin.config import get_settings
 from inkbin.db import init_db
@@ -10,7 +11,6 @@ from inkbin.i18n import COOKIE_NAME, normalize_locale
 from inkbin.rate_limit import RateLimitMiddleware
 from inkbin.routes.api import router as api_router
 from inkbin.routes.web import router as web_router
-from starlette.requests import Request
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -52,6 +52,7 @@ async def locale_cookie_middleware(request: Request, call_next):
             httponly=False,
         )
     return response
+
 
 # Servir arquivos estáticos (CSS, JS, Fontes)
 if static_dir.exists():

@@ -34,7 +34,11 @@ DbSession = Annotated[AsyncSession, Depends(get_db_session)]
 async def set_locale_endpoint(locale: str, request: Request) -> Response:
     norm = normalize_locale(locale)
     referer = request.headers.get("referer") or "/"
-    if not referer.startswith("/") and not referer.startswith("http://") and not referer.startswith("https://"):
+    if (
+        not referer.startswith("/")
+        and not referer.startswith("http://")
+        and not referer.startswith("https://")
+    ):
         referer = "/"
     response = RedirectResponse(url=referer, status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
@@ -303,4 +307,3 @@ async def reveal_burn_after_read_page(
             "active_page": "viewer",
         },
     )
-

@@ -1,15 +1,15 @@
 import pytest
+from httpx import ASGITransport, AsyncClient
 from starlette.requests import Request
-from httpx import AsyncClient, ASGITransport
 
 from inkbin.i18n import (
     DEFAULT_LOCALE,
     SUPPORTED_LOCALES,
+    get_client_translations,
+    load_catalogs,
     normalize_locale,
     resolve_locale,
     t,
-    load_catalogs,
-    get_client_translations,
 )
 from inkbin.main import app
 
@@ -30,8 +30,12 @@ def test_normalize_locale():
 
 def test_translation_helper():
     load_catalogs()
-    assert t("meta.title_default", locale="en") == "Inkbin — Anonymous and Secure Editorial Publishing"
-    assert t("meta.title_default", locale="pt-br") == "Inkbin — Publicação Editorial Anônima e Segura"
+    assert (
+        t("meta.title_default", locale="en") == "Inkbin — Anonymous and Secure Editorial Publishing"
+    )
+    assert (
+        t("meta.title_default", locale="pt-br") == "Inkbin — Publicação Editorial Anônima e Segura"
+    )
     assert t("meta.title_default", locale="cn") == "Inkbin — 匿名安全的社论级文本分享平台"
 
     # Interpolation
@@ -107,7 +111,9 @@ async def test_set_locale_endpoint():
         assert cookie == "pt-br"
 
         # Switch to cn with referer
-        resp2 = await client.get("/set-locale/cn", headers={"referer": "http://test/new"}, follow_redirects=False)
+        resp2 = await client.get(
+            "/set-locale/cn", headers={"referer": "http://test/new"}, follow_redirects=False
+        )
         assert resp2.status_code in (302, 303, 307)
         assert resp2.headers.get("location") == "http://test/new"
         assert resp2.cookies.get("inkbin_locale") == "cn"
@@ -141,9 +147,9 @@ async def test_qr_code_modal_translations_and_template():
         html = resp.text
         assert 'id="modal-qrcode"' in html
         assert 'class="qr-code-box"' in html
-        assert 'qrcode.min.js' in html
+        assert "qrcode.min.js" in html
         assert 'role="img"' in html
-        assert 'ti ti-qrcode' in html
+        assert "ti ti-qrcode" in html
 
 
 def test_platform_features_showcase_translations():
@@ -188,7 +194,9 @@ async def test_platform_features_showcase_multilingual_rendering():
         assert "Platform Guarantees & Features" in html_en
         assert "Anonymous" in html_en
         assert "Encrypted sharing" in html_en
-        sec_en = html_en.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        sec_en = html_en.split('<section class="platform-features-section"')[1].split("</section>")[
+            0
+        ]
         assert "features." not in sec_en
 
         # 2. Portuguese
@@ -199,7 +207,9 @@ async def test_platform_features_showcase_multilingual_rendering():
         assert "Garantias e Recursos da Plataforma" in html_pt
         assert "Criação anônima" in html_pt
         assert "Compartilhamento protegido" in html_pt
-        sec_pt = html_pt.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        sec_pt = html_pt.split('<section class="platform-features-section"')[1].split("</section>")[
+            0
+        ]
         assert "features." not in sec_pt
 
         # 3. Chinese
@@ -210,7 +220,9 @@ async def test_platform_features_showcase_multilingual_rendering():
         assert "平台保障与特性" in html_cn
         assert "匿名创建" in html_cn
         assert "加密保护" in html_cn
-        sec_cn = html_cn.split('<section class="platform-features-section"')[1].split('</section>')[0]
+        sec_cn = html_cn.split('<section class="platform-features-section"')[1].split("</section>")[
+            0
+        ]
         assert "features." not in sec_cn
 
 
@@ -264,4 +276,3 @@ def test_locale_key_parity():
     assert not missing_in_cn, f"Keys missing in cn: {missing_in_cn}"
     assert not extra_in_pt, f"Extra keys in pt-br: {extra_in_pt}"
     assert not extra_in_cn, f"Extra keys in cn: {extra_in_cn}"
-

@@ -1,5 +1,6 @@
 services:
   app:
+    image: gugaucb/inkbin:${INKBIN_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile

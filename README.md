@@ -21,7 +21,8 @@ High-performance, secure, open-source editorial platform for anonymous publishin
 [![Database](https://img.shields.io/badge/Database-PostgreSQL_16_%7C_SQLite-000000?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Cache](https://img.shields.io/badge/Cache-Redis_7_%7C_In--Memory-000000?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![Linter](https://img.shields.io/badge/Code_Style-Ruff-000000?style=for-the-badge&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-[![Docker](https://img.shields.io/badge/Docker-Compose_Ready-000000?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+[![Docker Hub](https://img.shields.io/badge/Docker_Hub-gugaucb%2Finkbin-000000?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/gugaucb/inkbin)
+[![Release](https://img.shields.io/badge/Release-v0.1.0-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/gugaucb/inkbin/releases)
 [![Tests](https://img.shields.io/badge/Tests-Passed-000000?style=for-the-badge&logo=pytest&logoColor=white)](tests)
 [![License](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)](LICENSE)
 
@@ -34,6 +35,7 @@ High-performance, secure, open-source editorial platform for anonymous publishin
 [Terminal Usage (cURL)](#-terminal-usage-guide-curl) •
 [REST API Reference](#-rest-api-reference) •
 [Architecture](#-architecture-and-structure) •
+[Release Guide](#-release-and-versioning-guide) •
 [Development & Contributing](#-development-and-contributing) •
 [License](#-license)
 
@@ -45,27 +47,38 @@ High-performance, secure, open-source editorial platform for anonymous publishin
 
 The Inkbin user interface is built strictly adhering to **INK Design System v2** principles, uniting high-contrast monochrome editorial typography, ergonomic touch targets, real-time counters, native multilingual support, and vector Tabler Icons.
 
-| Editor View | Viewer View |
+| Editor View & Options Bar | Viewer View |
 | :---: | :---: |
 | <img src="docs/assets/screenshots/editor-view.png" alt="Editor View" width="550"> | <img src="docs/assets/screenshots/viewer-view.png" alt="Viewer View" width="550"> |
-| *Creation form featuring Tab key indentation, syntax detection, dynamic expiration policy, optional password protection, and live character/byte counters.* | *Code reader view with metadata header, view count, quick actions (Copy Code, View Raw, Delete, Report), and syntax highlighting.* |
+| *Editorial creation form featuring syntax detection, dynamic expiration, client-side encryption options (AES-256-GCM / Base64), burn-after-read switch, cyan indicators, and live counters.* | *Code reader view with metadata header, view count, quick actions (Copy Code, View Raw, Delete, Report), and syntax highlighting.* |
 
-| Confirmation Modal & Admin Delete Token | Password Challenge (Security Gate) |
+| Confirmation Modal with QR Code & Token | Password Challenge (Security Gate) |
 | :---: | :---: |
 | <img src="docs/assets/screenshots/admin-delete-modal.png" alt="Admin Delete Modal" width="550"> | <img src="docs/assets/screenshots/password-challenge.png" alt="Password Challenge" width="550"> |
-| *Post-creation modal displaying the public short link (Base62 Slug) and unrecoverable secret admin key granted to the anonymous author for permanent deletion.* | *Challenge screen for Protected Pastes requiring cryptographic validation (Argon2id) before decrypting and rendering content.* |
+| *Post-creation modal displaying the public short link with hash key, secret admin deletion key, and rendered QR Code for instant mobile scanning.* | *Challenge screen for Protected Pastes requiring cryptographic validation (Argon2id) before decrypting and rendering content.* |
+
+<div align="center">
+
+| Burn After Read Interstitial |
+| :---: |
+| <img src="docs/assets/screenshots/burn-after-read-interstitial.png" alt="Burn After Read Interstitial" width="600"> |
+| *Confirmation gateway displaying publication metadata before irreversible permanent purging upon first read.* |
+
+</div>
 
 ---
 
 ## ⚡ Core Features
 
 - **Anonymous Creation**: Instant and streamlined sharing without registration, user accounts, email verification, or tracking telemetry.
+- **Client-Side Encryption & Formats**: End-to-end zero-knowledge encryption in the browser with AES-256-GCM (keys never touch server memory) and Base64 obfuscation.
+- **Burn After Read (One-Time Reading)**: Self-destructing pastes irreversibly purged immediately upon viewing.
 - **Native Internationalization (i18n)**: Out-of-the-box support for English (`en` canonical default), Brazilian Portuguese (`pt-br`), and Simplified Chinese (`cn`), selectable from the sidebar footer and persisted via secure cookies.
 - **Obfuscated Base62 Slugs**: Short (6–8 characters) non-sequential alphanumeric IDs preventing ID enumeration and automated scraping attacks.
 - **Dynamic Expiration Policies (`EXPIRATION_OPTIONS`)**: Configurable retention periods via Docker environment variables (e.g., `1h,1d,1w,1m,never` or minutes `10m,30m`) with automated physical database and cache purging.
 - **Local Browser History**: Client-side recent pastes saved in `localStorage`, featuring individual removal (`ti-x`) and complete history clearance without page reloads.
 - **Protected Pastes with Argon2id**: Password protection utilizing state-of-the-art key derivation (Argon2id) with smart rate limiting after 5 consecutive incorrect attempts.
-- **Admin Delete Token**: Cryptographically random 64-character token issued at creation, granting the anonymous author irrevocable permission to permanently delete their paste at any time.
+- **Admin Delete Token & QR Code**: Cryptographically random 64-character token issued at creation for permanent deletion, accompanied by a dynamic QR Code for instant mobile access.
 - **Anti-Spam & Rate Limiting**: Sliding window rate limiting backed by Redis with duplicate submission suppression (SHA-256 fingerprinting).
 - **Dual Data Engine with Zero-Config**: Native support for **PostgreSQL 16** (with high-performance `asyncpg` driver in production) and seamless fallback to **SQLite** (`aiosqlite` for local development without external services).
 - **INK Design System v2 & Accessibility**: High-contrast monochrome editorial layout conforming to WCAG 2.1 AA, modern sans-serif typography, and Tabler Icons.
@@ -74,25 +87,50 @@ The Inkbin user interface is built strictly adhering to **INK Design System v2**
 
 ## 🚀 Quickstart
 
-### Option 1: Docker Compose (Recommended for Production / Self-Hosting)
+### Option 1: Official Docker Image (Recommended for Production & Instant Run)
 
-Launch the complete stack (FastAPI app, PostgreSQL 16 database, Redis 7 cache) in two commands:
+Execute the pre-built multi-architecture image directly from Docker Hub:
+
+```bash
+# Standalone run with persistent volume and built-in SQLite
+docker run -d \
+  --name inkbin_app \
+  -p 8000:8000 \
+  -e APP_ENV=production \
+  -e SECRET_KEY="change-this-to-a-secure-random-key-with-at-least-32-chars" \
+  -v inkbin_data:/app/data \
+  gugaucb/inkbin:latest
+```
+
+Or deploy the complete production cluster (Inkbin App + PostgreSQL 16 + Redis 7) using Docker Compose without needing to clone the source code:
+
+```bash
+# 1. Download official docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/gugaucb/inkbin/main/docker-compose.yml -o docker-compose.yml
+
+# 2. Launch cluster (automatically downloads official image gugaucb/inkbin:latest)
+docker compose up -d
+```
+
+Check cluster status and health:
+
+```bash
+curl -fsS http://localhost:8000/health
+# Expected output: {"status":"ok","app":"inkbin"}
+```
+
+---
+
+### Option 2: Docker Compose from Source (Development / Build Local)
+
+When working on the source code, build and launch containers locally:
 
 ```bash
 # 1. Copy environment configuration
 cp .env.example .env
 
-# 2. Build and launch containers in background
+# 2. Build local Dockerfile and launch
 docker compose up --build -d
-```
-
-The application is available at `http://localhost:8000`.
-
-Check cluster health:
-
-```bash
-curl -fsS http://localhost:8000/health
-# Expected output: {"status":"ok","app":"inkbin"}
 ```
 
 View application logs in real-time:
@@ -317,6 +355,29 @@ ruff format --check .
 # Auto-formatting
 ruff format .
 ```
+
+---
+
+## 🏷️ Release and Versioning Guide
+
+Inkbin utilizes automated semantic versioning, multi-architecture image publication, and GitHub Releases:
+
+- **Semantic Versioning (SemVer)**: Tags follow `vX.Y.Z` (e.g., `v0.1.0`).
+- **Automated Docker Hub Pipeline**: Every tag push compiles multi-architecture images (`linux/amd64`, `linux/arm64`) and publishes to `gugaucb/inkbin` with tags `latest`, `X.Y.Z`, `vX.Y.Z`, and `X.Y`.
+- **Automated GitHub Releases**: Creates official GitHub releases with automatically categorized commit changelogs.
+
+To publish a new version:
+
+```bash
+# 1. Ensure tests and linters pass
+pytest && ruff check .
+
+# 2. Create annotated tag and push
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+For complete workflow details, secrets configuration, and release automation guidelines, see [Release Guide](docs/release-guide.md).
 
 ---
 
