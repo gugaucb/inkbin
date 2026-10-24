@@ -19,6 +19,7 @@ Pipeline de CI/CD automatizado via GitHub Actions para build e publicação mult
 - 03: [03-dockerhub-multiarch-publish-workflow.md](issues/03-dockerhub-multiarch-publish-workflow.md) — Configurado `.github/workflows/docker-publish.yml` para publicação multi-arch (`linux/amd64`, `linux/arm64`) no Docker Hub com tags semânticas e cache GHA.
 - 04: [04-github-release-and-tagging-automation.md](issues/04-github-release-and-tagging-automation.md) — Implementado workflow `.github/workflows/release.yml` com release notes automáticos e criado guia em `docs/release-guide.md`.
 - 05: [05-screenshots-capture-and-gallery-refresh.md](issues/05-screenshots-capture-and-gallery-refresh.md) — Capturados 5 screenshots em alta fidelidade demonstrando a nova barra de opções, criptografia no navegador, QR code e telas de confirmação.
+- 06: [06-multilingual-readmes-and-badges-update.md](issues/06-multilingual-readmes-and-badges-update.md) — Atualizados READMEs em EN, PT-BR e ZH-CN com badges oficiais de Docker Hub e Release, galeria visual completa, instruções de quickstart e guia de releases.
 
 ## Not yet specified
 

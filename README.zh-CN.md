@@ -21,7 +21,8 @@
 [![Database](https://img.shields.io/badge/Database-PostgreSQL_16_%7C_SQLite-000000?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Cache](https://img.shields.io/badge/Cache-Redis_7_%7C_In--Memory-000000?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![Linter](https://img.shields.io/badge/Code_Style-Ruff-000000?style=for-the-badge&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-[![Docker](https://img.shields.io/badge/Docker-Compose_Ready-000000?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+[![Docker Hub](https://img.shields.io/badge/Docker_Hub-gugaucb%2Finkbin-000000?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/gugaucb/inkbin)
+[![Release](https://img.shields.io/badge/Release-v0.1.0-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/gugaucb/inkbin/releases)
 [![Tests](https://img.shields.io/badge/Tests-Passed-000000?style=for-the-badge&logo=pytest&logoColor=white)](tests)
 [![License](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)](LICENSE)
 
@@ -34,6 +35,7 @@
 [终端使用指南 (cURL)](#-终端使用指南-curl) •
 [REST API 接口](#-rest-api-接口参考) •
 [系统架构](#-系统架构与目录结构) •
+[版本发布指南](#-版本发布与版本控制指南) •
 [开发与贡献](#-开发与贡献指南) •
 [开源许可证](#-开源许可证)
 
@@ -45,27 +47,38 @@
 
 Inkbin 严格依照 **INK Design System v2** 规范构建，融合高对比度单色社论排版、舒适的触控区域、实时字符统计、原生多语言界面与矢量 Tabler 图标。
 
-| 编辑视图 (Editor View) | 详情视图 (Viewer View) |
+| 编辑视图与安全控制栏 (Editor View) | 详情视图 (Viewer View) |
 | :---: | :---: |
 | <img src="docs/assets/screenshots/editor-view.png" alt="Editor View" width="550"> | <img src="docs/assets/screenshots/viewer-view.png" alt="Viewer View" width="550"> |
-| *创建表单支持 Tab 键缩进输入、自动语法高亮检测、动态保留期限、可选访问密码以及实时字符/字节计数器。* | *文本阅读器配备元数据面板、浏览量统计、快捷操作栏（复制代码、查看原文、彻底删除、违规举报）及语法高亮。* |
+| *社论级创建表单，集成语法检测、动态过期、浏览器端加密选项（AES-256-GCM / Base64）、阅后即焚开关、青色状态指示点及实时字数计数器。* | *文本阅读器配备元数据面板、浏览量统计、快捷操作栏（复制代码、查看原文、彻底删除、违规举报）及语法高亮。* |
 
-| 发布确认弹窗 & 管理删除密钥 | 密码挑战验证 (Security Gate) |
+| 发布确认弹窗、二维码与管理密钥 | 密码挑战验证 (Security Gate) |
 | :---: | :---: |
 | <img src="docs/assets/screenshots/admin-delete-modal.png" alt="Admin Delete Modal" width="550"> | <img src="docs/assets/screenshots/password-challenge.png" alt="Password Challenge" width="550"> |
-| *发布成功后展示公开短链接（Base62 Slug）以及颁发给匿名作者的专属管理删除密钥，供作者随时彻底销毁文本。* | *受保护文本挑战页面，要求输入密码并由 Argon2id 密码学验证通过后，方可解密并显示完整文本。* |
+| *发布成功后展示带密钥哈希的公开短链接、作者专属管理删除密钥，以及可直接供手机扫码阅读的动态二维码组件。* | *受保护文本挑战页面，要求输入密码并由 Argon2id 密码学验证通过后，方可解密并显示完整文本。* |
+
+<div align="center">
+
+| 阅后即焚确认提示页 (Burn After Read Interstitial) |
+| :---: |
+| <img src="docs/assets/screenshots/burn-after-read-interstitial.png" alt="Burn After Read Interstitial" width="600"> |
+| *一次性文本访问拦截网关，在执行物理永久销毁之前展示文本元数据，并提示不可逆风险。* |
+
+</div>
 
 ---
 
 ## ⚡ 核心特性
 
 - **匿名发布 (Anonymous Creation)**：即开即用，无需注册登录、绑定邮箱或任何用户追踪与遥测。
+- **客户端端到端加密 (Client-Side Encryption)**：浏览器端 AES-256-GCM 零知识加密（解密密钥仅存留在 URL 的 `#` 之后，绝不传入服务端内存）与 Base64 混淆。
+- **阅后即焚机制 (Burn After Read)**：一次性阅读文本，在用户首次确认查看后立即从数据库与缓存中永久物理擦除。
 - **原生多语言 (Native i18n)**：支持英语（默认 `en`）、巴西葡萄牙语（`pt-br`）及简体中文（`cn`），并在侧边栏底部提供简洁单色切换器，通过安全 Cookie 自动持久化。
 - **非连续 Base62 短链接 (Obfuscated Slugs)**：生成 6 至 8 位的紧凑随机混淆 Slug，有效杜绝连续 ID 遍历枚举与自动化抓取。
 - **动态保留策略 (`EXPIRATION_OPTIONS`)**：可通过 Docker 环境变量灵活定义文本过期选项（如 `1h,1d,1w,1m,never` 或分钟 `10m,30m`），后台自动执行数据库与缓存物理清除。
 - **本地历史记录 (Local History)**：基于浏览器 `localStorage` 安全存储个人发布记录，支持单个项目一键删除（`ti-x`）与全部历史快速清空，实时响应更新 DOM。
 - **Argon2id 密码保护 (Protected Pastes)**：使用高抗碰撞及防暴力破解的 Argon2id 算法存储密码散列，连续 5 次输入错误自动触发防爆破频率限制。
-- **管理删除凭证 (Admin Delete Token)**：创建时向作者颁发唯一的 64 位不可逆删除凭据，确保作者享有完全自主的永久销毁权限。
+- **管理删除凭证与二维码 (Admin Delete Token & QR Code)**：创建时向作者颁发唯一的 64 位不可逆删除凭据，并动态生成二维码方便移动设备即时阅读。
 - **防刷限流与突发垃圾防御 (Anti-Spam)**：采用 Redis 滑动窗口限流算法，并基于 SHA-256 内容散列在 60 秒内快速拦截重复内容轰炸。
 - **双数据库零配置运行 (Dual-Engine Data)**：生产环境开箱即用支持 **PostgreSQL 16**（配合高性能异步驱动 `asyncpg`），本地开发自动无缝降级为 **SQLite**（`aiosqlite`），无需外部依赖。
 - **INK Design System v2 & 无障碍 (A11y)**：符合 WCAG 2.1 AA 标准的单色高对比度社论美学设计，搭配现代无衬线字体与 Tabler 图标集。
@@ -74,25 +87,50 @@ Inkbin 严格依照 **INK Design System v2** 规范构建，融合高对比度�
 
 ## 🚀 快速开始
 
-### 方式一：Docker Compose（推荐生产环境与私有部署）
+### 方式一：Docker Hub 官方镜像（推荐生产环境与即刻运行）
 
-只需两条命令即可完整启动包含 FastAPI 应用、PostgreSQL 16 数据库与 Redis 7 缓存的服务集群：
+直接运行发布在 Docker Hub 上的预构建多架构镜像：
 
 ```bash
-# 1. 复制环境变量配置文件
-cp .env.example .env
-
-# 2. 构建镜像并后台启动服务
-docker compose up --build -d
+# 单容器运行（内置 SQLite 与持久化数据卷）
+docker run -d \
+  --name inkbin_app \
+  -p 8000:8000 \
+  -e APP_ENV=production \
+  -e SECRET_KEY="请替换为不少于32个字符的高熵随机密钥" \
+  -v inkbin_data:/app/data \
+  gugaucb/inkbin:latest
 ```
 
-服务就绪后，访问：`http://localhost:8000`。
+或者使用官方 Docker Compose 运行完整的生产集群（FastAPI + PostgreSQL 16 + Redis 7），无需克隆源代码：
+
+```bash
+# 1. 下载官方 docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/gugaucb/inkbin/main/docker-compose.yml -o docker-compose.yml
+
+# 2. 启动集群（自动从 Docker Hub 拉取 gugaucb/inkbin:latest 镜像）
+docker compose up -d
+```
 
 健康检查命令：
 
 ```bash
 curl -fsS http://localhost:8000/health
 # 预期输出: {"status":"ok","app":"inkbin"}
+```
+
+---
+
+### 方式二：Docker Compose 源码构建（本地二次开发）
+
+如需修改源码并在本地重新构建镜像：
+
+```bash
+# 1. 复制环境变量配置文件
+cp .env.example .env
+
+# 2. 本地构建并后台启动服务
+docker compose up --build -d
 ```
 
 查看实时应用日志：
@@ -320,6 +358,29 @@ ruff format --check .
 # 自动格式化修复
 ruff format .
 ```
+
+---
+
+## 🏷️ 版本发布与版本控制指南
+
+Inkbin 采用语义化版本管理标准，并打通了 GitHub Actions 自动化构建多架构 Docker 镜像与 GitHub Release 流程：
+
+- **语义化版本规范 (SemVer)**：版本标签遵循 `vX.Y.Z` 规范（例如 `v0.1.0`）。
+- **Docker Hub 自动化流水线**：每当向仓库推送版本标签，GitHub Actions 会自动编译多架构镜像（`linux/amd64` 与 `linux/arm64`），并推送至 `gugaucb/inkbin` 仓库，同时标记 `latest`、`X.Y.Z`、`vX.Y.Z` 及 `X.Y` 标签。
+- **GitHub Releases 自动化**：自动根据提交日志生成包含分类变更记录的官方版本发布页面。
+
+发布新版本的操作步骤：
+
+```bash
+# 1. 确保测试套件与代码规范检查 100% 通过
+pytest && ruff check .
+
+# 2. 创建附注标签并推送到远端仓库
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+关于自动化流水线配置、GitHub Secrets 密钥设置及详细发布说明，请参阅 [版本发布指南 (Release Guide)](docs/release-guide.md)。
 
 ---
 
