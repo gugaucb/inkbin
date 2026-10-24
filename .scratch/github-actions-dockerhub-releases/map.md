@@ -14,9 +14,7 @@ Pipeline de CI/CD automatizado via GitHub Actions para build e publicação mult
 
 ## Decisions so far
 
-<!-- O índice: uma linha por ticket fechado apontando para o arquivo com o resumo da resolução -->
-
-*(Nenhum ticket fechado ainda. O mapa acabou de ser traçado.)*
+- 01: [01-docker-compose-image-and-build-integration.md](issues/01-docker-compose-image-and-build-integration.md) — Configurado `docker-compose.yml` com `image: gugaucb/inkbin:${INKBIN_IMAGE_TAG:-latest}` e preservado bloco `build: .` para desenvolvimento local.
 
 ## Not yet specified
 
