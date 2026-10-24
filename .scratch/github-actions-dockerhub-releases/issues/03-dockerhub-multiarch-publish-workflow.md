@@ -1,6 +1,6 @@
 # 03 - Workflow de Publicação Multi-Arquitetura no Docker Hub
 
-Status: open
+Status: resolved
 Type: task
 Blocked by: 02
 
@@ -20,3 +20,12 @@ Como implementar o workflow `.github/workflows/docker-publish.yml` no GitHub Act
    - Em tag `v1.2.3`: gera `latest`, `1.2.3` e `v1.2.3`.
    - Em push na `main`: gera `edge`.
 5. Compilar e publicar com `docker/build-push-action@v6` suportando as plataformas `linux/amd64,linux/arm64` com cache GitHub Actions (`cache-from: type=gha`, `cache-to: type=gha,mode=max`).
+
+## Answer
+
+Implementado o workflow `.github/workflows/docker-publish.yml` atendendo a todos os requisitos:
+- Gatilhos configurados para pushes na `main`, envio de tags semânticas `v*.*.*` e acionamento manual `workflow_dispatch`.
+- Setup de emulação multi-arquitetura via `docker/setup-qemu-action@v3` e `docker/setup-buildx-action@v3`.
+- Autenticação segura contra o Docker Hub com `secrets.DOCKERHUB_USERNAME` e `secrets.DOCKERHUB_TOKEN`.
+- Extração de tags canônicas via `docker/metadata-action@v5` (`edge` para pushes na `main`, `latest`, `{{version}}`, `v{{version}}` para tags SemVer).
+- Compilação e publicação multi-arch para as plataformas `linux/amd64` e `linux/arm64` com cache acelerado GitHub Actions (`type=gha`, `mode=max`).

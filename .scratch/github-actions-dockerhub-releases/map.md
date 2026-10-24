@@ -16,6 +16,7 @@ Pipeline de CI/CD automatizado via GitHub Actions para build e publicação mult
 
 - 01: [01-docker-compose-image-and-build-integration.md](issues/01-docker-compose-image-and-build-integration.md) — Configurado `docker-compose.yml` com `image: gugaucb/inkbin:${INKBIN_IMAGE_TAG:-latest}` e preservado bloco `build: .` para desenvolvimento local.
 - 02: [02-ci-testing-and-linting-workflow.md](issues/02-ci-testing-and-linting-workflow.md) — Configurado `.github/workflows/ci.yml` com Python 3.11, cache pip, validação com Ruff e Pytest em pushes e PRs para a `main`.
+- 03: [03-dockerhub-multiarch-publish-workflow.md](issues/03-dockerhub-multiarch-publish-workflow.md) — Configurado `.github/workflows/docker-publish.yml` para publicação multi-arch (`linux/amd64`, `linux/arm64`) no Docker Hub com tags semânticas e cache GHA.
 
 ## Not yet specified
 
