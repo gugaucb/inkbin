@@ -147,9 +147,12 @@ def get_client_translations(locale: str) -> dict[str, str]:
 
 
 def i18n_context_processor(request: Request) -> dict[str, Any]:
+    from inkbin.expiration import get_expiration_choices
+
     current_loc = resolve_locale(request)
     return {
         "current_locale": current_loc,
         "t": lambda key, **kwargs: t(key, locale=current_loc, **kwargs),
         "client_i18n_json": json.dumps(get_client_translations(current_loc)),
+        "expiration_options": get_expiration_choices(locale=current_loc),
     }

@@ -1,6 +1,6 @@
 # 04 - Internacionalização Completa dos Templates Jinja2 e Seletor de Idioma na UI
 
-Status: open
+Status: closed
 Type: task
 Blocked by: 02, 03
 

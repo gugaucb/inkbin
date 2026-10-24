@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Conteúdo Indisponível por Violação Legal — Inkbin{% endblock %}
-{% block page_heading %}451 · Indisponível por determinação legal{% endblock %}
+{% block title %}{{ t('error451.page_title') }}{% endblock %}
+{% block page_heading %}{{ t('error451.heading') }}{% endblock %}
 
 {% block content %}
 <div class="viewer-card" style="padding: var(--space-12); text-align: center; max-width: 620px; margin: var(--space-8) auto;">
   <span class="badge" style="background: var(--ink-950); color: var(--ink-0); margin-bottom: var(--space-4); display: inline-flex; align-items: center; gap: 4px;">
     <i class="ti ti-shield-alert icon-sm" aria-hidden="true"></i>
-    <span>Ação de Moderação (HTTP 451)</span>
+    <span>{{ t('error451.badge') }}</span>
   </span>
   <div style="margin-bottom: var(--space-4);">
     <i class="ti ti-shield-alert" style="font-size: 48px; color: var(--text-muted);" aria-hidden="true"></i>
   </div>
   <h2 style="font-size: 26px; font-weight: 700; margin-bottom: var(--space-3); color: var(--text-primary);">
-    Publicação desativada pela moderação
+    {{ t('error451.title') }}
   </h2>
   <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto var(--space-6);">
-    Este documento foi desativado administrativamente devido a denúncia ou constatação de violação dos termos de uso da plataforma (ex.: código malicioso, vazamento de credenciais privadas ou conteúdo abusivo).
+    {{ t('error451.message') }}
   </p>
   <div style="display: flex; justify-content: center; gap: var(--space-3);">
     <a href="/" class="btn btn-primary">
       <i class="ti ti-arrow-left" aria-hidden="true"></i>
-      <span>Voltar à página inicial</span>
+      <span>{{ t('error451.back_home') }}</span>
     </a>
   </div>
 </div>
