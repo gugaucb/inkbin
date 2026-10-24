@@ -67,6 +67,15 @@ function setupEditor() {
   textarea.addEventListener('input', updateStats);
   updateStats();
 
+  // Format change hint listener
+  const formatSelect = document.getElementById('paste-content-format');
+  const base64Hint = document.getElementById('base64-warning-hint');
+  if (formatSelect && base64Hint) {
+    formatSelect.addEventListener('change', () => {
+      base64Hint.style.display = formatSelect.value === 'base64' ? 'flex' : 'none';
+    });
+  }
+
   // Async form submission
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -81,13 +90,26 @@ function setupEditor() {
       const language = document.getElementById('paste-language')?.value || 'plaintext';
       const expiration = document.getElementById('paste-expiration')?.value || 'never';
       const password = document.getElementById('paste-password')?.value || null;
+      const contentFormat = formatSelect ? formatSelect.value : 'plaintext';
+      const burnAfterRead = Boolean(document.getElementById('paste-burn-after-read')?.checked);
 
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="ti ti-loader animate-spin" aria-hidden="true"></i> <span>${t('editor.publishing_btn', 'Publicando...')}</span>`;
       }
 
+      let contentToSend = content;
+      let keyFragment = null;
+
       try {
+        if (contentFormat === 'aes-256-gcm') {
+          const key = await generateAesKey();
+          contentToSend = await encryptText(content, key);
+          keyFragment = await exportKeyToBase64Url(key);
+        } else if (contentFormat === 'base64') {
+          contentToSend = utf8ToBase64(content);
+        }
+
         const response = await fetch('/api/pastes', {
           method: 'POST',
           headers: {
@@ -95,10 +117,12 @@ function setupEditor() {
           },
           body: JSON.stringify({
             title: title || null,
-            content,
+            content: contentToSend,
             language,
             expiration,
             password: password || null,
+            content_format: contentFormat,
+            burn_after_read: burnAfterRead,
           }),
         });
 
@@ -109,6 +133,8 @@ function setupEditor() {
         }
 
         const data = await response.json();
+        const fullShareUrl = keyFragment ? `${data.url}#${keyFragment}` : data.url;
+
         // Save to local history
         saveToLocalHistory({
           slug: data.slug,
@@ -116,12 +142,15 @@ function setupEditor() {
           language: data.language,
           created_at: data.created_at,
           admin_delete_token: data.admin_delete_token,
-          url: data.url,
+          url: fullShareUrl,
+          content_format: data.content_format,
+          burn_after_read: data.burn_after_read,
         });
 
         // Show Success Modal
-        showSuccessModal(data);
+        showSuccessModal(data, keyFragment);
       } catch (err) {
+        console.error('Submission error:', err);
         alert(t('editor.alert_network', 'Falha na conexão ao publicar o paste.'));
       } finally {
         if (submitBtn) {
@@ -133,10 +162,113 @@ function setupEditor() {
   }
 }
 
-function showSuccessModal(data) {
+// --- Client-Side Cryptography (Web Crypto API) & Base64 ---
+
+function bufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function bufferToBase64Url(buffer) {
+  const base64 = bufferToBase64(buffer);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlToBuffer(base64url) {
+  let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  return base64ToBuffer(base64);
+}
+
+function utf8ToBase64(text) {
+  const bytes = new TextEncoder().encode(text);
+  return bufferToBase64(bytes);
+}
+
+function base64ToUtf8(base64) {
+  const bytes = base64ToBuffer(base64);
+  return new TextDecoder().decode(bytes);
+}
+
+async function generateAesKey() {
+  if (!window.crypto || !window.crypto.subtle) {
+    throw new Error('Web Crypto API não disponível neste navegador.');
+  }
+  return await window.crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptText(text, key) {
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const encodedText = new TextEncoder().encode(text);
+  const ciphertextBuffer = await window.crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encodedText
+  );
+
+  const combined = new Uint8Array(iv.length + ciphertextBuffer.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(ciphertextBuffer), iv.length);
+  return bufferToBase64(combined);
+}
+
+async function exportKeyToBase64Url(key) {
+  const rawKey = await window.crypto.subtle.exportKey('raw', key);
+  return bufferToBase64Url(rawKey);
+}
+
+async function importKeyFromBase64Url(base64url) {
+  const keyBytes = base64UrlToBuffer(base64url);
+  return await window.crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  );
+}
+
+async function decryptText(base64Combined, key) {
+  const combined = base64ToBuffer(base64Combined);
+  if (combined.byteLength < 13) {
+    throw new Error('Payload cifrado corrompido ou tamanho insuficiente.');
+  }
+  const iv = combined.slice(0, 12);
+  const ciphertext = combined.slice(12);
+
+  const decryptedBuffer = await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    ciphertext
+  );
+  return new TextDecoder().decode(decryptedBuffer);
+}
+
+function showSuccessModal(data, keyFragment = null) {
   const modal = document.getElementById('success-modal');
   if (!modal) {
-    window.location.href = data.url;
+    const redirectUrl = keyFragment ? `${data.url}#${keyFragment}` : data.url;
+    window.location.href = redirectUrl;
     return;
   }
 
@@ -154,6 +286,15 @@ function showSuccessModal(data) {
     }
   } catch (e) {
     targetUrl = data.url;
+  }
+
+  if (keyFragment) {
+    targetUrl = `${targetUrl}#${keyFragment}`;
+  }
+
+  const encryptedNotice = document.getElementById('modal-encrypted-notice');
+  if (encryptedNotice) {
+    encryptedNotice.style.display = keyFragment ? 'flex' : 'none';
   }
 
   document.getElementById('modal-slug-url').value = targetUrl;

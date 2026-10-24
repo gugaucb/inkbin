@@ -56,6 +56,26 @@
       </select>
     </div>
 
+    <div class="field-group field-format">
+      <label for="paste-content-format" class="field-label">
+        <i class="ti ti-shield-lock icon-sm" aria-hidden="true"></i>
+        <span>{{ t('editor.format_label') }}</span>
+      </label>
+      <select id="paste-content-format" name="content_format" class="select-field">
+        <option value="plaintext" selected>{{ t('editor.format_plaintext') }}</option>
+        <option value="aes-256-gcm">{{ t('editor.format_aes_gcm') }}</option>
+        <option value="base64">{{ t('editor.format_base64') }}</option>
+      </select>
+    </div>
+
+    <div class="field-group field-burn">
+      <label for="paste-burn-after-read" class="field-label field-checkbox-label">
+        <input type="checkbox" id="paste-burn-after-read" name="burn_after_read" class="checkbox-input">
+        <i class="ti ti-flame icon-sm" aria-hidden="true"></i>
+        <span>{{ t('editor.burn_label') }}</span>
+      </label>
+    </div>
+
     <div class="field-group field-password">
       <label for="paste-password" class="field-label">
         <i class="ti ti-lock icon-sm" aria-hidden="true"></i>
@@ -72,6 +92,11 @@
         autocomplete="new-password"
       >
     </div>
+  </div>
+
+  <div id="base64-warning-hint" class="editor-format-hint" style="display: none;" role="note">
+    <i class="ti ti-info-circle icon-sm" aria-hidden="true"></i>
+    <span>{{ t('editor.format_base64_hint') }}</span>
   </div>
 
   <div class="editor-container">
@@ -205,6 +230,11 @@
     </div>
 
     <div class="modal-body">
+      <div id="modal-encrypted-notice" class="modal-encrypted-alert" style="display: none;" role="status">
+        <i class="ti ti-shield-lock" aria-hidden="true"></i>
+        <p>{{ t('modal.encrypted_notice') }}</p>
+      </div>
+
       <div>
         <label for="modal-slug-url" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px;">
           <i class="ti ti-link icon-sm" aria-hidden="true"></i>

@@ -304,3 +304,20 @@ async def test_platform_features_css_and_responsiveness(client: AsyncClient):
     # Responsive rules
     assert "platform-features-grid" in css_text
     assert "platform-features-section" in css_text
+
+
+@pytest.mark.asyncio
+async def test_editor_format_and_burn_after_read_elements(client: AsyncClient):
+    response = await client.get("/")
+    assert response.status_code == 200
+    html = response.text
+
+    assert 'id="paste-content-format"' in html
+    assert 'id="paste-burn-after-read"' in html
+    assert 'id="base64-warning-hint"' in html
+    assert 'id="modal-encrypted-notice"' in html
+    assert "ti ti-lock" in html
+    assert "ti ti-flame" in html
+    assert "aes-256-gcm" in html
+    assert "base64" in html
+
