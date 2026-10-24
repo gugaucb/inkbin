@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any
+
 from starlette.requests import Request
 
 SUPPORTED_LOCALES = ("en", "pt-br", "cn")
@@ -35,7 +36,7 @@ def load_catalogs(force: bool = False) -> dict[str, dict[str, str]]:
             try:
                 data = json.loads(file_path.read_text(encoding="utf-8"))
                 catalogs[loc] = _flatten_dict(data)
-            except Exception:
+            except (json.JSONDecodeError, OSError):
                 catalogs[loc] = {}
         else:
             catalogs[loc] = {}
@@ -56,7 +57,7 @@ def normalize_locale(locale: str | None) -> str:
     if norm.startswith("pt") or norm in ("pt-br", "pt-pt"):
         return "pt-br"
 
-    if norm.startswith("zh") or norm.startswith("cn") or norm in ("zh-cn", "zh-hans", "zh-sg", "zh-tw", "zh-hant"):
+    if norm.startswith(("zh", "cn")) or norm in ("zh-cn", "zh-hans", "zh-sg", "zh-tw", "zh-hant"):
         return "cn"
 
     if norm.startswith("en"):

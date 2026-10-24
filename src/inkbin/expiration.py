@@ -1,6 +1,5 @@
 import re
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
 from inkbin.config import get_settings
 from inkbin.i18n import t
@@ -99,12 +98,16 @@ def get_expiration_label(token: str, locale: str = "en") -> str:
     return tok
 
 
-def get_expiration_choices(locale: str = "en", options_str: str | None = None) -> list[dict[str, str]]:
+def get_expiration_choices(
+    locale: str = "en", options_str: str | None = None
+) -> list[dict[str, str]]:
     active_tokens = get_active_expiration_options(options_str)
     choices: list[dict[str, str]] = []
     for tok in active_tokens:
-        choices.append({
-            "value": tok,
-            "label": get_expiration_label(tok, locale=locale),
-        })
+        choices.append(
+            {
+                "value": tok,
+                "label": get_expiration_label(tok, locale=locale),
+            }
+        )
     return choices

@@ -2,7 +2,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy import select
 
-from inkbin.db import get_engine, get_session_maker
 from inkbin.models import Paste
 
 
@@ -26,7 +25,12 @@ async def test_burn_after_read_lifecycle(client: AsyncClient, test_session_facto
     res_get = await client.get(f"/p/{slug}")
     assert res_get.status_code == 200
     html_get = res_get.text
-    assert "burn-reveal-form" in html_get or "burn_confirmation" in html_get or "Reveal and Destroy" in html_get or "Revelar e Destruir" in html_get
+    assert (
+        "burn-reveal-form" in html_get
+        or "burn_confirmation" in html_get
+        or "Reveal and Destroy" in html_get
+        or "Revelar e Destruir" in html_get
+    )
     assert "Confidential payload content" not in html_get
 
     # Verify paste is still present in database
@@ -39,7 +43,11 @@ async def test_burn_after_read_lifecycle(client: AsyncClient, test_session_facto
     assert res_reveal.status_code == 200
     html_reveal = res_reveal.text
     assert "Confidential payload content" in html_reveal
-    assert "permanently purged" in html_reveal or "destruído permanentemente" in html_reveal or "永久清除" in html_reveal
+    assert (
+        "permanently purged" in html_reveal
+        or "destruído permanentemente" in html_reveal
+        or "永久清除" in html_reveal
+    )
 
     # Verify paste is permanently purged from database
     async with test_session_factory() as session:
@@ -83,6 +91,7 @@ async def test_burn_after_read_api_confirmation(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_burn_after_read_time_expiration(client: AsyncClient, test_session_factory):
     from datetime import UTC, datetime, timedelta
+
     from sqlalchemy import update
 
     # 1. Create a paste with burn_after_read=True
@@ -100,9 +109,7 @@ async def test_burn_after_read_time_expiration(client: AsyncClient, test_session
     # 2. Simulate expiration in the past
     past_time = datetime.now(UTC) - timedelta(hours=2)
     async with test_session_factory() as session:
-        await session.execute(
-            update(Paste).where(Paste.slug == slug).values(expires_at=past_time)
-        )
+        await session.execute(update(Paste).where(Paste.slug == slug).values(expires_at=past_time))
         await session.commit()
 
     # 3. GET /p/{slug} should return 404 (expired) without showing confirmation
@@ -112,4 +119,3 @@ async def test_burn_after_read_time_expiration(client: AsyncClient, test_session
     # 4. POST /p/{slug}/reveal should also return 404
     res_reveal = await client.post(f"/p/{slug}/reveal")
     assert res_reveal.status_code == 404
-

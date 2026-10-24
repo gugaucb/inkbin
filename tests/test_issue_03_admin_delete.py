@@ -77,7 +77,11 @@ async def test_web_delete_confirmation_and_action(client):
     get_res = await client.get(f"/p/{slug}/delete")
     assert get_res.status_code == 200
     assert "delete" in get_res.text.lower() or "excluir" in get_res.text.lower()
-    assert "irreversible" in get_res.text.lower() or "irreversível" in get_res.text.lower() or "irreversivel" in get_res.text.lower()
+    assert (
+        "irreversible" in get_res.text.lower()
+        or "irreversível" in get_res.text.lower()
+        or "irreversivel" in get_res.text.lower()
+    )
 
     # Form POST to /p/{slug}/delete with valid token
     post_res = await client.post(

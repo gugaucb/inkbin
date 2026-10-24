@@ -89,10 +89,22 @@ async def test_get_viewer_page_success(client: AsyncClient):
     assert "ti ti-plus" in response.text
     assert "ti ti-trash" in response.text
     assert "ti ti-flag" in response.text
-    assert ('aria-label="View raw code"' in response.text or 'aria-label="Ver código bruto"' in response.text)
-    assert ('aria-label="Create new paste"' in response.text or 'aria-label="Criar nova publicação"' in response.text)
-    assert ('aria-label="Delete this paste with your Admin Delete Token"' in response.text or 'aria-label="Excluir este paste"' in response.text)
-    assert ('aria-label="Report publication"' in response.text or 'aria-label="Denunciar publicação"' in response.text)
+    assert (
+        'aria-label="View raw code"' in response.text
+        or 'aria-label="Ver código bruto"' in response.text
+    )
+    assert (
+        'aria-label="Create new paste"' in response.text
+        or 'aria-label="Criar nova publicação"' in response.text
+    )
+    assert (
+        'aria-label="Delete this paste with your Admin Delete Token"' in response.text
+        or 'aria-label="Excluir este paste"' in response.text
+    )
+    assert (
+        'aria-label="Report publication"' in response.text
+        or 'aria-label="Denunciar publicação"' in response.text
+    )
 
 
 @pytest.mark.asyncio
@@ -264,7 +276,10 @@ async def test_editor_platform_features_showcase_markup(client: AsyncClient):
     html = response.text
 
     # Section and accessibility
-    assert '<section class="platform-features-section" aria-labelledby="features-section-title">' in html
+    assert (
+        '<section class="platform-features-section" aria-labelledby="features-section-title">'
+        in html
+    )
     assert 'id="features-section-title"' in html
     assert 'class="platform-features-grid"' in html
 
@@ -383,10 +398,10 @@ async def test_editor_options_bar_elements_and_styles(client: AsyncClient):
     assert 'id="paste-format-base64"' in html
     assert 'id="paste-burn-after-read"' in html
     assert 'id="editor-options-explanations"' in html
-    assert 'data-desc-encrypt=' in html
-    assert 'data-desc-burn=' in html
-    assert 'data-desc-base64=' in html
-    assert 'data-desc-password=' in html
+    assert "data-desc-encrypt=" in html
+    assert "data-desc-burn=" in html
+    assert "data-desc-base64=" in html
+    assert "data-desc-password=" in html
 
     # 2. CSS rules
     css_res = await client.get("/static/css/ink-editorial.css")
@@ -397,6 +412,3 @@ async def test_editor_options_bar_elements_and_styles(client: AsyncClient):
     assert ".option-pill-custom" in css_text
     assert ".explanation-bullet-dot" in css_text
     assert "#00d4b8" in css_text
-
-
-

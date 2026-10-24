@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
+
 import pytest
-from httpx import AsyncClient, ASGITransport
 
 from inkbin.config import get_settings
 from inkbin.expiration import (
@@ -9,7 +9,6 @@ from inkbin.expiration import (
     get_expiration_choices,
     parse_duration_to_seconds,
 )
-from inkbin.main import app
 
 
 def test_parse_duration_to_seconds():
