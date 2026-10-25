@@ -28,7 +28,7 @@
 
 <br>
 
-[界面预览](#-界面预览与演示) •
+[产品宣传片与界面预览](#product-film-gallery) •
 [核心特性](#-核心特性) •
 [快速开始](#-快速开始) •
 [环境变量](#-环境变量配置) •
@@ -43,7 +43,23 @@
 
 ---
 
-## 📸 界面预览与演示
+<a id="product-film-gallery"></a>
+## 🎬 产品宣传片与界面预览
+
+<div align="center">
+
+<a href="https://youtu.be/yOKRQCSGJmg" target="_blank" title="在 YouTube 上观看 Inkbin 产品宣传片">
+  <img src="https://img.youtube.com/vi/yOKRQCSGJmg/maxresdefault.jpg" alt="Inkbin 产品宣传片" width="850">
+</a>
+
+<p align="center">
+  <b><a href="https://youtu.be/yOKRQCSGJmg">▶ 在 YouTube 上观看产品宣传片 (1080p 超清 • 01:09 分钟)</a></b> •
+  <a href="docs/assets/movies/InkBin_Product_Film_EN.mp4">📥 本地下载 / 直接播放 MP4 (6.5 MB)</a>
+</p>
+
+</div>
+
+<br>
 
 Inkbin 严格依照 **INK Design System v2** 规范构建，融合高对比度单色社论排版、舒适的触控区域、实时字符统计、原生多语言界面与矢量 Tabler 图标。
 

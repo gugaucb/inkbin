@@ -28,7 +28,7 @@ Plataforma open-source de alto desempenho e segura para publicação e compartil
 
 <br>
 
-[Galeria Visual](#-galeria-visual-e-demonstração) •
+[Filme do Produto & Galeria Visual](#product-film-gallery) •
 [Recursos](#-recursos-principais) •
 [Início Rápido](#-início-rápido) •
 [Variáveis de Ambiente](#-variáveis-de-ambiente) •
@@ -43,7 +43,23 @@ Plataforma open-source de alto desempenho e segura para publicação e compartil
 
 ---
 
-## 📸 Galeria Visual e Demonstração
+<a id="product-film-gallery"></a>
+## 🎬 Filme do Produto & Galeria Visual
+
+<div align="center">
+
+<a href="https://youtu.be/yOKRQCSGJmg" target="_blank" title="Assistir ao Filme do Inkbin no YouTube">
+  <img src="https://img.youtube.com/vi/yOKRQCSGJmg/maxresdefault.jpg" alt="Filme do Inkbin" width="850">
+</a>
+
+<p align="center">
+  <b><a href="https://youtu.be/yOKRQCSGJmg">▶ Assistir ao Filme do Produto no YouTube (1080p Full HD • 01:09 min)</a></b> •
+  <a href="docs/assets/movies/InkBin_Product_Film_EN.mp4">📥 Baixar MP4 Original (6.5 MB)</a>
+</p>
+
+</div>
+
+<br>
 
 A interface do Inkbin foi construída estritamente sob as diretrizes do **INK Design System v2**, unindo tipografia editorial monocromática de alto contraste, alvos táteis confortáveis, contadores em tempo real, suporte a múltiplos idiomas e ícones vetoriais Tabler Icons.
 

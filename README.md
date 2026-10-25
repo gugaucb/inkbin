@@ -28,7 +28,7 @@ High-performance, secure, open-source editorial platform for anonymous publishin
 
 <br>
 
-[Visual Gallery](#-visual-gallery-and-demo) •
+[Product Film & Visual Gallery](#product-film-gallery) •
 [Core Features](#-core-features) •
 [Quickstart](#-quickstart) •
 [Environment Variables](#-environment-variables) •
@@ -43,7 +43,23 @@ High-performance, secure, open-source editorial platform for anonymous publishin
 
 ---
 
-## 📸 Visual Gallery and Demo
+<a id="product-film-gallery"></a>
+## 🎬 Product Film & Visual Gallery
+
+<div align="center">
+
+<a href="https://youtu.be/yOKRQCSGJmg" target="_blank" title="Watch Inkbin Product Film on YouTube">
+  <img src="https://img.youtube.com/vi/yOKRQCSGJmg/maxresdefault.jpg" alt="Inkbin Product Film" width="850">
+</a>
+
+<p align="center">
+  <b><a href="https://youtu.be/yOKRQCSGJmg">▶ Watch Product Film on YouTube (1080p Full HD • 01:09 min)</a></b> •
+  <a href="docs/assets/movies/InkBin_Product_Film_EN.mp4">📥 Download Original MP4 (6.5 MB)</a>
+</p>
+
+</div>
+
+<br>
 
 The Inkbin user interface is built strictly adhering to **INK Design System v2** principles, uniting high-contrast monochrome editorial typography, ergonomic touch targets, real-time counters, native multilingual support, and vector Tabler Icons.
 
