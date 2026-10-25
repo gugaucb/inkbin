@@ -1,6 +1,8 @@
 import asyncio
 import sys
+
 from playwright.async_api import async_playwright
+
 
 async def run_tests():
     async with async_playwright() as p:
@@ -33,11 +35,14 @@ async def run_tests():
         await page.wait_for_timeout(500)
         print(f"Dialogs after clicking disabled encrypt: {dialogs}")
         assert len(dialogs) == 1, f"Expected 1 dialog, got {dialogs}"
-        assert any("HTTPS" in d or "localhost" in d or "Web Crypto" in d for d in dialogs), f"Unexpected dialog message: {dialogs}"
+        assert any("HTTPS" in d or "localhost" in d or "Web Crypto" in d for d in dialogs), (
+            f"Unexpected dialog message: {dialogs}"
+        )
 
         # Submit normal plaintext paste on LAN IP
         dialogs.clear()
         import time
+
         await page.fill("#paste-content", f"Plaintext paste from LAN IP test {time.time()}")
         await page.click("button[type=submit]")
         await page.wait_for_timeout(2000)
@@ -51,7 +56,9 @@ async def run_tests():
         share_url_input = await page.query_selector("#modal-slug-url")
         share_url_val = await share_url_input.input_value() if share_url_input else ""
         print(f"Share URL generated on LAN IP: {share_url_val}")
-        assert "192.168.15.8:8000" in share_url_val, f"Share URL should contain LAN IP host, got: {share_url_val}"
+        assert "192.168.15.8:8000" in share_url_val, (
+            f"Share URL should contain LAN IP host, got: {share_url_val}"
+        )
 
         # Test 2: Access via localhost (Secure context)
         local_url = "http://localhost:8000"
@@ -59,8 +66,12 @@ async def run_tests():
         await page.goto(local_url)
 
         is_secure_local = await page.evaluate("() => window.isSecureContext")
-        has_subtle_local = await page.evaluate("() => Boolean(window.crypto && window.crypto.subtle)")
-        print(f"Localhost security: isSecureContext={is_secure_local}, hasCryptoSubtle={has_subtle_local}")
+        has_subtle_local = await page.evaluate(
+            "() => Boolean(window.crypto && window.crypto.subtle)"
+        )
+        print(
+            f"Localhost security: isSecureContext={is_secure_local}, hasCryptoSubtle={has_subtle_local}"
+        )
         assert is_secure_local, "Localhost should be a secure context"
         assert has_subtle_local, "Subtle crypto should be available on localhost"
 
@@ -77,12 +88,17 @@ async def run_tests():
         await page.wait_for_timeout(2000)
         modal_visible_local = await page.is_visible("#success-modal")
         print(f"Modal visible after encrypted submission on localhost: {modal_visible_local}")
-        assert modal_visible_local, "Success modal should appear after encrypted submission on localhost"
-        assert len(dialogs) == 0, f"No error dialog should appear on localhost encrypted submit: {dialogs}"
+        assert modal_visible_local, (
+            "Success modal should appear after encrypted submission on localhost"
+        )
+        assert len(dialogs) == 0, (
+            f"No error dialog should appear on localhost encrypted submit: {dialogs}"
+        )
 
         print("\nALL VERIFICATIONS PASSED SUCCESSFULLY!")
         await browser.close()
         return 0
+
 
 if __name__ == "__main__":
     code = asyncio.run(run_tests())
