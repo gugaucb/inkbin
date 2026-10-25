@@ -1,0 +1,75 @@
+# Inkbin Standalone Docker Compose (Without Caddy)
+#
+# Ideal for:
+# 1. Deploying behind an external reverse proxy (Traefik, Nginx, Nginx Proxy Manager, Cloudflare Tunnel, AWS ALB)
+# 2. Deployments where SSL/TLS termination is handled externally
+# 3. Clean environments where ports 80/443 and Caddy volumes should not be managed here
+#
+# Usage:
+#   docker compose -f docker-compose.standalone.yml up -d
+#   docker compose -f docker-compose.standalone.yml logs -f app
+
+services:
+  app:
+    image: gugaucb/inkbin:${INKBIN_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inkbin_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./src:/app/src
+    environment:
+      - APP_ENV=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql+asyncpg://inkbin:inkbin_secret@db:5432/inkbin_db
+      - REDIS_URL=redis://redis:6379/0
+      - HOST=0.0.0.0
+      - PORT=8000
+      - BASE_URL=${BASE_URL:-http://localhost:8000}
+      - EXPIRATION_OPTIONS=${EXPIRATION_OPTIONS:-1h,1d,1w,1m,never}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: inkbin_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: inkbin
+      POSTGRES_PASSWORD: inkbin_secret
+      POSTGRES_DB: inkbin_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inkbin -d inkbin_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: inkbin_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

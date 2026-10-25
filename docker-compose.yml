@@ -19,8 +19,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - HOST=0.0.0.0
       - PORT=8000
-      - BASE_URL=http://localhost:8000
-      - EXPIRATION_OPTIONS=1h,1d,1w,1m
+      - BASE_URL=${BASE_URL:-http://localhost:8000}
+      - EXPIRATION_OPTIONS=${EXPIRATION_OPTIONS:-1h,1d,1w,1m,never}
     depends_on:
       db:
         condition: service_healthy
@@ -64,6 +64,8 @@ services:
     container_name: inkbin_proxy
     restart: unless-stopped
     profiles:
+      - caddy
+      - proxy
       - production
     ports:
       - "80:80"

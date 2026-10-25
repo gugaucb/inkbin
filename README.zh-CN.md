@@ -141,7 +141,58 @@ docker compose logs -f app
 
 ---
 
-### 方式二：本地开发模式（基于 SQLite 零配置运行）
+### 方式三：生产部署与 Caddy 自动 HTTPS (集成反向代理)
+
+如需在生产服务器部署并自动签发和续期 Let's Encrypt / ZeroSSL 免费 SSL/TLS 证书，Inkbin 通过 Docker Profile (`caddy` / `proxy` / `production`) 提供了集成的 **Caddy** 反向代理：
+
+```bash
+# 1. 在 .env 中配置生产环境变量
+cat <<EOF >> .env
+COMPOSE_PROFILES=caddy
+DOMAIN=paste.yourdomain.com
+ACME_EMAIL=admin@yourdomain.com
+BASE_URL=https://paste.yourdomain.com
+EOF
+
+# 2. 启动集群并启用 Caddy 监听 80 和 443 端口
+docker compose --profile caddy up -d
+```
+
+> [!TIP]
+> **在 Portainer 中部署**:
+> 在 Portainer 中创建或编辑 Stack 时，只需在 **Environment variables** 中添加 `COMPOSE_PROFILES=caddy`（或 `production`）、`DOMAIN=paste.yourdomain.com` 和 `ACME_EMAIL=admin@yourdomain.com`，Portainer 将在 80 和 443 端口自动伴随启动 Caddy 容器。
+
+---
+
+### 方式四：无 Caddy 独立部署（适用于 Traefik / Nginx / Cloudflare 外部反向代理）
+
+如果您已有现成的外部反向代理基础设施（如 **Traefik**、**Nginx Proxy Manager**、**Cloudflare Tunnel** 或 **AWS ALB**），或不希望 Caddy 占用宿主机的 80 与 443 端口，可选择以下两种方式之一：
+
+#### 方案 A：专用独立编排文件 (`docker-compose.standalone.yml`)
+该文件仅包含核心服务 `app`、`db` (PostgreSQL 16) 与 `redis` (Redis 7)，完全移除了 Caddy 容器定义、80/443 端口占用以及 `caddy_data`/`caddy_config` 持久化卷：
+
+```bash
+# 1. 下载官方无 Caddy 独立版编排文件
+curl -fsSL https://raw.githubusercontent.com/gugaucb/inkbin/main/docker-compose.standalone.yml -o docker-compose.standalone.yml
+
+# 2. 启动服务集群（Inkbin 直接在 8000 端口提供 HTTP 服务）
+docker compose -f docker-compose.standalone.yml up -d
+```
+
+> [!NOTE]
+> 在此模式下，请将您的外部反向代理目标指向 `http://<服务器IP>:8000`（或共享 Docker 网络中的 `http://inkbin_app:8000`），并确保外部反向代理透传 `X-Forwarded-Proto: https` 与 `Host: <域名>` 请求头。
+
+#### 方案 B：使用标准 `docker-compose.yml`（省略 Profile 参数）
+标准 `docker-compose.yml` 中的 Caddy 服务已受 Docker Profile (`profiles: ["caddy", "proxy", "production"]`) 隔离保护。直接执行不带 profile 的命令将仅启动 `app`、`db` 和 `redis`：
+
+```bash
+# 仅启动核心服务，不会启动 Caddy
+docker compose up -d
+```
+
+---
+
+### 方式五：本地开发模式（基于 SQLite 零配置运行）
 
 若无需 Docker 或 PostgreSQL/Redis，应用会自动触发降级保护，使用本地 `inkbin.db` 与内存缓存运行：
 

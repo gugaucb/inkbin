@@ -143,24 +143,24 @@ docker compose logs -f app
 
 ### Option 3: Production Deployment with Caddy & Let's Encrypt (Automatic HTTPS)
 
-To deploy on production servers with free SSL/TLS certificates issued and renewed automatically via Let's Encrypt / ZeroSSL, Inkbin includes **Caddy** as an integrated reverse proxy via Docker profiles (`production`):
+To deploy on production servers with free SSL/TLS certificates issued and renewed automatically via Let's Encrypt / ZeroSSL, Inkbin includes **Caddy** as an integrated reverse proxy via Docker profiles (`caddy`, `proxy`, or `production`):
 
 ```bash
 # 1. Configure production environment variables in your .env
 cat <<EOF >> .env
-COMPOSE_PROFILES=production
+COMPOSE_PROFILES=caddy
 DOMAIN=paste.yourdomain.com
 ACME_EMAIL=admin@yourdomain.com
 BASE_URL=https://paste.yourdomain.com
 EOF
 
 # 2. Launch the stack with Caddy listening on ports 80 and 443
-docker compose --profile production up -d
+docker compose --profile caddy up -d
 ```
 
 > [!TIP]
 > **Deploy in Portainer**:
-> When creating or editing your Stack in Portainer, add `COMPOSE_PROFILES=production`, `DOMAIN=paste.yourdomain.com`, and `ACME_EMAIL=admin@yourdomain.com` in the **Environment variables** section. Portainer will automatically spin up the Caddy container alongside the application on ports 80 and 443.
+> When creating or editing your Stack in Portainer, add `COMPOSE_PROFILES=caddy` (or `production`), `DOMAIN=paste.yourdomain.com`, and `ACME_EMAIL=admin@yourdomain.com` in the **Environment variables** section. Portainer will automatically spin up the Caddy container alongside the application on ports 80 and 443.
 
 > [!NOTE]
 > **HTTPS on Local Area Network (LAN / Mobile)**:
@@ -178,7 +178,35 @@ docker compose --profile production up -d
 
 ---
 
-### Option 4: Local Development (Zero-Config with SQLite)
+### Option 4: Deployment Without Caddy (Standalone & External Reverse Proxies)
+
+If you are already running an external reverse proxy (such as **Traefik**, **Nginx Proxy Manager**, **Cloudflare Tunnel**, or **AWS ALB**), or if you do not want Caddy managing ports 80 and 443 on your host, choose one of the two methods below:
+
+#### Method A: Dedicated Standalone Compose File (`docker-compose.standalone.yml`)
+Contains strictly the core services `app`, `db` (PostgreSQL 16), and `redis` (Redis 7), completely free of Caddy configurations, ports 80/443, and Caddy persistent volumes:
+
+```bash
+# 1. Download official standalone compose file without Caddy
+curl -fsSL https://raw.githubusercontent.com/gugaucb/inkbin/main/docker-compose.standalone.yml -o docker-compose.standalone.yml
+
+# 2. Launch stack (Inkbin exposes HTTP directly on port 8000)
+docker compose -f docker-compose.standalone.yml up -d
+```
+
+> [!NOTE]
+> In this configuration, point your external reverse proxy (Traefik/Nginx) to `http://<server-ip>:8000` (or `http://inkbin_app:8000` if sharing an external Docker network). Make sure your external reverse proxy passes `X-Forwarded-Proto: https` and `Host: <your-domain>` headers.
+
+#### Method B: Standard `docker-compose.yml` (Omitting Profiles)
+Because the `caddy` service in the standard `docker-compose.yml` is guarded by Docker profiles (`profiles: ["caddy", "proxy", "production"]`), running `docker compose up -d` without a profile flag will automatically start only `app`, `db`, and `redis`:
+
+```bash
+# Runs app, db, and redis without starting Caddy
+docker compose up -d
+```
+
+---
+
+### Option 5: Local Development (Zero-Config with SQLite)
 
 Run locally without installing Docker, PostgreSQL, or Redis. Inkbin automatically falls back to in-memory caching and local SQLite database (`inkbin.db`):
 

@@ -10,4 +10,5 @@ Contexto: A plataforma Inkbin requer comunicação segura (HTTPS) para habilitar
 ## Consequências
 - A aplicação Python/FastAPI permanece estritamente como servidor HTTP interno na porta 8000.
 - Em desenvolvimento simples, `docker compose up` expõe a porta 8000 diretamente sem Caddy.
-- Em produção ou testes com SSL (incluindo stacks no Portainer), define-se `COMPOSE_PROFILES=production` no `.env` para subir o Caddy nas portas 80 e 443.
+- Para deploys atrás de proxies reversos externos (Traefik, Nginx, Cloudflare Tunnel, AWS ALB) ou ambientes autônomos sem Caddy, utiliza-se `docker-compose.standalone.yml` (`docker compose -f docker-compose.standalone.yml up -d`), garantindo ausência total de volumes e portas do Caddy.
+- Quando o Caddy integrado for desejado, ele é ativado via perfis Docker dedicados (`COMPOSE_PROFILES=caddy`, `proxy` ou `production`) no `.env` ou via CLI (`docker compose --profile caddy up -d`).
