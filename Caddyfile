@@ -1,0 +1,32 @@
+# Inkbin - Reverse Proxy & Automatic TLS Configuration (Caddy)
+{
+	# Global options
+	email {$ACME_EMAIL:admin@example.com}
+	admin off
+	default_sni {$DOMAIN:localhost}
+}
+
+# Site configuration: binds to :443 and the configured DOMAIN (defaults to localhost).
+# Handles both local IP access (e.g. 192.168.x.x) and domain names.
+:443, {$DOMAIN:localhost} {
+	# Internal self-signed TLS by default.
+	# Set TLS_MODE="your-email@domain.com" in production for Let's Encrypt.
+	tls {$TLS_MODE:internal}
+
+	# High performance compression
+	encode zstd gzip
+
+	# Reverse proxy to FastAPI / Uvicorn application
+	reverse_proxy app:8000
+
+	# Security headers
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+

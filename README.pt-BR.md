@@ -141,7 +141,44 @@ docker compose logs -f app
 
 ---
 
-### Opção 2: Desenvolvimento Local (Zero-Config com SQLite)
+### Opção 3: Deploy em Produção com Caddy e Let's Encrypt (HTTPS Automático)
+
+Para implantar em servidores de produção com certificado SSL/TLS gratuito emitido e renovado automaticamente via Let's Encrypt / ZeroSSL, o Inkbin inclui o **Caddy** como proxy reverso integrado através de perfis do Docker (`production`):
+
+```bash
+# 1. Configure as variáveis no seu .env
+cat <<EOF >> .env
+COMPOSE_PROFILES=production
+DOMAIN=paste.meudominio.com
+ACME_EMAIL=admin@meudominio.com
+BASE_URL=https://paste.meudominio.com
+EOF
+
+# 2. Inicialize a stack com o Caddy ativo nas portas 80 e 443
+docker compose --profile production up -d
+```
+
+> [!TIP]
+> **Deploy no Portainer**:
+> Ao criar ou editar a Stack no Portainer, adicione `COMPOSE_PROFILES=production`, `DOMAIN=paste.meudominio.com` e `ACME_EMAIL=admin@meudominio.com` na seção **Environment variables**. O Portainer ativará o container do Caddy automaticamente nas portas 80 e 443.
+
+> [!NOTE]
+> **HTTPS em Rede Local (LAN / Mobile)**:
+> Se você estiver testando em um IP de rede local (ex: `192.168.15.8`) e quiser habilitar HTTPS para que navegadores móveis e desktop liberem a Web Crypto API, o Caddy gera certificados autoassinados internamente por padrão.
+> No seu `.env`:
+> ```env
+> DOMAIN=192.168.15.8
+> TLS_MODE=internal
+> BASE_URL=https://192.168.15.8
+> ```
+> Ao acessar `https://192.168.15.8` no Safari ou Chrome, o navegador exibirá um alerta de segurança informando que o certificado é local/autoassinado:
+> - **Safari**: Clique em **"Mostrar Detalhes"** → clique em **"visitar este site"** → confirme com sua senha do Mac ou Touch ID.
+> - **Chrome**: Clique em **"Avançado"** → clique em **"Ir para 192.168.15.8 (não seguro)"**.
+> Após aceitar, a conexão passa a ser reconhecida como contexto seguro (`window.isSecureContext = true`), liberando a criptografia client-side por completo.
+
+---
+
+### Opção 4: Desenvolvimento Local (Zero-Config com SQLite)
 
 Caso você queira rodar localmente sem precisar instalar Docker, PostgreSQL ou Redis, o Inkbin possui mecanismo de fallback automático: ao omitir `REDIS_URL` ou configurar `DATABASE_URL` para SQLite, a aplicação opera transparentemente em memória e com banco local `inkbin.db`:
 

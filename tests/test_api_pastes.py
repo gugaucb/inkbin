@@ -88,3 +88,38 @@ async def test_get_raw_paste(client: AsyncClient):
     assert raw_res.status_code == 200
     assert "text/plain" in raw_res.headers["content-type"]
     assert raw_res.text == "def foo():\n    return 42\n"
+
+
+@pytest.mark.asyncio
+async def test_create_paste_dynamic_host_url(client: AsyncClient):
+    # Test request with Host header of a LAN IP
+    headers = {"Host": "192.168.15.8:8000"}
+    payload = {
+        "title": "LAN Paste",
+        "content": "access via LAN IP",
+        "language": "plaintext",
+    }
+    response = await client.post("/api/pastes", json=payload, headers=headers)
+    assert response.status_code == 201
+    data = response.json()
+    assert "192.168.15.8:8000" in data["url"]
+    assert data["url"].startswith("http://192.168.15.8:8000/p/")
+
+
+@pytest.mark.asyncio
+async def test_create_paste_reverse_proxy_https_url(client: AsyncClient):
+    # Test reverse proxy forwarding headers (Caddy / Let's Encrypt)
+    headers = {
+        "Host": "paste.example.com",
+        "X-Forwarded-Proto": "https",
+        "X-Forwarded-Host": "paste.example.com",
+    }
+    payload = {
+        "title": "Secure Paste",
+        "content": "secure content behind proxy",
+        "language": "plaintext",
+    }
+    response = await client.post("/api/pastes", json=payload, headers=headers)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["url"].startswith("https://paste.example.com/p/")

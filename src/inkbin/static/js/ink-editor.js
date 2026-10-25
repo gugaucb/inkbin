@@ -146,6 +146,19 @@ function setupEditor() {
     updateExplanations();
   }
 
+  const encryptLabel = document.querySelector('label[for="paste-format-encrypt"]');
+  if (encryptRadio && !isWebCryptoSupported()) {
+    encryptRadio.disabled = true;
+    if (encryptLabel) {
+      encryptLabel.classList.add('disabled');
+      encryptLabel.title = t(
+        'editor.crypto_requires_secure_context',
+        'A criptografia no navegador (Web Crypto API) requer uma conexão segura (HTTPS ou localhost).'
+      );
+      encryptLabel.setAttribute('aria-disabled', 'true');
+    }
+  }
+
   // Radio button click behavior: Clicking checked radio toggles off back to plaintext
   [encryptRadio, base64Radio].forEach((radio) => {
     if (!radio) return;
@@ -159,6 +172,16 @@ function setupEditor() {
       }
     });
   });
+
+  if (encryptLabel && !isWebCryptoSupported()) {
+    encryptLabel.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert(t(
+        'editor.crypto_requires_secure_context',
+        'A criptografia no navegador (Web Crypto API) requer uma conexão segura (HTTPS ou localhost).'
+      ));
+    });
+  }
 
   // Password toggle behavior
   if (passwordToggle && passwordContainer) {
@@ -213,55 +236,92 @@ function setupEditor() {
 
       try {
         if (contentFormat === 'aes-256-gcm') {
-          const key = await generateAesKey();
-          contentToSend = await encryptText(content, key);
-          keyFragment = await exportKeyToBase64Url(key);
+          try {
+            const key = await generateAesKey();
+            contentToSend = await encryptText(content, key);
+            keyFragment = await exportKeyToBase64Url(key);
+          } catch (cryptoErr) {
+            console.error('Client encryption error:', cryptoErr);
+            alert(cryptoErr.message || t('editor.alert_crypto_failed', 'Falha ao criptografar o conteúdo no navegador.'));
+            return;
+          }
         } else if (contentFormat === 'base64') {
-          contentToSend = utf8ToBase64(content);
+          try {
+            contentToSend = utf8ToBase64(content);
+          } catch (b64Err) {
+            console.error('Base64 encoding error:', b64Err);
+            alert(t('editor.alert_encoding_failed', 'Falha ao codificar conteúdo em Base64.'));
+            return;
+          }
         }
 
-        const response = await fetch('/api/pastes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: title || null,
-            content: contentToSend,
-            language,
-            expiration,
-            password: password || null,
-            content_format: contentFormat,
-            burn_after_read: burnAfterRead,
-          }),
-        });
-
-        if (!response.ok) {
-          const err = await response.json();
-          alert(err.detail || t('editor.alert_error', 'Ocorreu um erro ao publicar o paste.'));
+        let response;
+        try {
+          response = await fetch('/api/pastes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              title: title || null,
+              content: contentToSend,
+              language,
+              expiration,
+              password: password || null,
+              content_format: contentFormat,
+              burn_after_read: burnAfterRead,
+            }),
+          });
+        } catch (netErr) {
+          console.error('Submission network error:', netErr);
+          alert(t('editor.alert_network', 'Falha na conexão ao publicar o paste.'));
           return;
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+          let errDetail;
+          try {
+            const err = await response.json();
+            errDetail = err.detail;
+          } catch {
+            errDetail = null;
+          }
+          alert(errDetail || t('editor.alert_error', 'Ocorreu um erro ao publicar o paste.'));
+          return;
+        }
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (parseErr) {
+          console.error('JSON parse error:', parseErr);
+          alert(t('editor.alert_error', 'Ocorreu um erro ao processar a resposta do servidor.'));
+          return;
+        }
+
         const fullShareUrl = keyFragment ? `${data.url}#${keyFragment}` : data.url;
 
         // Save to local history
-        saveToLocalHistory({
-          slug: data.slug,
-          title: data.title || t('viewer.untitled', 'Sem título'),
-          language: data.language,
-          created_at: data.created_at,
-          admin_delete_token: data.admin_delete_token,
-          url: fullShareUrl,
-          content_format: data.content_format,
-          burn_after_read: data.burn_after_read,
-        });
+        try {
+          saveToLocalHistory({
+            slug: data.slug,
+            title: data.title || t('viewer.untitled', 'Sem título'),
+            language: data.language,
+            created_at: data.created_at,
+            admin_delete_token: data.admin_delete_token,
+            url: fullShareUrl,
+            content_format: data.content_format,
+            burn_after_read: data.burn_after_read,
+          });
+        } catch (storageErr) {
+          console.warn('Failed to save to local history:', storageErr);
+        }
 
         // Show Success Modal
         showSuccessModal(data, keyFragment);
       } catch (err) {
         console.error('Submission error:', err);
-        alert(t('editor.alert_network', 'Falha na conexão ao publicar o paste.'));
+        alert(err.message || t('editor.alert_error', 'Ocorreu um erro ao publicar o paste.'));
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -316,9 +376,20 @@ function base64ToUtf8(base64) {
   return new TextDecoder().decode(bytes);
 }
 
+function isWebCryptoSupported() {
+  return Boolean(
+    window.crypto &&
+    window.crypto.subtle &&
+    typeof window.crypto.subtle.generateKey === 'function' &&
+    typeof window.crypto.subtle.importKey === 'function'
+  );
+}
+
 async function generateAesKey() {
-  if (!window.crypto || !window.crypto.subtle) {
-    throw new Error('Web Crypto API não disponível neste navegador.');
+  if (!isWebCryptoSupported()) {
+    throw new Error(
+      t('editor.crypto_requires_secure_context', 'A criptografia no navegador (Web Crypto API) requer uma conexão segura (HTTPS ou localhost).')
+    );
   }
   return await window.crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
@@ -348,6 +419,11 @@ async function exportKeyToBase64Url(key) {
 }
 
 async function importKeyFromBase64Url(base64url) {
+  if (!isWebCryptoSupported()) {
+    throw new Error(
+      t('viewer.encrypted_insecure_context', 'A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP.')
+    );
+  }
   const keyBytes = base64UrlToBuffer(base64url);
   return await window.crypto.subtle.importKey(
     'raw',
@@ -816,6 +892,20 @@ async function setupViewerContent() {
     const errorText = document.getElementById('crypto-error-text');
     const codeContainer = document.querySelector('.code-container');
 
+    if (!isWebCryptoSupported()) {
+      if (codeContainer) codeContainer.style.display = 'none';
+      if (errorNotice) {
+        if (errorText) {
+          errorText.textContent = t(
+            'viewer.encrypted_insecure_context',
+            'A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP.'
+          );
+        }
+        errorNotice.style.display = 'flex';
+      }
+      return;
+    }
+
     const keyHash = window.location.hash ? window.location.hash.slice(1).trim() : '';
 
     if (!keyHash) {
@@ -839,7 +929,11 @@ async function setupViewerContent() {
       console.error('Decryption failure:', err);
       if (codeContainer) codeContainer.style.display = 'none';
       if (errorNotice) {
-        if (errorText) errorText.textContent = t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
+        if (errorText) {
+          errorText.textContent = (!isWebCryptoSupported())
+            ? t('viewer.encrypted_insecure_context', 'A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP.')
+            : t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
+        }
         errorNotice.style.display = 'flex';
       }
     }

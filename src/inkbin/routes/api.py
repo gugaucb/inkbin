@@ -105,7 +105,12 @@ async def create_paste_endpoint(
 
     await cache.set(spam_key, paste.slug, ttl_seconds=60)
 
-    base = settings.BASE_URL.rstrip("/")
+    if settings.BASE_URL == "http://localhost:8000":
+        proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
+        base = f"{proto}://{host}".rstrip("/")
+    else:
+        base = settings.BASE_URL.rstrip("/")
     url = f"{base}/p/{paste.slug}"
 
     return PasteCreateResponse(

@@ -48,4 +48,13 @@ _Avoid_: Auto-delete, leitura efêmera desprotegida, one-time link sem confirma�
 Formato de transformação e representação textual que não provê segurança criptográfica, acompanhado de aviso editorial transparente e alternância entre conteúdo decodificado e bruto.
 _Avoid_: Criptografia Base64, encriptação leve, cifra Base64
 
+**Reverse Proxy**:
+Camada de borda (Caddy) que recebe as conexões de rede públicas nas portas 80/443, cuida da segurança da camada de transporte e roteia o tráfego internamente para o serviço de aplicação.
+_Avoid_: API gateway, load balancer complexo, web server monolítico
+
+**TLS Termination**:
+Prática de descriptografar conexões HTTPS na camada de borda do proxy, entregando requisições em HTTP puro para a aplicação interna protegida em rede privada.
+_Avoid_: SSL pass-through, criptografia end-to-end de infraestrutura interna
+
+
 

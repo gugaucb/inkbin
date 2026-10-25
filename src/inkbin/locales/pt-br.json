@@ -55,6 +55,9 @@
     "alert_empty": "Por favor, insira o conteúdo do paste antes de publicar.",
     "alert_error": "Ocorreu um erro ao publicar o paste.",
     "alert_network": "Falha na conexão ao publicar o paste.",
+    "alert_crypto_failed": "Falha ao criptografar o conteúdo no navegador.",
+    "alert_encoding_failed": "Falha ao codificar conteúdo em Base64.",
+    "crypto_requires_secure_context": "A criptografia no navegador (Web Crypto API) requer uma conexão segura (HTTPS ou localhost).",
     "options_expires_in": "Expira em",
     "option_password": "Senha",
     "option_encrypt": "Encrypt in browser",
@@ -134,7 +137,8 @@
     "base64_toggle_raw": "Visualizar Base64 Bruto",
     "encrypted_badge": "AES-256-GCM Cifrado no Cliente",
     "encrypted_missing_key": "Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.",
-    "encrypted_error": "Falha na decifração. A chave fornecida no link é inválida ou foi corrompida."
+    "encrypted_error": "Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.",
+    "encrypted_insecure_context": "A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP."
   },
   "report": {
     "modal_title": "Denunciar publicação",

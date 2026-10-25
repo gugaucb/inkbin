@@ -55,6 +55,9 @@
     "alert_empty": "Please enter paste content before publishing.",
     "alert_error": "An error occurred while publishing the paste.",
     "alert_network": "Connection failure while publishing paste.",
+    "alert_crypto_failed": "Failed to encrypt content in the browser.",
+    "alert_encoding_failed": "Failed to encode content in Base64.",
+    "crypto_requires_secure_context": "Browser encryption (Web Crypto API) requires a secure connection (HTTPS or localhost).",
     "options_expires_in": "Expires in",
     "option_password": "Password",
     "option_encrypt": "Encrypt in browser",
@@ -134,7 +137,8 @@
     "base64_toggle_raw": "View Raw Base64",
     "encrypted_badge": "AES-256-GCM Client Encrypted",
     "encrypted_missing_key": "Decryption key missing from link (#key). Without the original key fragment, this document cannot be decrypted.",
-    "encrypted_error": "Decryption failed. The key in the link is invalid or corrupted."
+    "encrypted_error": "Decryption failed. The key in the link is invalid or corrupted.",
+    "encrypted_insecure_context": "Browser decryption requires a secure connection (HTTPS or localhost). The Web Crypto API is unavailable on this HTTP address."
   },
   "report": {
     "modal_title": "Report publication",

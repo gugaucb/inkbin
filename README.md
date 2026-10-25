@@ -141,7 +141,44 @@ docker compose logs -f app
 
 ---
 
-### Option 2: Local Development (Zero-Config with SQLite)
+### Option 3: Production Deployment with Caddy & Let's Encrypt (Automatic HTTPS)
+
+To deploy on production servers with free SSL/TLS certificates issued and renewed automatically via Let's Encrypt / ZeroSSL, Inkbin includes **Caddy** as an integrated reverse proxy via Docker profiles (`production`):
+
+```bash
+# 1. Configure production environment variables in your .env
+cat <<EOF >> .env
+COMPOSE_PROFILES=production
+DOMAIN=paste.yourdomain.com
+ACME_EMAIL=admin@yourdomain.com
+BASE_URL=https://paste.yourdomain.com
+EOF
+
+# 2. Launch the stack with Caddy listening on ports 80 and 443
+docker compose --profile production up -d
+```
+
+> [!TIP]
+> **Deploy in Portainer**:
+> When creating or editing your Stack in Portainer, add `COMPOSE_PROFILES=production`, `DOMAIN=paste.yourdomain.com`, and `ACME_EMAIL=admin@yourdomain.com` in the **Environment variables** section. Portainer will automatically spin up the Caddy container alongside the application on ports 80 and 443.
+
+> [!NOTE]
+> **HTTPS on Local Area Network (LAN / Mobile)**:
+> If you are testing via a local network IP (e.g. `192.168.15.8`) and want to enable HTTPS so browsers and mobile devices unlock the Web Crypto API, Caddy generates internal self-signed certificates by default.
+> In your `.env`:
+> ```env
+> DOMAIN=192.168.15.8
+> TLS_MODE=internal
+> BASE_URL=https://192.168.15.8
+> ```
+> When opening `https://192.168.15.8` in Safari or Chrome, the browser will display a security warning because the certificate is self-signed:
+> - **Safari**: Click **"Show Details"** ("Mostrar Detalhes") → click **"visit this website"** ("visitar este site") → confirm with password/Touch ID.
+> - **Chrome**: Click **"Advanced"** → click **"Proceed to 192.168.15.8 (unsafe)"**.
+> Once accepted, the browser treats the connection as a Secure Context (`window.isSecureContext = true`), fully unlocking client-side encryption.
+
+---
+
+### Option 4: Local Development (Zero-Config with SQLite)
 
 Run locally without installing Docker, PostgreSQL, or Redis. Inkbin automatically falls back to in-memory caching and local SQLite database (`inkbin.db`):
 

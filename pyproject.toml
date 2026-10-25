@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inkbin"
-version = "0.1.0"
+version = "0.2.0"
 description = "Plataforma open-source editorial e de alto desempenho para compartilhamento anônimo e seguro de código e textos."
 readme = "README.md"
 requires-python = ">=3.11"
