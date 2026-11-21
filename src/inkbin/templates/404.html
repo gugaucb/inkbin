@@ -4,15 +4,35 @@
 {% block page_heading %}{{ t('error404.heading') }}{% endblock %}
 
 {% block content %}
-<div class="viewer-card error-card">
-  <div style="margin-bottom: var(--space-4);">
+<div class="viewer-card error-card" style="max-width: 620px;">
+  <span class="badge" style="background: var(--ink-950); color: var(--ink-0); margin-bottom: var(--space-4); display: inline-flex; align-items: center; gap: 4px;">
+    <i class="ti ti-file-x icon-sm" aria-hidden="true"></i>
+    <span>{{ t('error404.badge') }}</span>
+  </span>
+  <div class="error-icon-wrapper" style="margin-bottom: var(--space-4);">
     <i class="ti ti-file-x error-icon" aria-hidden="true"></i>
   </div>
   <h2 class="error-title">{{ t('error404.title') }}</h2>
-  <p class="error-message">
+  <p class="error-message" style="margin-bottom: var(--space-6);">
     {{ t('error404.message') }}
   </p>
-  <div>
+
+  <div class="error-hints-box" style="margin-bottom: var(--space-6); padding: var(--space-3) var(--space-4); border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--surface-subtle); text-align: left; font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i class="ti ti-clock icon-xs" aria-hidden="true"></i>
+      <span>{{ t('error404.hint_expired') }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i class="ti ti-flame icon-xs" aria-hidden="true"></i>
+      <span>{{ t('error404.hint_burned') }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i class="ti ti-trash icon-xs" aria-hidden="true"></i>
+      <span>{{ t('error404.hint_deleted') }}</span>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
     <a href="/" class="btn btn-primary">
       <i class="ti ti-plus" aria-hidden="true"></i>
       <span>{{ t('error404.create_new') }}</span>

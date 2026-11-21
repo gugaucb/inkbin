@@ -28,8 +28,20 @@ function setupEditor() {
 
   if (!textarea) return;
 
-  // Tab key indentation support
+  // Tab key indentation support & Ctrl/Cmd+Enter submission
   textarea.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (form) {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
+      return;
+    }
+
     if (e.key === 'Tab') {
       e.preventDefault();
       const start = textarea.selectionStart;
@@ -196,6 +208,17 @@ function setupEditor() {
         }
       }
       updateExplanations();
+    });
+  }
+
+  // Show/hide password in editor
+  const editorPasswordToggleBtn = document.getElementById('toggle-editor-password-btn');
+  if (editorPasswordToggleBtn && passwordInput) {
+    editorPasswordToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPwd = passwordInput.type === 'password';
+      passwordInput.type = isPwd ? 'text' : 'password';
+      editorPasswordToggleBtn.innerHTML = isPwd ? '<i class="ti ti-eye-off icon-sm" aria-hidden="true"></i>' : '<i class="ti ti-eye icon-sm" aria-hidden="true"></i>';
     });
   }
 
@@ -886,11 +909,69 @@ async function setupViewerContent() {
 
   const rawReceivedContent = codeEl.textContent || '';
 
+  // Word Wrap toggle
+  const toggleWrapBtn = document.getElementById('toggle-wrap-btn');
+  const toggleWrapText = document.getElementById('toggle-wrap-text');
+  const codeContentPre = document.querySelector('.code-content');
+  if (toggleWrapBtn && codeContentPre) {
+    let isWrapped = false;
+    toggleWrapBtn.addEventListener('click', () => {
+      isWrapped = !isWrapped;
+      if (isWrapped) {
+        codeContentPre.classList.add('wrapped');
+        toggleWrapBtn.innerHTML = `<i class="ti ti-text-wrap-disabled" aria-hidden="true"></i> <span id="toggle-wrap-text">${t('viewer.unwrap_code', 'Não quebrar')}</span>`;
+      } else {
+        codeContentPre.classList.remove('wrapped');
+        toggleWrapBtn.innerHTML = `<i class="ti ti-text-wrap" aria-hidden="true"></i> <span id="toggle-wrap-text">${t('viewer.wrap_code', 'Quebrar linhas')}</span>`;
+      }
+    });
+  }
+
   // 1. Handling AES-256-GCM Decryption
   if (contentFormat === 'aes-256-gcm') {
     const errorNotice = document.getElementById('crypto-error-notice');
     const errorText = document.getElementById('crypto-error-text');
     const codeContainer = document.querySelector('.code-container');
+    const manualKeyInput = document.getElementById('manual-crypto-key');
+    const manualDecryptBtn = document.getElementById('manual-decrypt-btn');
+
+    async function attemptDecryption(rawKey) {
+      if (!rawKey) return false;
+      let cleanKey = rawKey.trim();
+      if (cleanKey.startsWith('#')) cleanKey = cleanKey.slice(1);
+      if (!cleanKey) return false;
+
+      try {
+        const key = await importKeyFromBase64Url(cleanKey);
+        const decrypted = await decryptText(rawReceivedContent.trim(), key);
+        codeEl.textContent = decrypted;
+        if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
+          codeEl.removeAttribute('data-highlighted');
+          hljs.highlightElement(codeEl);
+        }
+        if (codeContainer) codeContainer.style.display = 'block';
+        if (errorNotice) errorNotice.style.display = 'none';
+        return true;
+      } catch (err) {
+        console.warn('Decryption failed:', err);
+        return false;
+      }
+    }
+
+    if (manualDecryptBtn && manualKeyInput) {
+      manualDecryptBtn.addEventListener('click', async () => {
+        const ok = await attemptDecryption(manualKeyInput.value);
+        if (!ok) {
+          alert(t('viewer.manual_decrypt_invalid', 'Formato de chave de decifração inválido.'));
+        }
+      });
+      manualKeyInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          manualDecryptBtn.click();
+        }
+      });
+    }
 
     if (!isWebCryptoSupported()) {
       if (codeContainer) codeContainer.style.display = 'none';
@@ -917,22 +998,12 @@ async function setupViewerContent() {
       return;
     }
 
-    try {
-      const key = await importKeyFromBase64Url(keyHash);
-      const decrypted = await decryptText(rawReceivedContent.trim(), key);
-      codeEl.textContent = decrypted;
-      if (typeof hljs !== 'undefined' && typeof hljs.highlightElement === 'function') {
-        codeEl.removeAttribute('data-highlighted');
-        hljs.highlightElement(codeEl);
-      }
-    } catch (err) {
-      console.error('Decryption failure:', err);
+    const initialOk = await attemptDecryption(keyHash);
+    if (!initialOk) {
       if (codeContainer) codeContainer.style.display = 'none';
       if (errorNotice) {
         if (errorText) {
-          errorText.textContent = (!isWebCryptoSupported())
-            ? t('viewer.encrypted_insecure_context', 'A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP.')
-            : t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
+          errorText.textContent = t('viewer.encrypted_error', 'Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.');
         }
         errorNotice.style.display = 'flex';
       }

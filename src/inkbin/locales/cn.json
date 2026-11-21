@@ -110,7 +110,9 @@
     "badge": "不可逆操作",
     "title": "此文档在阅读后将被销毁",
     "description": "作者已将此文档配置为一旦打开即从服务器永久清除。您现在要查看内容吗？",
+    "warning_irreversible": "注意：一旦确认，此内容将永久清除，无法重新加载或恢复。",
     "confirm_btn": "查看并销毁文档",
+    "confirm_loading": "正在解密并销毁...",
     "cancel_btn": "返回首页",
     "burned_banner": "此文档已在本次查看中从数据库中永久清除。"
   },
@@ -123,6 +125,9 @@
     "expires_at": "过期时间：{date}",
     "copy_code": "复制代码",
     "code_copied": "代码已复制！",
+    "wrap_code": "折行显示",
+    "unwrap_code": "单行滚动",
+    "wrap_code_title": "切换长代码换行显示",
     "view_raw": "查看原文",
     "view_raw_aria": "查看原始代码",
     "new_paste": "新建文本",
@@ -137,6 +142,9 @@
     "base64_toggle_raw": "查看原始 Base64",
     "encrypted_badge": "AES-256-GCM 客户端加密",
     "encrypted_missing_key": "链接中缺少解密密钥 (#key)。没有原始密钥片段，无法解密本文档。",
+    "manual_decrypt_placeholder": "在此粘贴解密密钥 (#...)",
+    "manual_decrypt_btn": "解密",
+    "manual_decrypt_invalid": "解密密钥格式无效。",
     "encrypted_error": "解密失败。链接中的密钥无效或已损坏。",
     "encrypted_insecure_context": "浏览器解密需要安全连接（HTTPS 或 localhost）。Web Crypto API 在此 HTTP 地址上不可用。"
   },
@@ -163,9 +171,11 @@
     "badge": "危险操作",
     "title_prefix": "删除 \"{title}\"",
     "description": "彻底删除将从数据库中物理清除此文本并使缓存失效。此操作立即生效且不可逆。",
+    "warning_permanent": "注意：此操作将立即从数据库和缓存中物理删除此文本。",
     "token_label": "管理密钥（管理员删除凭证）",
     "token_placeholder": "在此粘贴创建时获得的密钥",
     "token_hint": "创建文本时生成的专属 64 位字符凭据。",
+    "paste_token": "粘贴",
     "cancel": "取消并返回",
     "confirm": "确认彻底删除",
     "deleting": "正在删除...",
@@ -181,6 +191,9 @@
     "description": "此文档已被作者设置密码保护。请在下方输入凭据以解密并查看完整内容。",
     "label": "访问密码",
     "placeholder": "输入此文本的密码",
+    "toggle_show": "显示密码",
+    "toggle_hide": "隐藏密码",
+    "caps_warning": "大写锁定已开启",
     "back": "返回首页",
     "unlock": "解密文本",
     "validating": "验证中...",
@@ -190,9 +203,14 @@
   "error404": {
     "page_title": "未找到内容 — Inkbin",
     "heading": "404 · 记录不可用",
+    "badge": "HTTP 404 · 未找到",
     "title": "未找到文本",
     "message": "您要查找的文本可能已根据保留策略过期清除、已被作者删除，或根本不存在。",
-    "create_new": "创建新文本"
+    "hint_expired": "该文本可能已达到配置的过期时间",
+    "hint_burned": "已被阅读后阅后即焚销毁",
+    "hint_deleted": "或已被作者使用删除令牌彻底删除",
+    "create_new": "创建新文本",
+    "back_home": "返回首页"
   },
   "error451": {
     "page_title": "因法律或违规原因不可用 — Inkbin",
@@ -200,6 +218,7 @@
     "badge": "监管审核处置 (HTTP 451)",
     "title": "文本已被管理员下架封禁",
     "message": "因收到举报或系统检测到违反平台使用条款（如恶意代码、泄露私有凭据或侵权滥用内容），此文档已被下架停用。",
+    "reason_notice": "平台使用协议及法律法规合规执行。",
     "back_home": "返回首页"
   },
   "clipboard": {

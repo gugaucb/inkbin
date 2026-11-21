@@ -110,7 +110,9 @@
     "badge": "Ação Irreversível",
     "title": "Este paste será destruído após a leitura",
     "description": "O autor configurou este documento para ser excluído permanentemente do servidor assim que for aberto. Deseja revelar o conteúdo agora?",
+    "warning_irreversible": "Atenção: Após a confirmação, esta publicação será permanentemente excluída e não poderá ser recarregada ou recuperada.",
     "confirm_btn": "Revelar e Destruir Paste",
+    "confirm_loading": "Revelando e destruindo...",
     "cancel_btn": "Voltar para o Início",
     "burned_banner": "Este documento foi destruído permanentemente do banco de dados na visualização atual."
   },
@@ -123,6 +125,9 @@
     "expires_at": "Expira em: {date}",
     "copy_code": "Copiar código",
     "code_copied": "Código copiado!",
+    "wrap_code": "Quebrar linhas",
+    "unwrap_code": "Não quebrar",
+    "wrap_code_title": "Alternar quebra de linhas longas",
     "view_raw": "Ver Raw",
     "view_raw_aria": "Ver código bruto",
     "new_paste": "Novo texto",
@@ -137,6 +142,9 @@
     "base64_toggle_raw": "Visualizar Base64 Bruto",
     "encrypted_badge": "AES-256-GCM Cifrado no Cliente",
     "encrypted_missing_key": "Chave de decifração ausente no link (#chave). Sem a chave original, este documento não pode ser decifrado.",
+    "manual_decrypt_placeholder": "Cole a chave de decifração (#...) aqui",
+    "manual_decrypt_btn": "Decifrar",
+    "manual_decrypt_invalid": "Formato de chave de decifração inválido.",
     "encrypted_error": "Falha na decifração. A chave fornecida no link é inválida ou foi corrompida.",
     "encrypted_insecure_context": "A decifração no navegador requer uma conexão segura (HTTPS ou localhost). A Web Crypto API está indisponível neste endereço HTTP."
   },
@@ -163,9 +171,11 @@
     "badge": "Ação Destrutiva",
     "title_prefix": "Excluir \"{title}\"",
     "description": "A exclusão definitiva remove fisicamente este Paste do banco de dados e invalida o cache. Esta operação é imediata e irreversível.",
+    "warning_permanent": "Atenção: Esta ação remove fisicamente este paste do banco de dados e cache imediatamente.",
     "token_label": "Chave Secreta de Administração (Admin Delete Token)",
     "token_placeholder": "Cole aqui o token recebido na criação",
     "token_hint": "Token exclusivo de 64 caracteres gerado quando a publicação foi criada.",
+    "paste_token": "Colar",
     "cancel": "Cancelar e voltar",
     "confirm": "Confirmar exclusão definitiva",
     "deleting": "Excluindo...",
@@ -181,6 +191,9 @@
     "description": "Este documento foi protegido pelo criador. Digite a credencial abaixo para descriptografar e visualizar o conteúdo completo.",
     "label": "Senha de acesso",
     "placeholder": "Digite a senha deste paste",
+    "toggle_show": "Mostrar senha",
+    "toggle_hide": "Ocultar senha",
+    "caps_warning": "Caps Lock ativado",
     "back": "Voltar ao início",
     "unlock": "Desbloquear texto",
     "validating": "Validando...",
@@ -190,9 +203,14 @@
   "error404": {
     "page_title": "Conteúdo Não Encontrado — Inkbin",
     "heading": "404 · Registro indisponível",
+    "badge": "HTTP 404 · NÃO ENCONTRADO",
     "title": "Publicação não encontrada",
     "message": "O texto que você está procurando pode ter expirado conforme a política configurada, foi excluído pelo autor ou nunca existiu.",
-    "create_new": "Criar novo texto"
+    "hint_expired": "O texto pode ter atingido o prazo de expiração",
+    "hint_burned": "Ou foi destruído após a primeira leitura (burn-after-read)",
+    "hint_deleted": "Ou foi removido pelo autor com um Admin Delete Token",
+    "create_new": "Criar novo texto",
+    "back_home": "Voltar ao início"
   },
   "error451": {
     "page_title": "Conteúdo Indisponível por Violação Legal — Inkbin",
@@ -200,6 +218,7 @@
     "badge": "Ação de Moderação (HTTP 451)",
     "title": "Publicação desativada pela moderação",
     "message": "Este documento foi desativado administrativamente devido a denúncia ou constatação de violação dos termos de uso da plataforma (ex.: código malicioso, vazamento de credenciais privadas ou conteúdo abusivo).",
+    "reason_notice": "Conformidade com os termos de uso e aplicação legal da plataforma.",
     "back_home": "Voltar à página inicial"
   },
   "clipboard": {

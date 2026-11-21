@@ -38,6 +38,10 @@
         <span id="toggle-base64-text">{{ t('viewer.base64_toggle_raw') }}</span>
       </button>
       {% endif %}
+      <button type="button" id="toggle-wrap-btn" class="btn btn-secondary" style="font-size: 13px; height: 36px;" title="{{ t('viewer.wrap_code_title') }}" aria-label="{{ t('viewer.wrap_code_title') }}">
+        <i class="ti ti-text-wrap" aria-hidden="true"></i>
+        <span id="toggle-wrap-text">{{ t('viewer.wrap_code') }}</span>
+      </button>
       <button type="button" id="copy-code-btn" class="btn btn-primary" style="font-size: 13px; height: 36px;">
         <i class="ti ti-copy" aria-hidden="true"></i>
         <span>{{ t('viewer.copy_code') }}</span>
@@ -72,9 +76,16 @@
 
   <div id="crypto-error-notice" class="crypto-error-banner" style="display: none; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); margin: var(--space-4); border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border-strong); color: var(--text-primary); font-size: 14px; line-height: 1.5;" role="alert">
     <i class="ti ti-key-off" style="font-size: 20px; flex-shrink: 0; margin-top: 2px;" aria-hidden="true"></i>
-    <div>
+    <div style="flex-grow: 1;">
       <strong id="crypto-error-title" style="display: block; margin-bottom: 4px;">{{ t('viewer.encrypted_badge') }}</strong>
       <span id="crypto-error-text">{{ t('viewer.encrypted_missing_key') }}</span>
+      <div id="crypto-manual-key-wrapper" class="crypto-manual-key-box" style="margin-top: var(--space-3); display: flex; gap: var(--space-2); max-width: 440px;">
+        <input type="text" id="manual-crypto-key" class="input-text" placeholder="{{ t('viewer.manual_decrypt_placeholder') }}" style="height: 36px; font-family: var(--font-mono); font-size: 12px; flex-grow: 1;">
+        <button type="button" id="manual-decrypt-btn" class="btn btn-primary" style="height: 36px; font-size: 13px;">
+          <i class="ti ti-lock-open" aria-hidden="true"></i>
+          <span>{{ t('viewer.manual_decrypt_btn') }}</span>
+        </button>
+      </div>
     </div>
   </div>
 

@@ -49,6 +49,8 @@
     <div class="editor-toolbar">
       <span>{{ t('editor.toolbar_hint') }}</span>
       <div class="editor-stats">
+        <span class="editor-shortcut-hint" title="Ctrl/Cmd + Enter"><kbd>⌘/Ctrl</kbd> + <kbd>↵</kbd></span>
+        <span>·</span>
         <span id="char-count"><i class="ti ti-letter-case icon-sm" aria-hidden="true"></i> <span>0 {{ t('editor.chars', count=0).split(' ')[1] if ' ' in t('editor.chars', count=0) else 'chars' }}</span></span>
         <span>·</span>
         <span id="byte-count"><i class="ti ti-database icon-sm" aria-hidden="true"></i> <span>0 B / 1 MB {{ t('editor.bytes_max') }}</span></span>
@@ -150,6 +152,9 @@
             placeholder="{{ t('editor.password_placeholder') }}"
             autocomplete="new-password"
           >
+          <button type="button" id="toggle-editor-password-btn" class="password-toggle-btn" aria-label="{{ t('password.toggle_show') }}" title="{{ t('password.toggle_show') }}">
+            <i class="ti ti-eye icon-sm" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
     </div>

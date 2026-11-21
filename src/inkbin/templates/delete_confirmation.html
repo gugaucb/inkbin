@@ -28,23 +28,34 @@
     <span id="delete-msg-text" style="color: var(--text-primary); font-size: 13px;"></span>
   </div>
 
+  <div class="token-alert-box" style="margin-bottom: var(--space-4); border-color: var(--border-strong); display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-subtle); color: var(--text-primary); font-size: 13px;">
+    <i class="ti ti-alert-triangle icon-sm" style="flex-shrink: 0; margin-top: 2px;" aria-hidden="true"></i>
+    <span>{{ t('delete.warning_permanent') }}</span>
+  </div>
+
   <form id="delete-form" method="POST" action="/p/{{ paste.slug }}/delete">
     <div class="field-group" style="margin-bottom: var(--space-6);">
       <label for="delete-token" class="field-label" style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
         <i class="ti ti-key icon-sm" aria-hidden="true"></i>
         <span>{{ t('delete.token_label') }}</span>
       </label>
-      <input
-        type="text"
-        id="delete-token"
-        name="token"
-        class="input-text"
-        value="{{ token or '' }}"
-        placeholder="{{ t('delete.token_placeholder') }}"
-        required
-        autocomplete="off"
-        style="width: 100%; height: 42px; font-family: var(--font-mono); font-size: 13px;"
-      >
+      <div style="display: flex; gap: var(--space-2); align-items: center;">
+        <input
+          type="text"
+          id="delete-token"
+          name="token"
+          class="input-text"
+          value="{{ token or '' }}"
+          placeholder="{{ t('delete.token_placeholder') }}"
+          required
+          autocomplete="off"
+          style="width: 100%; height: 42px; font-family: var(--font-mono); font-size: 13px; flex-grow: 1;"
+        >
+        <button type="button" id="paste-clipboard-btn" class="btn btn-secondary" style="height: 42px; font-size: 13px; white-space: nowrap;" title="{{ t('delete.paste_token') }}">
+          <i class="ti ti-clipboard icon-sm" aria-hidden="true"></i>
+          <span>{{ t('delete.paste_token') }}</span>
+        </button>
+      </div>
       <span style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: block;">
         {{ t('delete.token_hint') }}
       </span>
@@ -75,6 +86,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const msgBox = document.getElementById("delete-msg");
   const msgText = document.getElementById("delete-msg-text");
   const confirmBtn = document.getElementById("confirm-delete-btn");
+  const pasteBtn = document.getElementById("paste-clipboard-btn");
+
+  if (pasteBtn && tokenInput) {
+    pasteBtn.addEventListener("click", async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            tokenInput.value = text.trim();
+            tokenInput.focus();
+          }
+        }
+      } catch (err) {
+        tokenInput.focus();
+      }
+    });
+  }
 
   if (form) {
     form.addEventListener("submit", async (e) => {

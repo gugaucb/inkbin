@@ -110,7 +110,9 @@
     "badge": "Irreversible Action",
     "title": "This paste will be destroyed after reading",
     "description": "The author configured this document to be permanently purged from the server as soon as it is opened. Would you like to reveal the content now?",
+    "warning_irreversible": "Warning: Once confirmed, this document is permanently purged from the server and cannot be reloaded or recovered.",
     "confirm_btn": "Reveal and Destroy Paste",
+    "confirm_loading": "Revealing and destroying...",
     "cancel_btn": "Back to Home",
     "burned_banner": "This document has been permanently purged from the database during this view."
   },
@@ -123,6 +125,9 @@
     "expires_at": "Expires in: {date}",
     "copy_code": "Copy code",
     "code_copied": "Code copied!",
+    "wrap_code": "Word wrap",
+    "unwrap_code": "No wrap",
+    "wrap_code_title": "Toggle word wrapping for long lines",
     "view_raw": "View Raw",
     "view_raw_aria": "View raw code",
     "new_paste": "New paste",
@@ -137,6 +142,9 @@
     "base64_toggle_raw": "View Raw Base64",
     "encrypted_badge": "AES-256-GCM Client Encrypted",
     "encrypted_missing_key": "Decryption key missing from link (#key). Without the original key fragment, this document cannot be decrypted.",
+    "manual_decrypt_placeholder": "Paste decryption key (#...) here",
+    "manual_decrypt_btn": "Decrypt",
+    "manual_decrypt_invalid": "Invalid decryption key format.",
     "encrypted_error": "Decryption failed. The key in the link is invalid or corrupted.",
     "encrypted_insecure_context": "Browser decryption requires a secure connection (HTTPS or localhost). The Web Crypto API is unavailable on this HTTP address."
   },
@@ -163,9 +171,11 @@
     "badge": "Destructive Action",
     "title_prefix": "Delete \"{title}\"",
     "description": "Definitive deletion physically removes this paste from the database and invalidates the cache. This operation is immediate and irreversible.",
+    "warning_permanent": "Warning: This action physically purges this paste from database and cache immediately.",
     "token_label": "Secret Administration Key (Admin Delete Token)",
     "token_placeholder": "Paste the token received upon creation here",
     "token_hint": "Exclusive 64-character token generated when the paste was created.",
+    "paste_token": "Paste",
     "cancel": "Cancel and return",
     "confirm": "Confirm definitive deletion",
     "deleting": "Deleting...",
@@ -181,6 +191,9 @@
     "description": "This document has been protected by its creator. Enter the credentials below to decrypt and view the full content.",
     "label": "Access password",
     "placeholder": "Enter the password for this paste",
+    "toggle_show": "Show password",
+    "toggle_hide": "Hide password",
+    "caps_warning": "Caps Lock is ON",
     "back": "Back to home",
     "unlock": "Unlock paste",
     "validating": "Validating...",
@@ -190,9 +203,14 @@
   "error404": {
     "page_title": "Content Not Found — Inkbin",
     "heading": "404 · Record unavailable",
+    "badge": "HTTP 404 · NOT FOUND",
     "title": "Paste not found",
     "message": "The text you are looking for may have expired according to the configured policy, was deleted by the author, or never existed.",
-    "create_new": "Create new paste"
+    "hint_expired": "The paste may have reached its configured expiration time",
+    "hint_burned": "It was burned after the first confirmed read",
+    "hint_deleted": "Or it was removed by the author with an Admin Delete Token",
+    "create_new": "Create new paste",
+    "back_home": "Back to home"
   },
   "error451": {
     "page_title": "Content Unavailable for Legal Reasons — Inkbin",
@@ -200,6 +218,7 @@
     "badge": "Moderation Action (HTTP 451)",
     "title": "Paste deactivated by moderation",
     "message": "This document was administratively deactivated due to a report or detected violation of platform terms of service (e.g. malicious code, leak of private credentials, or abusive content).",
+    "reason_notice": "Platform terms of service & legal compliance enforcement.",
     "back_home": "Back to homepage"
   },
   "clipboard": {

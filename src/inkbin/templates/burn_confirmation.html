@@ -18,6 +18,11 @@
     </p>
   </div>
 
+  <div class="token-alert-box" style="margin-bottom: var(--space-4); border-color: var(--border-strong); display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-subtle); color: var(--text-primary); font-size: 13px;">
+    <i class="ti ti-alert-triangle icon-sm" style="flex-shrink: 0; margin-top: 2px;" aria-hidden="true"></i>
+    <span>{{ t('burn.warning_irreversible') }}</span>
+  </div>
+
   <div class="burn-meta-box" style="margin: var(--space-4) 0; padding: var(--space-3); border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--surface-subtle); display: flex; flex-direction: column; gap: var(--space-2);">
     <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
       <span style="color: var(--text-muted); display: inline-flex; align-items: center; gap: var(--space-1);">
@@ -58,14 +63,20 @@
 
 {% block scripts %}
 <script>
-  // Preserve URL hash (decryption key) when submitting reveal confirmation
-  const burnForm = document.getElementById('burn-reveal-form');
-  if (burnForm) {
-    burnForm.addEventListener('submit', function() {
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("burn-reveal-form");
+  const btn = document.getElementById("reveal-btn");
+  if (form) {
+    form.addEventListener("submit", function() {
       if (window.location.hash) {
         this.action = this.action + window.location.hash;
       }
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ti ti-loader-2 ti-spin icon-sm" aria-hidden="true"></i> <span>' + (window.__INK_I18N__?.['burn.confirm_loading'] || 'Revelando e destruindo...') + '</span>';
+      }
     });
   }
+});
 </script>
 {% endblock %}

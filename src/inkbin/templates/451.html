@@ -9,15 +9,19 @@
     <i class="ti ti-shield-alert icon-sm" aria-hidden="true"></i>
     <span>{{ t('error451.badge') }}</span>
   </span>
-  <div style="margin-bottom: var(--space-4);">
+  <div class="error-icon-wrapper" style="margin-bottom: var(--space-4);">
     <i class="ti ti-shield-alert error-icon" aria-hidden="true"></i>
   </div>
   <h2 class="error-title">
     {{ t('error451.title') }}
   </h2>
-  <p class="error-message">
+  <p class="error-message" style="margin-bottom: var(--space-6);">
     {{ t('error451.message') }}
   </p>
+  <div class="error-hints-box" style="margin-bottom: var(--space-6); padding: var(--space-3) var(--space-4); border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--surface-subtle); text-align: left; font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
+    <i class="ti ti-info-circle icon-xs" aria-hidden="true"></i>
+    <span>{{ t('error451.reason_notice') }}</span>
+  </div>
   <div style="display: flex; justify-content: center; gap: var(--space-3);">
     <a href="/" class="btn btn-primary">
       <i class="ti ti-arrow-left" aria-hidden="true"></i>
